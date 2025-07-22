@@ -9,23 +9,27 @@ class TextNormal extends StatelessWidget {
   final TextAlign? textAlign;
   final int? maxLines;
   final TextOverflow? overflow;
+  final double? fontSize;
+  final FontWeight? fontWeight;
 
   const TextNormal(
-      this.data, {
-        super.key,
-        this.color,
-        this.textAlign,
-        this.maxLines,
-        this.overflow,
-      });
+    this.data, {
+    super.key,
+    this.color,
+    this.textAlign,
+    this.maxLines,
+    this.overflow,
+    this.fontSize,
+    this.fontWeight,
+  });
 
   @override
   Widget build(BuildContext context) {
     return Text(
       data,
       style: TextStyle(
-        fontSize: AppDimensions.fontNormal,
-        fontWeight: FontWeight.normal,
+        fontSize: fontSize ?? AppDimensions.fontNormal,
+        fontWeight: fontWeight ?? FontWeight.normal,
         color: color ?? AppColors.textPrimary,
         fontFamily: 'Roboto',
       ),

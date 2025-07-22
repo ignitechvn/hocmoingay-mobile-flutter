@@ -6,6 +6,11 @@ class AppDimensions {
   static const double paddingL = 24.0;
   static const double paddingXL = 32.0;
 
+  // Named padding constants
+  static const double smallPadding = paddingS;
+  static const double defaultPadding = paddingM;
+  static const double largePadding = paddingL;
+
   // Margin
   static const double marginXS = 16.0;
   static const double marginS = 8.0;
@@ -22,6 +27,11 @@ class AppDimensions {
   // Radius
   static const double borderRadiusS = 6.0;
   static const double borderRadiusM = 12.0;
+
+  // Named radius constants
+  static const double smallRadius = borderRadiusS;
+  static const double defaultRadius = borderRadiusM;
+  static const double largeRadius = 16.0;
 
   // Icon size
   static const double iconSmall = 16.0;

@@ -9,23 +9,27 @@ class TextHeader extends StatelessWidget {
   final TextAlign? textAlign;
   final int? maxLines;
   final TextOverflow? overflow;
+  final double? fontSize;
+  final FontWeight? fontWeight;
 
   const TextHeader(
-      this.data, {
-        super.key,
-        this.color,
-        this.textAlign,
-        this.maxLines,
-        this.overflow,
-      });
+    this.data, {
+    super.key,
+    this.color,
+    this.textAlign,
+    this.maxLines,
+    this.overflow,
+    this.fontSize,
+    this.fontWeight,
+  });
 
   @override
   Widget build(BuildContext context) {
     return Text(
       data,
       style: TextStyle(
-        fontSize: AppDimensions.fontLarge,
-        fontWeight: FontWeight.w600,
+        fontSize: fontSize ?? AppDimensions.fontLarge,
+        fontWeight: fontWeight ?? FontWeight.w600,
         color: color ?? AppColors.textPrimary,
         fontFamily: 'Roboto',
       ),
