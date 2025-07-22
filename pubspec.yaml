@@ -122,5 +122,5 @@ flutter:
     - assets/images/
     - assets/icons/
     - assets/animations/
-  
+    - assets/images/onboarding/
   # Fonts are handled by Material Design's default Roboto font

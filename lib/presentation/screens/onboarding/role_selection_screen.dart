@@ -7,7 +7,6 @@ import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_dimensions.dart';
 import '../../../core/theme/app_text_styles.dart';
 import '../../../core/widgets/app_button.dart';
-import '../../../core/widgets/app_card.dart';
 
 class RoleSelectionScreen extends StatefulWidget {
   const RoleSelectionScreen({super.key});
@@ -66,464 +65,289 @@ class _RoleSelectionScreenState extends State<RoleSelectionScreen>
   }
 
   @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: AppColors.background,
-      body: SafeArea(
-        child: Column(
-          children: [
-            // Illustration Section (35-40% of screen height)
-            Expanded(
-              flex: 4,
-              child: FadeTransition(
-                opacity: _fadeAnimation,
-                child: SlideTransition(
-                  position: _slideAnimation,
-                  child: Container(
-                    width: double.infinity,
-                    padding: const EdgeInsets.all(AppDimensions.largePadding),
-                    child: Stack(
-                      children: [
-                        // Abstract background shapes
-                        Positioned(
-                          top: 20,
-                          right: 20,
-                          child: Container(
-                            width: 80,
-                            height: 80,
-                            decoration: BoxDecoration(
-                              color: AppColors.decorativePurple.withOpacity(
-                                0.6,
-                              ),
-                              borderRadius: BorderRadius.circular(40),
-                            ),
-                          ),
-                        ),
-                        Positioned(
-                          bottom: 40,
-                          left: 30,
-                          child: Container(
-                            width: 60,
-                            height: 60,
-                            decoration: BoxDecoration(
-                              color: AppColors.decorativeBlue.withOpacity(0.7),
-                              borderRadius: BorderRadius.circular(30),
-                            ),
-                          ),
-                        ),
-                        // Main illustration
-                        Center(
-                          child: Container(
+  Widget build(BuildContext context) => Scaffold(
+    backgroundColor: Colors.white,
+    body: SafeArea(
+      child: Column(
+        children: [
+          // Illustration Section (35-40% of screen height)
+          Expanded(
+            flex: 4,
+            child: FadeTransition(
+              opacity: _fadeAnimation,
+              child: SlideTransition(
+                position: _slideAnimation,
+                child: Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.all(AppDimensions.largePadding),
+                  child: Center(
+                    child: Image.asset(
+                      'assets/images/onboarding/role_selection_illustration.jpg',
+                      width: 500,
+                      height: 500,
+                      fit: BoxFit.contain,
+                      errorBuilder:
+                          (context, error, stackTrace) =>
+                          // Fallback to placeholder if image not found
+                          Container(
                             width: 280,
                             height: 200,
-                            decoration: BoxDecoration(
-                              color: AppColors.surface,
-                              borderRadius: BorderRadius.circular(
-                                AppDimensions.largeRadius,
-                              ),
-                              boxShadow: [
-                                BoxShadow(
-                                  color: AppColors.shadowMedium,
-                                  blurRadius: 20,
-                                  offset: const Offset(0, 10),
-                                ),
-                              ],
-                            ),
-                            child: Stack(
+                            color: AppColors.surface,
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
                               children: [
-                                // Person 1 (Teacher)
-                                Positioned(
-                                  left: 40,
-                                  bottom: 30,
-                                  child: Container(
-                                    width: 80,
-                                    height: 120,
-                                    child: Stack(
-                                      children: [
-                                        // Head
-                                        Positioned(
-                                          top: 0,
-                                          left: 20,
-                                          child: Container(
-                                            width: 40,
-                                            height: 40,
-                                            decoration: const BoxDecoration(
-                                              color: AppColors.accent,
-                                              shape: BoxShape.circle,
-                                            ),
-                                            child: const Center(
-                                              child: Icon(
-                                                Icons.person,
-                                                color: AppColors.textInverse,
-                                                size: 24,
-                                              ),
-                                            ),
-                                          ),
-                                        ),
-                                        // Body
-                                        Positioned(
-                                          top: 35,
-                                          left: 25,
-                                          child: Container(
-                                            width: 30,
-                                            height: 50,
-                                            decoration: BoxDecoration(
-                                              color: AppColors.accent,
-                                              borderRadius:
-                                                  BorderRadius.circular(15),
-                                            ),
-                                          ),
-                                        ),
-                                        // Arms
-                                        Positioned(
-                                          top: 40,
-                                          left: 15,
-                                          child: Container(
-                                            width: 8,
-                                            height: 30,
-                                            decoration: BoxDecoration(
-                                              color: AppColors.accent,
-                                              borderRadius:
-                                                  BorderRadius.circular(4),
-                                            ),
-                                          ),
-                                        ),
-                                        Positioned(
-                                          top: 40,
-                                          right: 15,
-                                          child: Container(
-                                            width: 8,
-                                            height: 30,
-                                            decoration: BoxDecoration(
-                                              color: AppColors.accent,
-                                              borderRadius:
-                                                  BorderRadius.circular(4),
-                                            ),
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
+                                Icon(
+                                  Icons.people,
+                                  size: 80,
+                                  color: AppColors.primary,
                                 ),
-
-                                // Laptop
-                                Positioned(
-                                  left: 120,
-                                  bottom: 20,
-                                  child: Container(
-                                    width: 80,
-                                    height: 60,
-                                    decoration: BoxDecoration(
-                                      color: AppColors.success,
-                                      borderRadius: BorderRadius.circular(
-                                        AppDimensions.smallRadius,
-                                      ),
-                                    ),
-                                    child: Stack(
-                                      children: [
-                                        // Screen
-                                        Positioned(
-                                          top: 5,
-                                          left: 5,
-                                          right: 5,
-                                          bottom: 5,
-                                          child: Container(
-                                            decoration: BoxDecoration(
-                                              color: const Color(0xFF87CEEB),
-                                              borderRadius:
-                                                  BorderRadius.circular(4),
-                                            ),
-                                            child: const Center(
-                                              child: Icon(
-                                                Icons.computer,
-                                                color: AppColors.textInverse,
-                                                size: 16,
-                                              ),
-                                            ),
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                ),
-
-                                // Person 2 (Student)
-                                Positioned(
-                                  right: 40,
-                                  bottom: 30,
-                                  child: Container(
-                                    width: 80,
-                                    height: 120,
-                                    child: Stack(
-                                      children: [
-                                        // Head
-                                        Positioned(
-                                          top: 0,
-                                          left: 20,
-                                          child: Container(
-                                            width: 40,
-                                            height: 40,
-                                            decoration: const BoxDecoration(
-                                              color: AppColors.secondary,
-                                              shape: BoxShape.circle,
-                                            ),
-                                            child: const Center(
-                                              child: Icon(
-                                                Icons.person,
-                                                color: AppColors.textInverse,
-                                                size: 24,
-                                              ),
-                                            ),
-                                          ),
-                                        ),
-                                        // Body
-                                        Positioned(
-                                          top: 35,
-                                          left: 25,
-                                          child: Container(
-                                            width: 30,
-                                            height: 50,
-                                            decoration: BoxDecoration(
-                                              color: AppColors.secondary,
-                                              borderRadius:
-                                                  BorderRadius.circular(15),
-                                            ),
-                                          ),
-                                        ),
-                                        // Arms
-                                        Positioned(
-                                          top: 40,
-                                          left: 15,
-                                          child: Container(
-                                            width: 8,
-                                            height: 30,
-                                            decoration: BoxDecoration(
-                                              color: AppColors.secondary,
-                                              borderRadius:
-                                                  BorderRadius.circular(4),
-                                            ),
-                                          ),
-                                        ),
-                                        Positioned(
-                                          top: 40,
-                                          right: 15,
-                                          child: Container(
-                                            width: 8,
-                                            height: 30,
-                                            decoration: BoxDecoration(
-                                              color: AppColors.secondary,
-                                              borderRadius:
-                                                  BorderRadius.circular(4),
-                                            ),
-                                          ),
-                                        ),
-                                      ],
-                                    ),
+                                const SizedBox(height: 16),
+                                Text(
+                                  'Chọn vai trò',
+                                  style: AppTextStyles.titleLarge.copyWith(
+                                    color: AppColors.primary,
+                                    fontWeight: FontWeight.bold,
                                   ),
                                 ),
                               ],
                             ),
                           ),
-                        ),
-                      ],
                     ),
                   ),
                 ),
               ),
             ),
+          ),
 
-            // Content Section
-            Expanded(
-              flex: 3,
-              child: FadeTransition(
-                opacity: _fadeAnimation,
-                child: SlideTransition(
-                  position: _slideAnimation,
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: AppDimensions.largePadding,
-                    ),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        // Main Title
-                        Text(
-                          'Chọn vai trò của bạn',
-                          style: AppTextStyles.onboardingTitle,
-                          textAlign: TextAlign.center,
-                        ),
-                        const SizedBox(height: AppDimensions.defaultPadding),
+          // Content Section
+          Expanded(
+            flex: 3,
+            child: FadeTransition(
+              opacity: _fadeAnimation,
+              child: SlideTransition(
+                position: _slideAnimation,
+                child: Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: AppDimensions.largePadding,
+                  ),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      // Main Title
+                      const Text(
+                        'Chọn vai trò của bạn',
+                        style: AppTextStyles.onboardingTitle,
+                        textAlign: TextAlign.center,
+                      ),
+                      const SizedBox(height: AppDimensions.defaultPadding),
 
-                        // Description
-                        Text(
-                          'Chọn "Giáo viên" nếu bạn muốn dạy hoặc "Học sinh" nếu bạn muốn học',
-                          style: AppTextStyles.onboardingDescription,
-                          textAlign: TextAlign.center,
-                        ),
-                        const SizedBox(height: AppDimensions.largePadding),
+                      // Description
+                      const Text(
+                        'Xác định vai trò của bạn để tối ưu hóa trải nghiệm học tập và giảng dạy trên nền tảng',
+                        style: AppTextStyles.onboardingDescription,
+                        textAlign: TextAlign.center,
+                      ),
+                      const SizedBox(height: AppDimensions.largePadding),
 
-                        // Role Selection
-                        Row(
-                          children: [
-                            // Teacher Role
-                            Expanded(
-                              child: GestureDetector(
-                                onTap:
-                                    () => _selectRole(AppConstants.roleTeacher),
-                                child: AnimatedContainer(
-                                  duration: const Duration(milliseconds: 200),
-                                  height: 120,
-                                  decoration: BoxDecoration(
-                                    color:
-                                        selectedRole == AppConstants.roleTeacher
-                                            ? AppColors.teacherLight
-                                            : AppColors.surface,
-                                    borderRadius: BorderRadius.circular(
-                                      AppDimensions.defaultRadius,
-                                    ),
-                                    border: Border.all(
-                                      color:
-                                          selectedRole ==
-                                                  AppConstants.roleTeacher
-                                              ? AppColors.teacherPrimary
-                                              : AppColors.grey300,
-                                      width: 2,
-                                    ),
-                                    boxShadow: [
-                                      BoxShadow(
-                                        color: AppColors.shadowLight,
-                                        blurRadius: 10,
-                                        offset: const Offset(0, 5),
-                                      ),
-                                    ],
+                      // Role Selection
+                      Row(
+                        children: [
+                          // Teacher Role
+                          Expanded(
+                            child: GestureDetector(
+                              onTap:
+                                  () => _selectRole(AppConstants.roleTeacher),
+                              child: AnimatedContainer(
+                                duration: const Duration(milliseconds: 200),
+                                height: 120,
+                                decoration: BoxDecoration(
+                                  color:
+                                      selectedRole == AppConstants.roleTeacher
+                                          ? AppColors.teacherLight
+                                          : AppColors.surface,
+                                  borderRadius: BorderRadius.circular(
+                                    AppDimensions.defaultRadius,
                                   ),
-                                  child: Column(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      Container(
-                                        width: 50,
-                                        height: 50,
-                                        decoration: const BoxDecoration(
-                                          color: AppColors.accent,
-                                          shape: BoxShape.circle,
-                                        ),
-                                        child: const Icon(
-                                          Icons.school,
-                                          color: AppColors.textInverse,
-                                          size: 24,
-                                        ),
-                                      ),
-                                      const SizedBox(
-                                        height: AppDimensions.smallPadding,
-                                      ),
-                                      Text(
-                                        'Giáo viên',
-                                        style: AppTextStyles.titleMedium,
-                                      ),
-                                    ],
-                                  ),
+                                  border:
+                                      selectedRole == AppConstants.roleTeacher
+                                          ? Border.all(
+                                            color: AppColors.teacherPrimary,
+                                            width: 2,
+                                          )
+                                          : null,
+                                  boxShadow: const [
+                                    BoxShadow(
+                                      color: AppColors.shadowLight,
+                                      blurRadius: 10,
+                                      offset: Offset(0, 5),
+                                    ),
+                                  ],
+                                ),
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Image.asset(
+                                      'assets/images/onboarding/teacher_icon.png',
+                                      width: 60,
+                                      height: 60,
+                                      fit: BoxFit.cover,
+                                    ),
+                                    const SizedBox(
+                                      height: AppDimensions.smallPadding,
+                                    ),
+                                    Text(
+                                      'Giáo viên',
+                                      style: AppTextStyles.titleMedium,
+                                    ),
+                                  ],
                                 ),
                               ),
                             ),
+                          ),
 
-                            const SizedBox(width: AppDimensions.defaultPadding),
+                          const SizedBox(width: AppDimensions.defaultPadding),
 
-                            // Student Role
-                            Expanded(
-                              child: GestureDetector(
-                                onTap:
-                                    () => _selectRole(AppConstants.roleStudent),
-                                child: AnimatedContainer(
-                                  duration: const Duration(milliseconds: 200),
-                                  height: 120,
-                                  decoration: BoxDecoration(
-                                    color:
-                                        selectedRole == AppConstants.roleStudent
-                                            ? AppColors.studentLight
-                                            : AppColors.surface,
-                                    borderRadius: BorderRadius.circular(
-                                      AppDimensions.defaultRadius,
-                                    ),
-                                    border: Border.all(
-                                      color:
-                                          selectedRole ==
-                                                  AppConstants.roleStudent
-                                              ? AppColors.studentPrimary
-                                              : AppColors.grey300,
-                                      width: 2,
-                                    ),
-                                    boxShadow: [
-                                      BoxShadow(
-                                        color: AppColors.shadowLight,
-                                        blurRadius: 10,
-                                        offset: const Offset(0, 5),
-                                      ),
-                                    ],
+                          // Student Role
+                          Expanded(
+                            child: GestureDetector(
+                              onTap:
+                                  () => _selectRole(AppConstants.roleStudent),
+                              child: AnimatedContainer(
+                                duration: const Duration(milliseconds: 200),
+                                height: 120,
+                                decoration: BoxDecoration(
+                                  color:
+                                      selectedRole == AppConstants.roleStudent
+                                          ? AppColors.teacherLight
+                                          : AppColors.surface,
+                                  borderRadius: BorderRadius.circular(
+                                    AppDimensions.defaultRadius,
                                   ),
-                                  child: Column(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      Container(
-                                        width: 50,
-                                        height: 50,
-                                        decoration: const BoxDecoration(
-                                          color: AppColors.secondary,
-                                          shape: BoxShape.circle,
-                                        ),
-                                        child: const Icon(
-                                          Icons.person,
-                                          color: AppColors.textInverse,
-                                          size: 24,
-                                        ),
-                                      ),
-                                      const SizedBox(
-                                        height: AppDimensions.smallPadding,
-                                      ),
-                                      Text(
-                                        'Học sinh',
-                                        style: AppTextStyles.titleMedium,
-                                      ),
-                                    ],
-                                  ),
+                                  border:
+                                      selectedRole == AppConstants.roleStudent
+                                          ? Border.all(
+                                            color: AppColors.teacherPrimary,
+                                            width: 2,
+                                          )
+                                          : null,
+                                  boxShadow: const [
+                                    BoxShadow(
+                                      color: AppColors.shadowLight,
+                                      blurRadius: 10,
+                                      offset: Offset(0, 5),
+                                    ),
+                                  ],
+                                ),
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Image.asset(
+                                      'assets/images/onboarding/student_icon.png',
+                                      width: 60,
+                                      height: 60,
+                                      fit: BoxFit.cover,
+                                    ),
+                                    const SizedBox(
+                                      height: AppDimensions.smallPadding,
+                                    ),
+                                    Text(
+                                      'Học sinh',
+                                      style: AppTextStyles.titleMedium,
+                                    ),
+                                  ],
                                 ),
                               ),
                             ),
-                          ],
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              ),
-            ),
+                          ),
 
-            // Action Button Section
-            Expanded(
-              flex: 2,
-              child: FadeTransition(
-                opacity: _fadeAnimation,
-                child: SlideTransition(
-                  position: _slideAnimation,
-                  child: Container(
-                    padding: const EdgeInsets.all(AppDimensions.largePadding),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        PrimaryButton(
-                          text: 'Tiếp tục',
-                          size: AppButtonSize.large,
-                          onPressed:
-                              selectedRole != null ? _proceedToLogin : null,
-                        ),
-                      ],
-                    ),
+                          const SizedBox(width: AppDimensions.defaultPadding),
+
+                          // Parent Role
+                          Expanded(
+                            child: GestureDetector(
+                              onTap: () => _selectRole(AppConstants.roleParent),
+                              child: AnimatedContainer(
+                                duration: const Duration(milliseconds: 200),
+                                height: 120,
+                                decoration: BoxDecoration(
+                                  color:
+                                      selectedRole == AppConstants.roleParent
+                                          ? AppColors.teacherLight
+                                          : AppColors.surface,
+                                  borderRadius: BorderRadius.circular(
+                                    AppDimensions.defaultRadius,
+                                  ),
+                                  border:
+                                      selectedRole == AppConstants.roleParent
+                                          ? Border.all(
+                                            color: AppColors.teacherPrimary,
+                                            width: 2,
+                                          )
+                                          : null,
+                                  boxShadow: const [
+                                    BoxShadow(
+                                      color: AppColors.shadowLight,
+                                      blurRadius: 10,
+                                      offset: Offset(0, 5),
+                                    ),
+                                  ],
+                                ),
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Image.asset(
+                                      'assets/images/onboarding/parent_icon.png',
+                                      width: 60,
+                                      height: 60,
+                                      fit: BoxFit.cover,
+                                    ),
+                                    const SizedBox(
+                                      height: AppDimensions.smallPadding,
+                                    ),
+                                    Text(
+                                      'Phụ huynh',
+                                      style: AppTextStyles.titleMedium,
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
                   ),
                 ),
               ),
             ),
-          ],
-        ),
+          ),
+
+          // Action Button Section
+          Expanded(
+            flex: 2,
+            child: FadeTransition(
+              opacity: _fadeAnimation,
+              child: SlideTransition(
+                position: _slideAnimation,
+                child: Container(
+                  padding: const EdgeInsets.all(AppDimensions.largePadding),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      PrimaryButton(
+                        text: 'Tiếp tục',
+                        size: AppButtonSize.large,
+                        onPressed:
+                            selectedRole != null ? _proceedToLogin : null,
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ],
       ),
-    );
-  }
+    ),
+  );
 }

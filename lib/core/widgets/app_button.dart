@@ -73,6 +73,10 @@ class AppButton extends StatelessWidget {
               BorderRadius.circular(AppDimensions.defaultRadius),
         ),
         elevation: onPressed != null ? 2 : 0,
+        disabledBackgroundColor:
+            customColor ?? AppColors.primary, // Keep color when disabled
+        disabledForegroundColor:
+            AppColors.textInverse, // Keep text color when disabled
       ),
       onPressed: isLoading ? null : onPressed,
       child: _buildButtonContent(),
@@ -90,6 +94,10 @@ class AppButton extends StatelessWidget {
               BorderRadius.circular(AppDimensions.defaultRadius),
         ),
         elevation: onPressed != null ? 2 : 0,
+        disabledBackgroundColor:
+            customColor ?? AppColors.secondary, // Keep color when disabled
+        disabledForegroundColor:
+            AppColors.textInverse, // Keep text color when disabled
       ),
       onPressed: isLoading ? null : onPressed,
       child: _buildButtonContent(),
@@ -106,6 +114,8 @@ class AppButton extends StatelessWidget {
               customBorderRadius ??
               BorderRadius.circular(AppDimensions.defaultRadius),
         ),
+        disabledForegroundColor:
+            customColor ?? AppColors.primary, // Keep color when disabled
       ),
       onPressed: isLoading ? null : onPressed,
       child: _buildButtonContent(),
@@ -121,6 +131,8 @@ class AppButton extends StatelessWidget {
               customBorderRadius ??
               BorderRadius.circular(AppDimensions.defaultRadius),
         ),
+        disabledForegroundColor:
+            customColor ?? AppColors.primary, // Keep color when disabled
       ),
       onPressed: isLoading ? null : onPressed,
       child: _buildButtonContent(),
@@ -138,6 +150,8 @@ class AppButton extends StatelessWidget {
               BorderRadius.circular(AppDimensions.defaultRadius),
         ),
         elevation: onPressed != null ? 2 : 0,
+        disabledBackgroundColor: customColor ?? AppColors.error, // Keep color when disabled
+        disabledForegroundColor: AppColors.textInverse, // Keep text color when disabled
       ),
       onPressed: isLoading ? null : onPressed,
       child: _buildButtonContent(),
@@ -145,24 +159,34 @@ class AppButton extends StatelessWidget {
   }
 
   Widget _buildButtonContent() {
-    if (isLoading) {
-      return SizedBox(
-        height: _getIconSize(),
-        width: _getIconSize(),
-        child: CircularProgressIndicator(
-          strokeWidth: 2,
-          valueColor: AlwaysStoppedAnimation<Color>(
-            type == AppButtonType.outline || type == AppButtonType.text
-                ? (customColor ?? AppColors.primary)
-                : AppColors.textInverse,
-          ),
-        ),
-      );
-    }
-
     final hasIcon = icon != null;
     final hasTrailingIcon = trailingIcon != null;
 
+    // Show loading spinner with text
+    if (isLoading) {
+      return Row(
+        mainAxisSize: MainAxisSize.min,
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          SizedBox(
+            height: _getIconSize(),
+            width: _getIconSize(),
+            child: CircularProgressIndicator(
+              strokeWidth: 2,
+              valueColor: AlwaysStoppedAnimation<Color>(
+                type == AppButtonType.outline || type == AppButtonType.text
+                    ? (customColor ?? AppColors.primary)
+                    : AppColors.textInverse,
+              ),
+            ),
+          ),
+          const SizedBox(width: AppDimensions.smallPadding),
+          Text(text, style: _getTextStyle(), textAlign: TextAlign.center),
+        ],
+      );
+    }
+
+    // Show normal content with icons
     if (hasIcon || hasTrailingIcon) {
       return Row(
         mainAxisSize: MainAxisSize.min,
@@ -192,6 +216,7 @@ class AppButton extends StatelessWidget {
       );
     }
 
+    // Show text only
     return Text(text, style: _getTextStyle(), textAlign: TextAlign.center);
   }
 

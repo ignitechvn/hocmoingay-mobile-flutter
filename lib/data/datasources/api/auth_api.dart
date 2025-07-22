@@ -24,7 +24,9 @@ class AuthApi {
   }
 
   // Register Student
-  Future<RegisterResponseDto> registerStudent(RegisterStudentDto registerDto) async {
+  Future<RegisterResponseDto> registerStudent(
+    RegisterStudentDto registerDto,
+  ) async {
     try {
       final response = await _apiService.post(
         '/auth/register/student',
@@ -39,7 +41,9 @@ class AuthApi {
   }
 
   // Register Teacher
-  Future<RegisterResponseDto> registerTeacher(RegisterTeacherDto registerDto) async {
+  Future<RegisterResponseDto> registerTeacher(
+    RegisterTeacherDto registerDto,
+  ) async {
     try {
       final response = await _apiService.post(
         '/auth/register/teacher',
@@ -104,13 +108,14 @@ class AuthApi {
   }
 
   // Refresh Token
-  Future<LoginResponseDto> refreshToken(String refreshToken) async {
+  Future<RefreshTokenResponseDto> refreshToken(String refreshToken) async {
     try {
+      final refreshTokenDto = RefreshTokenDto(refreshToken: refreshToken);
       final response = await _apiService.post(
-        '/auth/refresh-token',
-        data: {'refreshToken': refreshToken},
+        '/auth/refresh',
+        data: refreshTokenDto.toJson(),
       );
-      return LoginResponseDto.fromJson(response.data);
+      return RefreshTokenResponseDto.fromJson(response.data);
     } on DioException catch (e) {
       throw _handleDioError(e);
     } catch (e) {

@@ -169,3 +169,23 @@ enum Gender {
     );
   }
 }
+
+// Classroom Student Status Enum
+enum ClassroomStudentStatus {
+  waitingTeacherConfirm('waiting_teacher_confirm', 'Chờ giáo viên xác nhận'),
+  waitingStudentConfirm('waiting_student_confirm', 'Chờ học sinh xác nhận'),
+  actived('actived', 'Đã kích hoạt'),
+  rejectedByStudent('rejected_by_student', 'Học sinh từ chối'),
+  rejectedByTeacher('rejected_by_teacher', 'Giáo viên từ chối');
+
+  const ClassroomStudentStatus(this.value, this.label);
+  final String value;
+  final String label;
+
+  static ClassroomStudentStatus fromString(String value) {
+    return ClassroomStudentStatus.values.firstWhere(
+      (status) => status.value == value,
+      orElse: () => ClassroomStudentStatus.waitingTeacherConfirm,
+    );
+  }
+}

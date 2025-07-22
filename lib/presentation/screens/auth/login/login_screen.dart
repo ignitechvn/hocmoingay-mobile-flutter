@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../../core/constants/app_constants.dart';
@@ -9,15 +10,16 @@ import '../../../../core/theme/app_text_styles.dart';
 import '../../../../core/utils/validators.dart';
 import '../../../../core/widgets/app_button.dart';
 import '../../../../core/widgets/app_text_field.dart';
+import '../../../../providers/auth/auth_state_provider.dart';
 
-class LoginScreen extends StatefulWidget {
+class LoginScreen extends ConsumerStatefulWidget {
   const LoginScreen({super.key});
 
   @override
-  State<LoginScreen> createState() => _LoginScreenState();
+  ConsumerState<LoginScreen> createState() => _LoginScreenState();
 }
 
-class _LoginScreenState extends State<LoginScreen>
+class _LoginScreenState extends ConsumerState<LoginScreen>
     with TickerProviderStateMixin {
   late AnimationController _animationController;
   late Animation<double> _fadeAnimation;
@@ -69,31 +71,19 @@ class _LoginScreenState extends State<LoginScreen>
     });
 
     try {
-      // TODO: Implement actual API call
-      // final authApi = AuthApi(apiService);
-      // final loginDto = LoginDto(
-      //   userName: _phoneController.text.trim(),
-      //   password: _passwordController.text,
-      //   role: _selectedRole.value,
-      // );
-      // final response = await authApi.login(loginDto);
+      await ref
+          .read(authStateProvider.notifier)
+          .login(
+            _phoneController.text.trim(),
+            _passwordController.text,
+            _selectedRole,
+          );
 
-      // Simulate API call for now
-      await Future.delayed(const Duration(seconds: 2));
-
-      if (mounted) {
-        // TODO: Save token and user data to secure storage
-        // await secureStorage.write(key: AppConstants.tokenKey, value: response.accessToken);
-        // await secureStorage.write(key: AppConstants.userKey, value: response.user.toJson());
-
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Đăng nhập thành công!'),
-            backgroundColor: AppColors.success,
-          ),
-        );
-
-        context.push(AppRoutes.home);
+      // Check if login was successful
+      final authState = ref.read(authStateProvider);
+      if (authState.isAuthenticated && mounted) {
+        // Navigate to home screen based on user role
+        context.go(AppRoutes.home);
       }
     } catch (e) {
       if (mounted) {
@@ -114,7 +104,7 @@ class _LoginScreenState extends State<LoginScreen>
   }
 
   void _handleForgotPassword() {
-    context.push(AppRoutes.resetPassword);
+    // TODO: Navigate to reset password
   }
 
   void _handleRegister() {
@@ -123,313 +113,222 @@ class _LoginScreenState extends State<LoginScreen>
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: AppColors.background,
-      body: SafeArea(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.all(AppDimensions.largePadding),
-          child: Form(
-            key: _formKey,
-            child: Column(
-              children: [
-                // Header Section
-                FadeTransition(
-                  opacity: _fadeAnimation,
-                  child: SlideTransition(
-                    position: _slideAnimation,
-                    child: Column(
-                      children: [
-                        const SizedBox(height: AppDimensions.largePadding),
+    // Listen to auth state changes
+    ref.listen<AuthState>(authStateProvider, (previous, next) {
+      if (next.isAuthenticated && mounted) {
+        // Navigate to home screen when authenticated
+        context.go(AppRoutes.home);
+      } else if (next.hasError && mounted) {
+        // Show error message
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(next.error ?? 'Đăng nhập thất bại'),
+            backgroundColor: AppColors.error,
+          ),
+        );
+      }
+    });
 
-                        // Logo/Illustration
-                        Container(
-                          width: 120,
-                          height: 120,
-                          decoration: BoxDecoration(
-                            color: AppColors.surface,
-                            borderRadius: BorderRadius.circular(
-                              AppDimensions.largeRadius,
+    return Scaffold(
+      backgroundColor: Colors.white,
+      body: SafeArea(
+        child: Center(
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.all(AppDimensions.largePadding),
+            child: Form(
+              key: _formKey,
+              child: Column(
+                children: [
+                  // Header Section
+                  FadeTransition(
+                    opacity: _fadeAnimation,
+                    child: SlideTransition(
+                      position: _slideAnimation,
+                      child: Column(
+                        children: [
+                          // Title
+                          Text(
+                            'Đăng nhập',
+                            style: AppTextStyles.displaySmall,
+                            textAlign: TextAlign.center,
+                          ),
+
+                          const SizedBox(height: AppDimensions.defaultPadding),
+
+                          // Subtitle
+                          Text(
+                            'Chào mừng bạn quay trở lại!',
+                            style: AppTextStyles.bodyLarge.copyWith(
+                              color: AppColors.textSecondary,
                             ),
-                            boxShadow: [
-                              BoxShadow(
-                                color: AppColors.shadowMedium,
-                                blurRadius: 20,
-                                offset: const Offset(0, 10),
+                            textAlign: TextAlign.center,
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+
+                  const SizedBox(height: AppDimensions.largePadding * 2),
+
+                  // Form Section
+                  FadeTransition(
+                    opacity: _fadeAnimation,
+                    child: SlideTransition(
+                      position: _slideAnimation,
+                      child: Column(
+                        children: [
+                          // Phone Field
+                          PhoneTextField(
+                            controller: _phoneController,
+                            validator: Validators.validatePhone,
+                          ),
+
+                          const SizedBox(height: AppDimensions.defaultPadding),
+
+                          // Password Field
+                          PasswordTextField(
+                            controller: _passwordController,
+                            validator: Validators.validatePassword,
+                            onSubmitted: (_) => _handleLogin(),
+                          ),
+
+                          const SizedBox(height: AppDimensions.defaultPadding),
+
+                          // Role Selection
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text('Vai trò', style: AppTextStyles.inputLabel),
+                              const SizedBox(
+                                height: AppDimensions.smallPadding,
+                              ),
+                              Container(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: AppDimensions.defaultPadding,
+                                ),
+                                decoration: BoxDecoration(
+                                  color: AppColors.surface,
+                                  borderRadius: BorderRadius.circular(
+                                    AppDimensions.defaultRadius,
+                                  ),
+                                  border: Border.all(color: AppColors.grey300),
+                                ),
+                                child: DropdownButtonFormField<Role>(
+                                  value: _selectedRole,
+                                  decoration: const InputDecoration(
+                                    border: InputBorder.none,
+                                    contentPadding: EdgeInsets.zero,
+                                  ),
+                                  items:
+                                      Role.values
+                                          .map(
+                                            (role) => DropdownMenuItem<Role>(
+                                              value: role,
+                                              child: Text(
+                                                role.value == 'teacher'
+                                                    ? 'Giáo viên'
+                                                    : role.value == 'student'
+                                                    ? 'Học sinh'
+                                                    : role.value == 'parent'
+                                                    ? 'Phụ huynh'
+                                                    : 'Admin',
+                                                style: AppTextStyles.bodyMedium,
+                                              ),
+                                            ),
+                                          )
+                                          .toList(),
+                                  onChanged:
+                                      (Role? value) =>
+                                          value != null
+                                              ? setState(
+                                                () => _selectedRole = value,
+                                              )
+                                              : null,
+                                ),
                               ),
                             ],
                           ),
-                          child: const Icon(
-                            Icons.school,
-                            size: 60,
-                            color: AppColors.primary,
-                          ),
-                        ),
 
-                        const SizedBox(height: AppDimensions.largePadding),
+                          const SizedBox(height: AppDimensions.defaultPadding),
 
-                        // Title
-                        Text(
-                          'Đăng nhập',
-                          style: AppTextStyles.displaySmall,
-                          textAlign: TextAlign.center,
-                        ),
-
-                        const SizedBox(height: AppDimensions.defaultPadding),
-
-                        // Subtitle
-                        Text(
-                          'Chào mừng bạn quay trở lại!',
-                          style: AppTextStyles.bodyLarge.copyWith(
-                            color: AppColors.textSecondary,
-                          ),
-                          textAlign: TextAlign.center,
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-
-                const SizedBox(height: AppDimensions.largePadding * 2),
-
-                // Form Section
-                FadeTransition(
-                  opacity: _fadeAnimation,
-                  child: SlideTransition(
-                    position: _slideAnimation,
-                    child: Column(
-                      children: [
-                        // Phone Field
-                        PhoneTextField(
-                          controller: _phoneController,
-                          validator: Validators.validatePhone,
-                        ),
-
-                        const SizedBox(height: AppDimensions.defaultPadding),
-
-                        // Password Field
-                        PasswordTextField(
-                          controller: _passwordController,
-                          validator: Validators.validatePassword,
-                          onSubmitted: (_) => _handleLogin(),
-                        ),
-
-                        const SizedBox(height: AppDimensions.defaultPadding),
-
-                        // Role Selection
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text('Vai trò', style: AppTextStyles.inputLabel),
-                            const SizedBox(height: AppDimensions.smallPadding),
-                            Container(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: AppDimensions.defaultPadding,
-                                vertical: AppDimensions.smallPadding,
-                              ),
-                              decoration: BoxDecoration(
-                                color: AppColors.surface,
-                                borderRadius: BorderRadius.circular(
-                                  AppDimensions.defaultRadius,
+                          // Remember Me & Forgot Password
+                          Row(
+                            children: [
+                              // Remember Me
+                              Expanded(
+                                child: Row(
+                                  children: [
+                                    Checkbox(
+                                      value: _rememberMe,
+                                      onChanged: (value) {
+                                        setState(() {
+                                          _rememberMe = value ?? false;
+                                        });
+                                      },
+                                      activeColor: AppColors.primary,
+                                    ),
+                                    Text(
+                                      'Ghi nhớ đăng nhập',
+                                      style: AppTextStyles.bodyMedium,
+                                    ),
+                                  ],
                                 ),
-                                border: Border.all(color: AppColors.grey300),
                               ),
-                              child: DropdownButtonFormField<Role>(
-                                value: _selectedRole,
-                                decoration: const InputDecoration(
-                                  border: InputBorder.none,
-                                  contentPadding: EdgeInsets.zero,
-                                ),
-                                items:
-                                    Role.values.map((role) {
-                                      return DropdownMenuItem<Role>(
-                                        value: role,
-                                        child: Text(
-                                          role.value == 'teacher'
-                                              ? 'Giáo viên'
-                                              : role.value == 'student'
-                                              ? 'Học sinh'
-                                              : role.value == 'parent'
-                                              ? 'Phụ huynh'
-                                              : 'Admin',
-                                          style: AppTextStyles.bodyMedium,
-                                        ),
-                                      );
-                                    }).toList(),
-                                onChanged: (Role? value) {
-                                  if (value != null) {
-                                    setState(() {
-                                      _selectedRole = value;
-                                    });
-                                  }
-                                },
-                              ),
-                            ),
-                          ],
-                        ),
 
-                        const SizedBox(height: AppDimensions.defaultPadding),
-
-                        // Remember Me & Forgot Password
-                        Row(
-                          children: [
-                            // Remember Me
-                            Expanded(
-                              child: Row(
-                                children: [
-                                  Checkbox(
-                                    value: _rememberMe,
-                                    onChanged: (value) {
-                                      setState(() {
-                                        _rememberMe = value ?? false;
-                                      });
-                                    },
-                                    activeColor: AppColors.primary,
+                              // Forgot Password
+                              TextButton(
+                                onPressed: _handleForgotPassword,
+                                child: Text(
+                                  'Quên mật khẩu?',
+                                  style: AppTextStyles.bodyMedium.copyWith(
+                                    color: AppColors.primary,
+                                    fontWeight: FontWeight.w600,
                                   ),
-                                  Text(
-                                    'Ghi nhớ đăng nhập',
-                                    style: AppTextStyles.bodyMedium,
-                                  ),
-                                ],
-                              ),
-                            ),
-
-                            // Forgot Password
-                            TextButton(
-                              onPressed: _handleForgotPassword,
-                              child: Text(
-                                'Quên mật khẩu?',
-                                style: AppTextStyles.bodyMedium.copyWith(
-                                  color: AppColors.primary,
-                                  fontWeight: FontWeight.w600,
                                 ),
                               ),
-                            ),
-                          ],
-                        ),
+                            ],
+                          ),
 
-                        const SizedBox(height: AppDimensions.largePadding),
+                          const SizedBox(height: AppDimensions.largePadding),
 
-                        // Login Button
-                        PrimaryButton(
-                          text: 'Đăng nhập',
-                          size: AppButtonSize.large,
-                          isLoading: _isLoading,
-                          onPressed: _handleLogin,
-                        ),
+                          // Login Button
+                          PrimaryButton(
+                            text: 'Đăng nhập',
+                            size: AppButtonSize.large,
+                            isLoading: _isLoading,
+                            onPressed: _handleLogin,
+                          ),
 
-                        const SizedBox(height: AppDimensions.largePadding),
+                          const SizedBox(height: AppDimensions.largePadding),
 
-                        // Divider
-                        Row(
-                          children: [
-                            Expanded(
-                              child: Container(
-                                height: 1,
-                                color: AppColors.grey300,
-                              ),
-                            ),
-                            Padding(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: AppDimensions.defaultPadding,
-                              ),
-                              child: Text(
-                                'hoặc',
+                          // Register Link
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Text(
+                                'Chưa có tài khoản? ',
                                 style: AppTextStyles.bodyMedium.copyWith(
                                   color: AppColors.textSecondary,
                                 ),
                               ),
-                            ),
-                            Expanded(
-                              child: Container(
-                                height: 1,
-                                color: AppColors.grey300,
-                              ),
-                            ),
-                          ],
-                        ),
-
-                        const SizedBox(height: AppDimensions.largePadding),
-
-                        // Google Sign In Button
-                        OutlinedButton(
-                          style: OutlinedButton.styleFrom(
-                            side: const BorderSide(color: AppColors.grey300),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(
-                                AppDimensions.defaultRadius,
-                              ),
-                            ),
-                            padding: const EdgeInsets.symmetric(
-                              vertical: AppDimensions.defaultPadding,
-                            ),
-                          ),
-                          onPressed: () {
-                            // TODO: Implement Google sign in
-                          },
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              // Google Icon
-                              Container(
-                                width: 24,
-                                height: 24,
-                                decoration: const BoxDecoration(
-                                  color: Colors.white,
-                                  shape: BoxShape.circle,
-                                ),
-                                child: const Center(
-                                  child: Text(
-                                    'G',
-                                    style: TextStyle(
-                                      color: Colors.red,
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.bold,
-                                    ),
+                              TextButton(
+                                onPressed: _handleRegister,
+                                child: Text(
+                                  'Đăng ký ngay',
+                                  style: AppTextStyles.bodyMedium.copyWith(
+                                    color: AppColors.primary,
+                                    fontWeight: FontWeight.w600,
                                   ),
-                                ),
-                              ),
-                              const SizedBox(
-                                width: AppDimensions.defaultPadding,
-                              ),
-                              Text(
-                                'Tiếp tục với Google',
-                                style: AppTextStyles.buttonMedium.copyWith(
-                                  color: AppColors.textPrimary,
                                 ),
                               ),
                             ],
                           ),
-                        ),
-
-                        const SizedBox(height: AppDimensions.largePadding),
-
-                        // Register Link
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Text(
-                              'Chưa có tài khoản? ',
-                              style: AppTextStyles.bodyMedium.copyWith(
-                                color: AppColors.textSecondary,
-                              ),
-                            ),
-                            TextButton(
-                              onPressed: _handleRegister,
-                              child: Text(
-                                'Đăng ký ngay',
-                                style: AppTextStyles.bodyMedium.copyWith(
-                                  color: AppColors.primary,
-                                  fontWeight: FontWeight.w600,
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
           ),
         ),

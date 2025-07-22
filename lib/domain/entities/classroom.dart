@@ -1,0 +1,201 @@
+import '../../core/constants/app_constants.dart';
+
+// Schedule Entity
+class Schedule {
+  final int dayOfWeek;
+  final String startTime;
+  final String endTime;
+
+  const Schedule({
+    required this.dayOfWeek,
+    required this.startTime,
+    required this.endTime,
+  });
+
+  // Helper methods
+  String get dayOfWeekText {
+    switch (dayOfWeek) {
+      case 1:
+        return 'Thứ 2';
+      case 2:
+        return 'Thứ 3';
+      case 3:
+        return 'Thứ 4';
+      case 4:
+        return 'Thứ 5';
+      case 5:
+        return 'Thứ 6';
+      case 6:
+        return 'Thứ 7';
+      case 7:
+        return 'Chủ nhật';
+      default:
+        return 'Không xác định';
+    }
+  }
+
+  String get timeRange => '$startTime - $endTime';
+}
+
+// Lesson Session Entity
+class LessonSession {
+  final String id;
+  final DateTime date;
+  final String startTime;
+  final String endTime;
+  final String status;
+  final String? note;
+  final String? originalSessionId;
+
+  const LessonSession({
+    required this.id,
+    required this.date,
+    required this.startTime,
+    required this.endTime,
+    required this.status,
+    this.note,
+    this.originalSessionId,
+  });
+
+  // Helper methods
+  String get timeRange => '$startTime - $endTime';
+  bool get isToday => DateTime.now().difference(date).inDays == 0;
+  bool get isUpcoming => date.isAfter(DateTime.now());
+  bool get isPast => date.isBefore(DateTime.now());
+}
+
+// Teacher Entity
+class Teacher {
+  final String id;
+  final String fullName;
+  final String? avatar;
+  final String? email;
+  final String phone;
+
+  const Teacher({
+    required this.id,
+    required this.fullName,
+    this.avatar,
+    this.email,
+    required this.phone,
+  });
+}
+
+// Classroom Entity
+class Classroom {
+  final String id;
+  final String name;
+  final String code;
+  final String joinCode;
+  final GradeLevel grade;
+  final String status;
+  final int lessonSessionCount;
+  final int lessonLearnedCount;
+  final DateTime startDate;
+  final DateTime endDate;
+  final int totalStudents;
+  final List<Schedule> schedule;
+  final List<LessonSession> lessonSessions;
+
+  const Classroom({
+    required this.id,
+    required this.name,
+    required this.code,
+    required this.joinCode,
+    required this.grade,
+    required this.status,
+    required this.lessonSessionCount,
+    required this.lessonLearnedCount,
+    required this.startDate,
+    required this.endDate,
+    required this.totalStudents,
+    required this.schedule,
+    required this.lessonSessions,
+  });
+
+  // Helper methods
+  double get progressPercentage {
+    if (lessonSessionCount == 0) return 0.0;
+    return (lessonLearnedCount / lessonSessionCount) * 100;
+  }
+
+  bool get isActive => status == 'active';
+  bool get isFinished => status == 'finished';
+  bool get isEnrolling => status == 'enrolling';
+
+  String get nextLessonTime {
+    final now = DateTime.now();
+    final upcomingSessions =
+        lessonSessions.where((session) => session.date.isAfter(now)).toList();
+
+    if (upcomingSessions.isEmpty) return 'Không có lịch học';
+
+    upcomingSessions.sort((a, b) => a.date.compareTo(b.date));
+    final nextSession = upcomingSessions.first;
+
+    return '${nextSession.date.toString().split(' ')[0]} ${nextSession.timeRange}';
+  }
+}
+
+// Classroom Student Entity
+class ClassroomStudent extends Classroom {
+  final ClassroomStudentStatus studentStatus;
+  final Teacher teacher;
+
+  const ClassroomStudent({
+    required super.id,
+    required super.name,
+    required super.code,
+    required super.joinCode,
+    required super.grade,
+    required super.status,
+    required super.lessonSessionCount,
+    required super.lessonLearnedCount,
+    required super.startDate,
+    required super.endDate,
+    required super.totalStudents,
+    required super.schedule,
+    required super.lessonSessions,
+    required this.studentStatus,
+    required this.teacher,
+  });
+
+  // Helper methods
+  bool get isEnrolled => studentStatus == ClassroomStudentStatus.actived;
+  bool get isWaitingConfirmation =>
+      studentStatus == ClassroomStudentStatus.waitingTeacherConfirm ||
+      studentStatus == ClassroomStudentStatus.waitingStudentConfirm;
+  bool get isRejected =>
+      studentStatus == ClassroomStudentStatus.rejectedByStudent ||
+      studentStatus == ClassroomStudentStatus.rejectedByTeacher;
+}
+
+// Student Classrooms Entity
+class StudentClassrooms {
+  final List<ClassroomStudent> enrollingClassrooms;
+  final List<ClassroomStudent> ongoingClassrooms;
+  final List<ClassroomStudent> finishedClassrooms;
+
+  const StudentClassrooms({
+    required this.enrollingClassrooms,
+    required this.ongoingClassrooms,
+    required this.finishedClassrooms,
+  });
+
+  // Helper methods
+  int get totalClassrooms =>
+      enrollingClassrooms.length +
+      ongoingClassrooms.length +
+      finishedClassrooms.length;
+
+  List<ClassroomStudent> get allClassrooms => [
+    ...enrollingClassrooms,
+    ...ongoingClassrooms,
+    ...finishedClassrooms,
+  ];
+
+  List<ClassroomStudent> get activeClassrooms => [
+    ...enrollingClassrooms,
+    ...ongoingClassrooms,
+  ];
+}

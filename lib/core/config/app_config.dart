@@ -19,11 +19,11 @@ class AppConfig {
   static String get baseUrl {
     switch (_environment) {
       case Environment.development:
-        return 'https://dev-api.hocmoingay.com';
+        return 'https://hocmoingay-web-backend.onrender.com';
       case Environment.staging:
-        return 'https://staging-api.hocmoingay.com';
+        return 'https://hocmoingay-web-backend.onrender.com';
       case Environment.production:
-        return 'https://api.hocmoingay.com';
+        return 'https://hocmoingay-web-backend.onrender.com';
     }
   }
 

@@ -2,9 +2,9 @@ import 'package:flutter/material.dart';
 
 class AppColors {
   // Primary Colors
-  static const Color primary = Color(0xFF00897B); // Teal
-  static const Color primaryLight = Color(0xFF4DB6AC);
-  static const Color primaryDark = Color(0xFF00695C);
+  static const Color primary = Color(0xFF1E3A8A); // Blue (from web design)
+  static const Color primaryLight = Color(0xFF3B5998);
+  static const Color primaryDark = Color(0xFF1E3A8A);
 
   // Secondary Colors
   static const Color secondary = Color(0xFFFF9800); // Orange
@@ -17,7 +17,7 @@ class AppColors {
   static const Color accentDark = Color(0xFFFFB300);
 
   // Background Colors
-  static const Color background = Color(0xFFE8F4F8); // Light teal background
+  static const Color background = Color(0xFFF8FAFC); // Light blue background
   static const Color surface = Colors.white;
   static const Color surfaceVariant = Color(0xFFF5F5F5);
 
@@ -38,8 +38,10 @@ class AppColors {
   static const Color infoLight = Color(0xFF64B5F6);
 
   // Role-specific Colors
-  static const Color teacherPrimary = Color(0xFF00897B); // Teal
-  static const Color teacherLight = Color(0xFFE0F2F1);
+  static const Color teacherPrimary = Color(
+    0xFF1E3A8A,
+  ); // Blue (from web design)
+  static const Color teacherLight = Color(0xFFE8F2FF);
   static const Color studentPrimary = Color(0xFFFF9800); // Orange
   static const Color studentLight = Color(0xFFFFF3E0);
   static const Color parentPrimary = Color(0xFF9C27B0); // Purple
@@ -59,7 +61,9 @@ class AppColors {
 
   // Decorative Colors
   static const Color decorativePurple = Color(0xFFE6E6FA);
-  static const Color decorativeBlue = Color(0xFFE0F2F1);
+  static const Color decorativeBlue = Color(
+    0xFFE8F2FF,
+  ); // Updated to match new primary
   static const Color decorativeGreen = Color(0xFFE8F5E8);
   static const Color decorativeYellow = Color(0xFFFFF8E1);
   static const Color decorativeOrange = Color(0xFFFFF3E0);

@@ -100,7 +100,7 @@ class _RegisterScreenState extends State<RegisterScreen>
     try {
       // TODO: Implement actual API call
       // final authApi = AuthApi(apiService);
-      
+
       if (_selectedRole == Role.student) {
         // Register Student
         // final registerDto = RegisterStudentDto(
@@ -164,200 +164,222 @@ class _RegisterScreenState extends State<RegisterScreen>
   }
 
   @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: AppColors.background,
-      appBar: AppBar(
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: AppColors.textPrimary),
-          onPressed: _handleBackToLogin,
-        ),
+  Widget build(BuildContext context) => Scaffold(
+    backgroundColor: Colors.white,
+    appBar: AppBar(
+      backgroundColor: Colors.transparent,
+      elevation: 0,
+      leading: IconButton(
+        icon: const Icon(Icons.arrow_back, color: AppColors.textPrimary),
+        onPressed: _handleBackToLogin,
       ),
-      body: SafeArea(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.all(AppDimensions.largePadding),
-          child: Form(
-            key: _formKey,
-            child: Column(
-              children: [
-                // Header Section
-                FadeTransition(
-                  opacity: _fadeAnimation,
-                  child: SlideTransition(
-                    position: _slideAnimation,
-                    child: Column(
-                      children: [
-                        const SizedBox(height: AppDimensions.largePadding),
+    ),
+    body: SafeArea(
+      child: SingleChildScrollView(
+        padding: const EdgeInsets.all(AppDimensions.largePadding),
+        child: Form(
+          key: _formKey,
+          child: Column(
+            children: [
+              // Header Section
+              FadeTransition(
+                opacity: _fadeAnimation,
+                child: SlideTransition(
+                  position: _slideAnimation,
+                  child: Column(
+                    children: [
+                      // Title
+                      Text(
+                        'Tạo tài khoản',
+                        style: AppTextStyles.displaySmall,
+                        textAlign: TextAlign.center,
+                      ),
 
-                        // Illustration
-                        Container(
-                          width: 120,
-                          height: 120,
-                          decoration: BoxDecoration(
-                            color: AppColors.surface,
-                            borderRadius: BorderRadius.circular(
-                              AppDimensions.largeRadius,
-                            ),
-                            boxShadow: [
-                              BoxShadow(
-                                color: AppColors.shadowMedium,
-                                blurRadius: 20,
-                                offset: const Offset(0, 10),
-                              ),
-                            ],
-                          ),
-                          child: const Icon(
-                            Icons.person_add,
-                            size: 60,
-                            color: AppColors.primary,
-                          ),
+                      const SizedBox(height: AppDimensions.defaultPadding),
+
+                      // Subtitle
+                      Text(
+                        'Tham gia cùng chúng tôi để bắt đầu hành trình học tập!',
+                        style: AppTextStyles.bodyLarge.copyWith(
+                          color: AppColors.textSecondary,
                         ),
-
-                        const SizedBox(height: AppDimensions.largePadding),
-
-                        // Title
-                        Text(
-                          'Tạo tài khoản',
-                          style: AppTextStyles.displaySmall,
-                          textAlign: TextAlign.center,
-                        ),
-
-                        const SizedBox(height: AppDimensions.defaultPadding),
-
-                        // Subtitle
-                        Text(
-                          'Tham gia cùng chúng tôi để bắt đầu hành trình học tập!',
-                          style: AppTextStyles.bodyLarge.copyWith(
-                            color: AppColors.textSecondary,
-                          ),
-                          textAlign: TextAlign.center,
-                        ),
-                      ],
-                    ),
+                        textAlign: TextAlign.center,
+                      ),
+                    ],
                   ),
                 ),
+              ),
 
-                const SizedBox(height: AppDimensions.largePadding * 2),
+              const SizedBox(height: AppDimensions.largePadding * 2),
 
-                // Form Section
-                FadeTransition(
-                  opacity: _fadeAnimation,
-                  child: SlideTransition(
-                    position: _slideAnimation,
-                    child: Column(
-                      children: [
-                        // Name Field
-                        NameTextField(
-                          controller: _nameController,
-                          validator: Validators.validateName,
-                        ),
+              // Form Section
+              FadeTransition(
+                opacity: _fadeAnimation,
+                child: SlideTransition(
+                  position: _slideAnimation,
+                  child: Column(
+                    children: [
+                      // Name Field
+                      NameTextField(
+                        controller: _nameController,
+                        validator: Validators.validateName,
+                      ),
 
+                      const SizedBox(height: AppDimensions.defaultPadding),
+
+                      // Phone Field
+                      PhoneTextField(
+                        controller: _phoneController,
+                        validator: Validators.validatePhone,
+                      ),
+
+                      const SizedBox(height: AppDimensions.defaultPadding),
+
+                      // Email Field (Optional)
+                      EmailTextField(
+                        controller: _emailController,
+                        validator: (value) {
+                          if (value != null && value.isNotEmpty) {
+                            return Validators.validateEmail(value);
+                          }
+                          return null;
+                        },
+                      ),
+
+                      const SizedBox(height: AppDimensions.defaultPadding),
+
+                      // Address Field
+                      AppTextField(
+                        controller: _addressController,
+                        label: 'Địa chỉ',
+                        hint: 'Nhập địa chỉ của bạn',
+                        validator: (value) {
+                          if (value == null || value.trim().isEmpty) {
+                            return 'Địa chỉ là bắt buộc';
+                          }
+                          return null;
+                        },
+                      ),
+
+                      const SizedBox(height: AppDimensions.defaultPadding),
+
+                      // Gender Selection
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text('Giới tính', style: AppTextStyles.inputLabel),
+                          const SizedBox(height: AppDimensions.smallPadding),
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: AppDimensions.defaultPadding,
+                            ),
+                            decoration: BoxDecoration(
+                              color: AppColors.surface,
+                              borderRadius: BorderRadius.circular(
+                                AppDimensions.defaultRadius,
+                              ),
+                              border: Border.all(color: AppColors.grey300),
+                            ),
+                            child: DropdownButtonFormField<Gender>(
+                              value: _selectedGender,
+                              decoration: const InputDecoration(
+                                border: InputBorder.none,
+                                contentPadding: EdgeInsets.zero,
+                              ),
+                              items:
+                                  Gender.values.map((gender) {
+                                    return DropdownMenuItem<Gender>(
+                                      value: gender,
+                                      child: Text(
+                                        gender.label,
+                                        style: AppTextStyles.bodyMedium,
+                                      ),
+                                    );
+                                  }).toList(),
+                              onChanged: (Gender? value) {
+                                if (value != null) {
+                                  setState(() {
+                                    _selectedGender = value;
+                                  });
+                                }
+                              },
+                            ),
+                          ),
+                        ],
+                      ),
+
+                      const SizedBox(height: AppDimensions.defaultPadding),
+
+                      // Password Field
+                      PasswordTextField(
+                        controller: _passwordController,
+                        validator: Validators.validatePassword,
+                      ),
+
+                      const SizedBox(height: AppDimensions.defaultPadding),
+
+                      // Role Selection
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text('Vai trò', style: AppTextStyles.inputLabel),
+                          const SizedBox(height: AppDimensions.smallPadding),
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: AppDimensions.defaultPadding,
+                            ),
+                            decoration: BoxDecoration(
+                              color: AppColors.surface,
+                              borderRadius: BorderRadius.circular(
+                                AppDimensions.defaultRadius,
+                              ),
+                              border: Border.all(color: AppColors.grey300),
+                            ),
+                            child: DropdownButtonFormField<Role>(
+                              value: _selectedRole,
+                              decoration: const InputDecoration(
+                                border: InputBorder.none,
+                                contentPadding: EdgeInsets.zero,
+                              ),
+                              items:
+                                  [Role.student, Role.teacher].map((role) {
+                                    return DropdownMenuItem<Role>(
+                                      value: role,
+                                      child: Text(
+                                        role.value == 'teacher'
+                                            ? 'Giáo viên'
+                                            : 'Học sinh',
+                                        style: AppTextStyles.bodyMedium,
+                                      ),
+                                    );
+                                  }).toList(),
+                              onChanged: (Role? value) {
+                                if (value != null) {
+                                  setState(() {
+                                    _selectedRole = value;
+                                    // Reset grade if not student
+                                    if (value != Role.student) {
+                                      _selectedGrade = null;
+                                    }
+                                  });
+                                }
+                              },
+                            ),
+                          ),
+                        ],
+                      ),
+
+                      // Grade Selection (only for students)
+                      if (_selectedRole == Role.student) ...[
                         const SizedBox(height: AppDimensions.defaultPadding),
-
-                        // Phone Field
-                        PhoneTextField(
-                          controller: _phoneController,
-                          validator: Validators.validatePhone,
-                        ),
-
-                        const SizedBox(height: AppDimensions.defaultPadding),
-
-                        // Email Field (Optional)
-                        EmailTextField(
-                          controller: _emailController,
-                          validator: (value) {
-                            if (value != null && value.isNotEmpty) {
-                              return Validators.validateEmail(value);
-                            }
-                            return null;
-                          },
-                        ),
-                        
-                        const SizedBox(height: AppDimensions.defaultPadding),
-                        
-                        // Address Field
-                        AppTextField(
-                          controller: _addressController,
-                          label: 'Địa chỉ',
-                          hint: 'Nhập địa chỉ của bạn',
-                          validator: (value) {
-                            if (value == null || value.trim().isEmpty) {
-                              return 'Địa chỉ là bắt buộc';
-                            }
-                            return null;
-                          },
-                        ),
-                        
-                        const SizedBox(height: AppDimensions.defaultPadding),
-                        
-                        // Gender Selection
                         Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text(
-                              'Giới tính',
-                              style: AppTextStyles.inputLabel,
-                            ),
+                            Text('Lớp học', style: AppTextStyles.inputLabel),
                             const SizedBox(height: AppDimensions.smallPadding),
                             Container(
                               padding: const EdgeInsets.symmetric(
                                 horizontal: AppDimensions.defaultPadding,
-                                vertical: AppDimensions.smallPadding,
-                              ),
-                              decoration: BoxDecoration(
-                                color: AppColors.surface,
-                                borderRadius: BorderRadius.circular(AppDimensions.defaultRadius),
-                                border: Border.all(color: AppColors.grey300),
-                              ),
-                              child: DropdownButtonFormField<Gender>(
-                                value: _selectedGender,
-                                decoration: const InputDecoration(
-                                  border: InputBorder.none,
-                                  contentPadding: EdgeInsets.zero,
-                                ),
-                                items: Gender.values.map((gender) {
-                                  return DropdownMenuItem<Gender>(
-                                    value: gender,
-                                    child: Text(
-                                      gender.label,
-                                      style: AppTextStyles.bodyMedium,
-                                    ),
-                                  );
-                                }).toList(),
-                                onChanged: (Gender? value) {
-                                  if (value != null) {
-                                    setState(() {
-                                      _selectedGender = value;
-                                    });
-                                  }
-                                },
-                              ),
-                            ),
-                          ],
-                        ),
-
-                        const SizedBox(height: AppDimensions.defaultPadding),
-
-                        // Password Field
-                        PasswordTextField(
-                          controller: _passwordController,
-                          validator: Validators.validatePassword,
-                        ),
-
-                        const SizedBox(height: AppDimensions.defaultPadding),
-
-                        // Role Selection
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text('Vai trò', style: AppTextStyles.inputLabel),
-                            const SizedBox(height: AppDimensions.smallPadding),
-                            Container(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: AppDimensions.defaultPadding,
-                                vertical: AppDimensions.smallPadding,
                               ),
                               decoration: BoxDecoration(
                                 color: AppColors.surface,
@@ -366,264 +388,114 @@ class _RegisterScreenState extends State<RegisterScreen>
                                 ),
                                 border: Border.all(color: AppColors.grey300),
                               ),
-                              child: DropdownButtonFormField<Role>(
-                                value: _selectedRole,
-                                decoration: const InputDecoration(
+                              child: DropdownButtonFormField<GradeLevel>(
+                                value: _selectedGrade,
+                                decoration: InputDecoration(
                                   border: InputBorder.none,
                                   contentPadding: EdgeInsets.zero,
+                                  hintText: 'Chọn lớp học',
+                                  hintStyle: AppTextStyles.bodyMedium.copyWith(
+                                    color: AppColors.grey500,
+                                  ),
                                 ),
-                                items: [Role.student, Role.teacher].map((role) {
-                                  return DropdownMenuItem<Role>(
-                                    value: role,
-                                    child: Text(
-                                      role.value == 'teacher' ? 'Giáo viên' : 'Học sinh',
-                                      style: AppTextStyles.bodyMedium,
-                                    ),
-                                  );
-                                }).toList(),
-                                onChanged: (Role? value) {
-                                  if (value != null) {
-                                    setState(() {
-                                      _selectedRole = value;
-                                      // Reset grade if not student
-                                      if (value != Role.student) {
-                                        _selectedGrade = null;
-                                      }
-                                    });
-                                  }
+                                style: AppTextStyles.bodyMedium,
+                                dropdownColor: AppColors.surface,
+                                icon: const Icon(
+                                  Icons.keyboard_arrow_down,
+                                  color: AppColors.textSecondary,
+                                ),
+                                items:
+                                    GradeLevel.values.map((grade) {
+                                      return DropdownMenuItem<GradeLevel>(
+                                        value: grade,
+                                        child: Text(
+                                          grade.label,
+                                          style: AppTextStyles.bodyMedium,
+                                        ),
+                                      );
+                                    }).toList(),
+                                onChanged: (GradeLevel? value) {
+                                  setState(() {
+                                    _selectedGrade = value;
+                                  });
                                 },
                               ),
                             ),
                           ],
                         ),
+                      ],
 
-                        // Grade Selection (only for students)
-                        if (_selectedRole == Role.student) ...[
-                          const SizedBox(height: AppDimensions.defaultPadding),
-                          Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text('Lớp học', style: AppTextStyles.inputLabel),
-                              const SizedBox(
-                                height: AppDimensions.smallPadding,
-                              ),
-                              Container(
-                                padding: const EdgeInsets.symmetric(
-                                  horizontal: AppDimensions.defaultPadding,
-                                  vertical: AppDimensions.smallPadding,
-                                ),
-                                decoration: BoxDecoration(
-                                  color: AppColors.surface,
-                                  borderRadius: BorderRadius.circular(
-                                    AppDimensions.defaultRadius,
-                                  ),
-                                  border: Border.all(color: AppColors.grey300),
-                                ),
-                                child: DropdownButtonFormField<GradeLevel>(
-                                  value: _selectedGrade,
-                                  decoration: const InputDecoration(
-                                    border: InputBorder.none,
-                                    contentPadding: EdgeInsets.zero,
-                                    hintText: 'Chọn lớp học',
-                                  ),
-                                  items:
-                                      GradeLevel.values.map((grade) {
-                                        return DropdownMenuItem<GradeLevel>(
-                                          value: grade,
-                                          child: Text(
-                                            grade.label,
-                                            style: AppTextStyles.bodyMedium,
-                                          ),
-                                        );
-                                      }).toList(),
-                                  onChanged: (GradeLevel? value) {
-                                    setState(() {
-                                      _selectedGrade = value;
-                                    });
-                                  },
-                                ),
-                              ),
-                            ],
+                      const SizedBox(height: AppDimensions.defaultPadding),
+
+                      // Terms of Service
+                      Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Checkbox(
+                            value: _agreeToTerms,
+                            onChanged: (value) {
+                              setState(() {
+                                _agreeToTerms = value ?? false;
+                              });
+                            },
+                            activeColor: AppColors.primary,
                           ),
-                        ],
-
-                        const SizedBox(height: AppDimensions.defaultPadding),
-
-                        // Terms of Service
-                        Row(
-                          children: [
-                            Checkbox(
-                              value: _agreeToTerms,
-                              onChanged: (value) {
-                                setState(() {
-                                  _agreeToTerms = value ?? false;
-                                });
-                              },
-                              activeColor: AppColors.primary,
-                            ),
-                            Expanded(
-                              child: RichText(
-                                text: TextSpan(
-                                  style: AppTextStyles.bodyMedium,
-                                  children: [
-                                    const TextSpan(
-                                      text:
-                                          'Bằng cách tiếp tục, bạn đồng ý với ',
-                                      style: TextStyle(
-                                        color: AppColors.textSecondary,
-                                      ),
-                                    ),
-                                    WidgetSpan(
-                                      child: GestureDetector(
-                                        onTap: _handleTermsOfService,
-                                        child: Text(
-                                          'điều khoản sử dụng',
-                                          style: AppTextStyles.bodyMedium
-                                              .copyWith(
-                                                color: AppColors.primary,
-                                                fontWeight: FontWeight.w600,
-                                              ),
+                          Expanded(
+                            child: Padding(
+                              padding: const EdgeInsets.only(top: 12.0),
+                              child: GestureDetector(
+                                onTap: _handleTermsOfService,
+                                child: RichText(
+                                  text: TextSpan(
+                                    style: AppTextStyles.bodyMedium,
+                                    children: [
+                                      const TextSpan(
+                                        text:
+                                            'Bằng cách tiếp tục, bạn đồng ý với ',
+                                        style: TextStyle(
+                                          color: AppColors.textSecondary,
                                         ),
                                       ),
-                                    ),
-                                    const TextSpan(
-                                      text: '.',
-                                      style: TextStyle(
-                                        color: AppColors.textSecondary,
+                                      TextSpan(
+                                        text: 'điều khoản sử dụng',
+                                        style: AppTextStyles.bodyMedium
+                                            .copyWith(
+                                              color: AppColors.primary,
+                                              fontWeight: FontWeight.w600,
+                                            ),
                                       ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-
-                        const SizedBox(height: AppDimensions.largePadding),
-
-                        // Register Button
-                        PrimaryButton(
-                          text: 'Đăng ký',
-                          size: AppButtonSize.large,
-                          isLoading: _isLoading,
-                          onPressed: _handleRegister,
-                        ),
-
-                        const SizedBox(height: AppDimensions.largePadding),
-
-                        // Divider
-                        Row(
-                          children: [
-                            Expanded(
-                              child: Container(
-                                height: 1,
-                                color: AppColors.grey300,
-                              ),
-                            ),
-                            Padding(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: AppDimensions.defaultPadding,
-                              ),
-                              child: Text(
-                                'hoặc',
-                                style: AppTextStyles.bodyMedium.copyWith(
-                                  color: AppColors.textSecondary,
-                                ),
-                              ),
-                            ),
-                            Expanded(
-                              child: Container(
-                                height: 1,
-                                color: AppColors.grey300,
-                              ),
-                            ),
-                          ],
-                        ),
-
-                        const SizedBox(height: AppDimensions.largePadding),
-
-                        // Google Sign Up Button
-                        OutlinedButton(
-                          style: OutlinedButton.styleFrom(
-                            side: const BorderSide(color: AppColors.grey300),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(
-                                AppDimensions.defaultRadius,
-                              ),
-                            ),
-                            padding: const EdgeInsets.symmetric(
-                              vertical: AppDimensions.defaultPadding,
-                            ),
-                          ),
-                          onPressed: _handleGoogleSignUp,
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              // Google Icon
-                              Container(
-                                width: 24,
-                                height: 24,
-                                decoration: const BoxDecoration(
-                                  color: Colors.white,
-                                  shape: BoxShape.circle,
-                                ),
-                                child: const Center(
-                                  child: Text(
-                                    'G',
-                                    style: TextStyle(
-                                      color: Colors.red,
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.bold,
-                                    ),
+                                      const TextSpan(
+                                        text: '.',
+                                        style: TextStyle(
+                                          color: AppColors.textSecondary,
+                                        ),
+                                      ),
+                                    ],
                                   ),
                                 ),
                               ),
-                              const SizedBox(
-                                width: AppDimensions.defaultPadding,
-                              ),
-                              Text(
-                                'Tiếp tục với Google',
-                                style: AppTextStyles.buttonMedium.copyWith(
-                                  color: AppColors.textPrimary,
-                                ),
-                              ),
-                            ],
+                            ),
                           ),
-                        ),
+                        ],
+                      ),
 
-                        const SizedBox(height: AppDimensions.largePadding),
+                      const SizedBox(height: AppDimensions.largePadding),
 
-                        // Login Link
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Text(
-                              'Đã có tài khoản? ',
-                              style: AppTextStyles.bodyMedium.copyWith(
-                                color: AppColors.textSecondary,
-                              ),
-                            ),
-                            TextButton(
-                              onPressed: _handleBackToLogin,
-                              child: Text(
-                                'Đăng nhập tại đây',
-                                style: AppTextStyles.bodyMedium.copyWith(
-                                  color: AppColors.primary,
-                                  fontWeight: FontWeight.w600,
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ],
-                    ),
+                      // Register Button
+                      PrimaryButton(
+                        text: 'Đăng ký',
+                        size: AppButtonSize.large,
+                        isLoading: _isLoading,
+                        onPressed: _handleRegister,
+                      ),
+                    ],
                   ),
                 ),
-              ],
-            ),
+              ),
+            ],
           ),
         ),
       ),
-    );
-  }
+    ),
+  );
 }

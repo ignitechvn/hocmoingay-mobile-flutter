@@ -2,24 +2,24 @@ import '../../core/constants/app_constants.dart';
 
 // Login Request DTO
 class LoginDto {
-  final String userName; // Phone number
+  final String phone; // Phone number
   final String password;
   final String role;
 
   const LoginDto({
-    required this.userName,
+    required this.phone,
     required this.password,
     required this.role,
   });
 
   Map<String, dynamic> toJson() => {
-    'userName': userName,
+    'phone': phone,
     'password': password,
     'role': role,
   };
 
   factory LoginDto.fromJson(Map<String, dynamic> json) => LoginDto(
-    userName: json['userName'] as String,
+    phone: json['phone'] as String,
     password: json['password'] as String,
     role: json['role'] as String,
   );
@@ -168,18 +168,25 @@ class UserDto {
 // Login Response DTO
 class LoginResponseDto {
   final String accessToken;
+  final String? refreshToken;
   final UserDto user;
 
-  const LoginResponseDto({required this.accessToken, required this.user});
+  const LoginResponseDto({
+    required this.accessToken,
+    this.refreshToken,
+    required this.user,
+  });
 
   Map<String, dynamic> toJson() => {
     'access_token': accessToken,
+    if (refreshToken != null) 'refresh_token': refreshToken,
     'user': user.toJson(),
   };
 
   factory LoginResponseDto.fromJson(Map<String, dynamic> json) =>
       LoginResponseDto(
         accessToken: json['access_token'] as String,
+        refreshToken: json['refresh_token'] as String?,
         user: UserDto.fromJson(json['user'] as Map<String, dynamic>),
       );
 }
@@ -257,4 +264,42 @@ class VerifyOtpDto {
     otp: json['otp'] as String,
     role: json['role'] as String,
   );
+}
+
+// Refresh Token DTO
+class RefreshTokenDto {
+  final String refreshToken;
+
+  const RefreshTokenDto({required this.refreshToken});
+
+  Map<String, dynamic> toJson() => {'refresh_token': refreshToken};
+
+  factory RefreshTokenDto.fromJson(Map<String, dynamic> json) =>
+      RefreshTokenDto(refreshToken: json['refresh_token'] as String);
+}
+
+// Refresh Token Response DTO
+class RefreshTokenResponseDto {
+  final String accessToken;
+  final String refreshToken;
+  final int expiresIn;
+
+  const RefreshTokenResponseDto({
+    required this.accessToken,
+    required this.refreshToken,
+    required this.expiresIn,
+  });
+
+  Map<String, dynamic> toJson() => {
+    'access_token': accessToken,
+    'refresh_token': refreshToken,
+    'expires_in': expiresIn,
+  };
+
+  factory RefreshTokenResponseDto.fromJson(Map<String, dynamic> json) =>
+      RefreshTokenResponseDto(
+        accessToken: json['access_token'] as String,
+        refreshToken: json['refresh_token'] as String,
+        expiresIn: json['expires_in'] as int,
+      );
 }
