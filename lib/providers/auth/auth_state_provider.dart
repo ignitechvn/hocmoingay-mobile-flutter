@@ -108,7 +108,7 @@ class AuthStateNotifier extends StateNotifier<AuthState> {
     try {
       // Create login DTO
       final loginDto = LoginDto(
-        phone: phone,
+        userName: phone,
         password: password,
         role: role.value,
       );

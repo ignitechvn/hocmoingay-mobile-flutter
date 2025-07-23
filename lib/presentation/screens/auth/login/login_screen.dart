@@ -8,6 +8,7 @@ import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_dimensions.dart';
 import '../../../../core/theme/app_text_styles.dart';
 import '../../../../core/utils/validators.dart';
+import '../../../../core/utils/toast_utils.dart';
 import '../../../../core/widgets/app_button.dart';
 import '../../../../core/widgets/app_text_field.dart';
 import '../../../../providers/auth/auth_state_provider.dart';
@@ -78,20 +79,11 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
             _passwordController.text,
             _selectedRole,
           );
-
-      // Check if login was successful
-      final authState = ref.read(authStateProvider);
-      if (authState.isAuthenticated && mounted) {
-        // Navigate to home screen based on user role
-        context.go(AppRoutes.home);
-      }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Đăng nhập thất bại: ${e.toString()}'),
-            backgroundColor: AppColors.error,
-          ),
+        ToastUtils.showFail(
+          context: context,
+          message: 'Đăng nhập thất bại: ${e.toString()}',
         );
       }
     } finally {
@@ -104,7 +96,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
   }
 
   void _handleForgotPassword() {
-    // TODO: Navigate to reset password
+    context.push(AppRoutes.forgotPassword);
   }
 
   void _handleRegister() {
@@ -116,15 +108,18 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
     // Listen to auth state changes
     ref.listen<AuthState>(authStateProvider, (previous, next) {
       if (next.isAuthenticated && mounted) {
+        // Show success toast
+        ToastUtils.showSuccess(
+          context: context,
+          message: 'Đăng nhập thành công!',
+        );
         // Navigate to home screen when authenticated
         context.go(AppRoutes.home);
       } else if (next.hasError && mounted) {
         // Show error message
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(next.error ?? 'Đăng nhập thất bại'),
-            backgroundColor: AppColors.error,
-          ),
+        ToastUtils.showFail(
+          context: context,
+          message: next.error ?? 'Đăng nhập thất bại',
         );
       }
     });
@@ -229,9 +224,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
                                                     ? 'Giáo viên'
                                                     : role.value == 'student'
                                                     ? 'Học sinh'
-                                                    : role.value == 'parent'
-                                                    ? 'Phụ huynh'
-                                                    : 'Admin',
+                                                    : 'Phụ huynh',
                                                 style: AppTextStyles.bodyMedium,
                                               ),
                                             ),

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../../core/constants/app_constants.dart';
@@ -10,14 +11,17 @@ import '../../../../core/utils/validators.dart';
 import '../../../../core/widgets/app_button.dart';
 import '../../../../core/widgets/app_text_field.dart';
 
-class RegisterScreen extends StatefulWidget {
+import '../../../../data/dto/auth_dto.dart';
+import '../../../../providers/api/api_providers.dart';
+
+class RegisterScreen extends ConsumerStatefulWidget {
   const RegisterScreen({super.key});
 
   @override
-  State<RegisterScreen> createState() => _RegisterScreenState();
+  ConsumerState<RegisterScreen> createState() => _RegisterScreenState();
 }
 
-class _RegisterScreenState extends State<RegisterScreen>
+class _RegisterScreenState extends ConsumerState<RegisterScreen>
     with TickerProviderStateMixin {
   late AnimationController _animationController;
   late Animation<double> _fadeAnimation;
@@ -98,40 +102,41 @@ class _RegisterScreenState extends State<RegisterScreen>
     });
 
     try {
-      // TODO: Implement actual API call
-      // final authApi = AuthApi(apiService);
+      final authApi = ref.read(authApiProvider);
 
       if (_selectedRole == Role.student) {
         // Register Student
-        // final registerDto = RegisterStudentDto(
-        //   fullName: _nameController.text.trim(),
-        //   phone: _phoneController.text.trim(),
-        //   password: _passwordController.text,
-        //   address: _addressController.text.trim(),
-        //   gender: _selectedGender.value,
-        //   grade: _selectedGrade!.value,
-        // );
-        // final response = await authApi.registerStudent(registerDto);
+        final registerDto = RegisterStudentDto(
+          fullName: _nameController.text.trim(),
+          phone: _phoneController.text.trim(),
+          password: _passwordController.text,
+          address: _addressController.text.trim(),
+          gender: _selectedGender.value,
+          grade: _selectedGrade!.value,
+        );
+        await authApi.registerStudent(registerDto);
+
+        if (mounted) {
+          // Save user data if needed
+          // await secureStorage.write(key: AppConstants.userKey, value: response.user.toJson());
+          context.push(AppRoutes.congratulations);
+        }
       } else if (_selectedRole == Role.teacher) {
         // Register Teacher
-        // final registerDto = RegisterTeacherDto(
-        //   fullName: _nameController.text.trim(),
-        //   phone: _phoneController.text.trim(),
-        //   password: _passwordController.text,
-        //   address: _addressController.text.trim(),
-        //   gender: _selectedGender.value,
-        // );
-        // final response = await authApi.registerTeacher(registerDto);
-      }
+        final registerDto = RegisterTeacherDto(
+          fullName: _nameController.text.trim(),
+          phone: _phoneController.text.trim(),
+          password: _passwordController.text,
+          address: _addressController.text.trim(),
+          gender: _selectedGender.value,
+        );
+        await authApi.registerTeacher(registerDto);
 
-      // Simulate API call for now
-      await Future.delayed(const Duration(seconds: 2));
-
-      if (mounted) {
-        // TODO: Save user data if needed
-        // await secureStorage.write(key: AppConstants.userKey, value: response.user.toJson());
-
-        context.push(AppRoutes.congratulations);
+        if (mounted) {
+          // Save user data if needed
+          // await secureStorage.write(key: AppConstants.userKey, value: response.user.toJson());
+          context.push(AppRoutes.congratulations);
+        }
       }
     } catch (e) {
       if (mounted) {
@@ -149,10 +154,6 @@ class _RegisterScreenState extends State<RegisterScreen>
         });
       }
     }
-  }
-
-  void _handleGoogleSignUp() {
-    // TODO: Implement Google sign up
   }
 
   void _handleBackToLogin() {

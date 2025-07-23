@@ -2,24 +2,24 @@ import '../../core/constants/app_constants.dart';
 
 // Login Request DTO
 class LoginDto {
-  final String phone; // Phone number
+  final String userName; // User name (phone number)
   final String password;
   final String role;
 
   const LoginDto({
-    required this.phone,
+    required this.userName,
     required this.password,
     required this.role,
   });
 
   Map<String, dynamic> toJson() => {
-    'phone': phone,
+    'userName': userName,
     'password': password,
     'role': role,
   };
 
   factory LoginDto.fromJson(Map<String, dynamic> json) => LoginDto(
-    phone: json['phone'] as String,
+    userName: json['userName'] as String,
     password: json['password'] as String,
     role: json['role'] as String,
   );

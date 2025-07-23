@@ -5,8 +5,16 @@ import 'core/theme/app_colors.dart';
 import 'core/theme/app_material_colors.dart';
 import 'core/theme/app_text_styles.dart';
 import 'core/routers/app_router.dart';
+import 'core/utils/logger.dart';
+import 'core/config/app_config.dart';
 
 void main() {
+  // Khởi tạo logging
+  AppLogger.info('=== ỨNG DỤNG HỌC MỖI NGÀY KHỞI ĐỘNG ===');
+  AppLogger.info('Environment: ${AppConfig.environment}');
+  AppLogger.info('Enable Logging: ${AppConfig.enableLogging}');
+  AppLogger.info('Base URL: ${AppConfig.baseUrl}');
+
   runApp(const ProviderScope(child: MyApp()));
 }
 

@@ -19,15 +19,15 @@ class AppConfig {
   static String get baseUrl {
     switch (_environment) {
       case Environment.development:
-        return 'https://hocmoingay-web-backend.onrender.com';
+        return 'http://54.179.51.171:8000';
       case Environment.staging:
-        return 'https://hocmoingay-web-backend.onrender.com';
+        return 'http://54.179.51.171:8000';
       case Environment.production:
-        return 'https://hocmoingay-web-backend.onrender.com';
+        return 'http://54.179.51.171:8000';
     }
   }
 
-  static String get apiVersion => '/api/v1';
+  static String get apiVersion => '';
 
   // App Configuration
   static const String appName = 'Học Mỗi Ngày';

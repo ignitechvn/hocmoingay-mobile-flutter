@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../../core/constants/app_constants.dart';
@@ -9,15 +10,26 @@ import '../../../../core/theme/app_text_styles.dart';
 import '../../../../core/utils/validators.dart';
 import '../../../../core/widgets/app_button.dart';
 import '../../../../core/widgets/app_text_field.dart';
+import '../../../../data/dto/auth_dto.dart';
+import '../../../../providers/api/api_providers.dart';
 
-class ResetPasswordScreen extends StatefulWidget {
-  const ResetPasswordScreen({super.key});
+class ResetPasswordScreen extends ConsumerStatefulWidget {
+  final String? phone;
+  final Role? role;
+  final String? otp;
+
+  const ResetPasswordScreen({
+    super.key,
+    this.phone,
+    this.role,
+    this.otp,
+  });
 
   @override
-  State<ResetPasswordScreen> createState() => _ResetPasswordScreenState();
+  ConsumerState<ResetPasswordScreen> createState() => _ResetPasswordScreenState();
 }
 
-class _ResetPasswordScreenState extends State<ResetPasswordScreen>
+class _ResetPasswordScreenState extends ConsumerState<ResetPasswordScreen>
     with TickerProviderStateMixin {
   late AnimationController _animationController;
   late Animation<double> _fadeAnimation;
@@ -77,16 +89,13 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen>
     });
 
     try {
-      // TODO: Implement actual API call
-      // final authApi = AuthApi(apiService);
-      // final resetPasswordDto = ResetPasswordDto(
-      //   password: _passwordController.text,
-      //   confirmPassword: _confirmPasswordController.text,
-      // );
-      // await authApi.resetPassword(resetPasswordDto);
+      final authApi = ref.read(authApiProvider);
+      final resetPasswordDto = ResetPasswordDto(
+        password: _passwordController.text,
+        confirmPassword: _confirmPasswordController.text,
+      );
       
-      // Simulate API call for now
-      await Future.delayed(const Duration(seconds: 2));
+      await authApi.resetPassword(resetPasswordDto);
       
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -95,7 +104,7 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen>
             backgroundColor: AppColors.success,
           ),
         );
-        context.push(AppRoutes.login);
+        context.go(AppRoutes.login);
       }
     } catch (e) {
       if (mounted) {

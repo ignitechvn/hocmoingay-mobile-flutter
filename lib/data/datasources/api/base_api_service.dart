@@ -2,6 +2,7 @@ import 'package:dio/dio.dart';
 
 import '../../../core/config/app_config.dart';
 import '../../../core/interceptors/auth_interceptor.dart';
+import '../../../core/interceptors/api_logging_interceptor.dart';
 import 'auth_api.dart';
 
 class BaseApiService {
@@ -18,6 +19,9 @@ class BaseApiService {
               sendTimeout: AppConfig.receiveTimeout,
             ),
           ) {
+    // Add logging interceptor first
+    dio.interceptors.add(ApiLoggingInterceptor());
+    
     // Add auth interceptor if authApi is provided
     if (authApi != null) {
       dio.interceptors.add(AuthInterceptor(authApi, dio));

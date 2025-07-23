@@ -110,8 +110,7 @@ class AppConstants {
 enum Role {
   teacher('teacher'),
   student('student'),
-  parent('parent'),
-  admin('admin');
+  parent('parent');
 
   const Role(this.value);
   final String value;
