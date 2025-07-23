@@ -1,26 +1,21 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../../core/theme/app_colors.dart';
 
-import '../../../../core/theme/app_colors.dart';
-import '../../../../core/theme/app_text_styles.dart';
-import 'tabs/classes_tab.dart';
-import '../../profile/profile_screen.dart';
-
-class StudentDashboardScreen extends StatefulWidget {
-  const StudentDashboardScreen({super.key});
+class TeacherDashboardScreen extends StatefulWidget {
+  const TeacherDashboardScreen({super.key});
 
   @override
-  State<StudentDashboardScreen> createState() => _StudentDashboardScreenState();
+  State<TeacherDashboardScreen> createState() => _TeacherDashboardScreenState();
 }
 
-class _StudentDashboardScreenState extends State<StudentDashboardScreen> {
+class _TeacherDashboardScreenState extends State<TeacherDashboardScreen> {
   int _currentIndex = 0;
 
   final List<Widget> _tabs = [
-    const ClassesTab(),
-    const _DiscoverTab(),
+    const _ClassesTab(),
+    const _StudentsTab(),
     const _NotificationsTab(),
-    const ProfileScreen(),
+    const _ProfileTab(),
   ];
 
   @override
@@ -43,7 +38,7 @@ class _StudentDashboardScreenState extends State<StudentDashboardScreen> {
         elevation: 8,
         items: const [
           BottomNavigationBarItem(icon: Icon(Icons.school), label: ''),
-          BottomNavigationBarItem(icon: Icon(Icons.explore), label: ''),
+          BottomNavigationBarItem(icon: Icon(Icons.people), label: ''),
           BottomNavigationBarItem(icon: Icon(Icons.notifications), label: ''),
           BottomNavigationBarItem(icon: Icon(Icons.person), label: ''),
         ],
@@ -53,19 +48,36 @@ class _StudentDashboardScreenState extends State<StudentDashboardScreen> {
 }
 
 // Simple tab implementations
-class _DiscoverTab extends StatelessWidget {
-  const _DiscoverTab();
+class _ClassesTab extends StatelessWidget {
+  const _ClassesTab();
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
-        title: const Text('Khám phá'),
+        title: const Text('Lớp học của tôi'),
         backgroundColor: Colors.transparent,
         elevation: 0,
       ),
-      body: const Center(child: Text('Khám phá khóa học')),
+      body: const Center(child: Text('Danh sách lớp học')),
+    );
+  }
+}
+
+class _StudentsTab extends StatelessWidget {
+  const _StudentsTab();
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: Colors.white,
+      appBar: AppBar(
+        title: const Text('Học sinh'),
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+      ),
+      body: const Center(child: Text('Danh sách học sinh')),
     );
   }
 }
@@ -83,6 +95,23 @@ class _NotificationsTab extends StatelessWidget {
         elevation: 0,
       ),
       body: const Center(child: Text('Danh sách thông báo')),
+    );
+  }
+}
+
+class _ProfileTab extends StatelessWidget {
+  const _ProfileTab();
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: Colors.white,
+      appBar: AppBar(
+        title: const Text('Cá nhân'),
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+      ),
+      body: const Center(child: Text('Thông tin cá nhân')),
     );
   }
 }

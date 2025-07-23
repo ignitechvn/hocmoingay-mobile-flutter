@@ -104,7 +104,7 @@ class _ResetPasswordScreenState extends ConsumerState<ResetPasswordScreen>
             backgroundColor: AppColors.success,
           ),
         );
-        context.go(AppRoutes.login);
+        Navigator.pushNamedAndRemoveUntil(context, '/login', (route) => false);
       }
     } catch (e) {
       if (mounted) {
@@ -129,7 +129,7 @@ class _ResetPasswordScreenState extends ConsumerState<ResetPasswordScreen>
   }
 
   void _handleRegister() {
-    context.push(AppRoutes.register);
+            Navigator.pushNamed(context, '/register');
   }
 
   @override

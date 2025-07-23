@@ -80,7 +80,7 @@ class RegisterStudentDto extends RegisterBaseDto {
         address: json['address'] as String,
         gender: json['gender'] as String,
         grade: json['grade'] as String,
-        role: json['role'] as String? ?? 'student',
+        role: json['role'] as String? ?? Role.student.value,
       );
 }
 
@@ -107,7 +107,7 @@ class RegisterTeacherDto extends RegisterBaseDto {
         password: json['password'] as String,
         address: json['address'] as String,
         gender: json['gender'] as String,
-        role: json['role'] as String? ?? 'teacher',
+        role: json['role'] as String? ?? Role.teacher.value,
       );
 }
 
@@ -156,7 +156,9 @@ class UserDto {
     email: json['email'] as String?,
     role: json['role'] as String,
     grade: json['grade'] as String?,
-    gender: json['gender'] as String,
+    gender:
+        json['gender'] as String? ??
+        'male', // Default to 'male' if not provided
   );
 
   // Helper methods

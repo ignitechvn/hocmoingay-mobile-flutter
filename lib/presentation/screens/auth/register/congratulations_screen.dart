@@ -63,7 +63,7 @@ class _CongratulationsScreenState extends State<CongratulationsScreen>
   }
 
   void _handleSignIn() {
-    context.push(AppRoutes.login);
+    Navigator.pushNamed(context, '/login');
   }
 
   @override

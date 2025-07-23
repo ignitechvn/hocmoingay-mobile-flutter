@@ -54,13 +54,18 @@ class ApiLoggingInterceptor extends Interceptor {
             ? DateTime.now().difference(startTime)
             : Duration.zero;
 
-    // Log error details
+    // Log error details with response body
     AppLogger.logApiError(
       err.requestOptions.method,
       '${err.requestOptions.baseUrl}${err.requestOptions.path}',
       err,
       err.stackTrace,
     );
+
+    // Log detailed error response
+    if (err.response?.data != null) {
+      AppLogger.error('Error Response Body: ${err.response!.data}');
+    }
 
     // Log performance even for errors
     AppLogger.logPerformance(

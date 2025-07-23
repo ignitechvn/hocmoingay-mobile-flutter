@@ -164,16 +164,20 @@ class ClassroomResponseDto {
     endDate: json['endDate'] as String,
     totalStudents: json['totalStudents'] as int,
     schedule:
-        (json['schedule'] as List<dynamic>)
-            .map((s) => ScheduleResponseDto.fromJson(s as Map<String, dynamic>))
-            .toList(),
+        (json['schedule'] as List<dynamic>?)
+            ?.map(
+              (s) => ScheduleResponseDto.fromJson(s as Map<String, dynamic>),
+            )
+            .toList() ??
+        [],
     lessonSessions:
-        (json['lessonSessions'] as List<dynamic>)
-            .map(
+        (json['lessonSessions'] as List<dynamic>?)
+            ?.map(
               (ls) =>
                   LessonSessionResponseDto.fromJson(ls as Map<String, dynamic>),
             )
-            .toList(),
+            .toList() ??
+        [],
   );
 
   // Helper methods
@@ -225,16 +229,20 @@ class ClassroomStudentResponseDto extends ClassroomResponseDto {
     endDate: json['endDate'] as String,
     totalStudents: json['totalStudents'] as int,
     schedule:
-        (json['schedule'] as List<dynamic>)
-            .map((s) => ScheduleResponseDto.fromJson(s as Map<String, dynamic>))
-            .toList(),
+        (json['schedule'] as List<dynamic>?)
+            ?.map(
+              (s) => ScheduleResponseDto.fromJson(s as Map<String, dynamic>),
+            )
+            .toList() ??
+        [],
     lessonSessions:
-        (json['lessonSessions'] as List<dynamic>)
-            .map(
+        (json['lessonSessions'] as List<dynamic>?)
+            ?.map(
               (ls) =>
                   LessonSessionResponseDto.fromJson(ls as Map<String, dynamic>),
             )
-            .toList(),
+            .toList() ??
+        [],
     classroomStudentStatus: json['classroomStudentStatus'] as String,
     teacher: TeacherDto.fromJson(json['teacher'] as Map<String, dynamic>),
   );

@@ -60,7 +60,7 @@ class _RoleSelectionScreenState extends State<RoleSelectionScreen>
   void _proceedToLogin() {
     if (selectedRole != null) {
       // TODO: Save selected role to preferences
-      context.push(AppRoutes.login);
+      Navigator.pushNamed(context, '/login');
     }
   }
 

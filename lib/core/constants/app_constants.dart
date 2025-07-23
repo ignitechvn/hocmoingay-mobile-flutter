@@ -108,12 +108,13 @@ class AppConstants {
 
 // User Role Enum
 enum Role {
-  teacher('teacher'),
-  student('student'),
-  parent('parent');
+  teacher('teacher', 'Giáo viên'),
+  student('student', 'Học sinh'),
+  parent('parent', 'Phụ huynh');
 
-  const Role(this.value);
+  const Role(this.value, this.displayName);
   final String value;
+  final String displayName;
 
   static Role fromString(String value) {
     return Role.values.firstWhere(
@@ -165,6 +166,25 @@ enum Gender {
     return Gender.values.firstWhere(
       (gender) => gender.value == value,
       orElse: () => Gender.male,
+    );
+  }
+}
+
+// Classroom Status Enum
+enum ClassroomStatus {
+  enrolling('ENROLLING', 'Đang tuyển sinh'),
+  ongoing('ONGOING', 'Đang diễn ra'),
+  finished('FINISHED', 'Đã kết thúc'),
+  canceled('CANCELED', 'Đã hủy');
+
+  const ClassroomStatus(this.value, this.label);
+  final String value;
+  final String label;
+
+  static ClassroomStatus fromString(String value) {
+    return ClassroomStatus.values.firstWhere(
+      (status) => status.value == value,
+      orElse: () => ClassroomStatus.enrolling,
     );
   }
 }

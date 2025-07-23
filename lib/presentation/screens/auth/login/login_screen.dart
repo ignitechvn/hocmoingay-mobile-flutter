@@ -9,6 +9,7 @@ import '../../../../core/theme/app_dimensions.dart';
 import '../../../../core/theme/app_text_styles.dart';
 import '../../../../core/utils/validators.dart';
 import '../../../../core/utils/toast_utils.dart';
+import '../../../../core/error/api_error_handler.dart';
 import '../../../../core/widgets/app_button.dart';
 import '../../../../core/widgets/app_text_field.dart';
 import '../../../../providers/auth/auth_state_provider.dart';
@@ -81,10 +82,8 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
           );
     } catch (e) {
       if (mounted) {
-        ToastUtils.showFail(
-          context: context,
-          message: 'Đăng nhập thất bại: ${e.toString()}',
-        );
+        // Use enhanced error handler
+        ApiErrorHandler.handleError(context, e);
       }
     } finally {
       if (mounted) {
@@ -96,11 +95,11 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
   }
 
   void _handleForgotPassword() {
-    context.push(AppRoutes.forgotPassword);
+    Navigator.pushNamed(context, '/forgot-password');
   }
 
   void _handleRegister() {
-    context.push(AppRoutes.register);
+    Navigator.pushNamed(context, '/register');
   }
 
   @override
@@ -113,14 +112,12 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
           context: context,
           message: 'Đăng nhập thành công!',
         );
-        // Navigate to home screen when authenticated
-        context.go(AppRoutes.home);
+
+        // Navigate to home and clear all previous routes
+        Navigator.pushNamedAndRemoveUntil(context, '/', (route) => false);
       } else if (next.hasError && mounted) {
-        // Show error message
-        ToastUtils.showFail(
-          context: context,
-          message: next.error ?? 'Đăng nhập thất bại',
-        );
+        // Show error message using enhanced error handler
+        ApiErrorHandler.handleError(context, next.error);
       }
     });
 
@@ -220,11 +217,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
                                             (role) => DropdownMenuItem<Role>(
                                               value: role,
                                               child: Text(
-                                                role.value == 'teacher'
-                                                    ? 'Giáo viên'
-                                                    : role.value == 'student'
-                                                    ? 'Học sinh'
-                                                    : 'Phụ huynh',
+                                                role.displayName,
                                                 style: AppTextStyles.bodyMedium,
                                               ),
                                             ),

@@ -149,9 +149,12 @@ class AuthStateNotifier extends StateNotifier<AuthState> {
       state = state.copyWith(
         status: AuthStatus.authenticated,
         user: user,
-        userRole: role,
+        userRole: user.role,
         error: null,
       );
+      
+      // Debug log
+      print('✅ Login successful - User: ${user.fullName}, Role: ${user.role}');
     } catch (e) {
       state = state.copyWith(status: AuthStatus.error, error: e.toString());
     }

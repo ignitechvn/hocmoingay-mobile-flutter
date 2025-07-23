@@ -8,6 +8,8 @@ import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_dimensions.dart';
 import '../../../../core/theme/app_text_styles.dart';
 import '../../../../core/utils/validators.dart';
+import '../../../../core/utils/toast_utils.dart';
+import '../../../../core/error/api_error_handler.dart';
 import '../../../../core/widgets/app_button.dart';
 import '../../../../core/widgets/app_text_field.dart';
 
@@ -77,22 +79,18 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen>
     if (!_formKey.currentState!.validate()) return;
 
     if (!_agreeToTerms) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Vui lòng đồng ý với điều khoản sử dụng'),
-          backgroundColor: AppColors.warning,
-        ),
+      ToastUtils.showWarning(
+        context: context,
+        message: 'Vui lòng đồng ý với điều khoản sử dụng',
       );
       return;
     }
 
     // Validate grade for students
     if (_selectedRole == Role.student && _selectedGrade == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Vui lòng chọn lớp học'),
-          backgroundColor: AppColors.warning,
-        ),
+      ToastUtils.showWarning(
+        context: context,
+        message: 'Vui lòng chọn lớp học',
       );
       return;
     }
@@ -114,12 +112,17 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen>
           gender: _selectedGender.value,
           grade: _selectedGrade!.value,
         );
-        await authApi.registerStudent(registerDto);
+        final response = await authApi.registerStudent(registerDto);
 
         if (mounted) {
+          // Show success toast
+          ToastUtils.showSuccess(
+            context: context,
+            message: 'Đăng ký thành công!',
+          );
           // Save user data if needed
           // await secureStorage.write(key: AppConstants.userKey, value: response.user.toJson());
-          context.push(AppRoutes.congratulations);
+          Navigator.pushNamed(context, '/congratulations');
         }
       } else if (_selectedRole == Role.teacher) {
         // Register Teacher
@@ -130,22 +133,23 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen>
           address: _addressController.text.trim(),
           gender: _selectedGender.value,
         );
-        await authApi.registerTeacher(registerDto);
+        final response = await authApi.registerTeacher(registerDto);
 
         if (mounted) {
+          // Show success toast
+          ToastUtils.showSuccess(
+            context: context,
+            message: 'Đăng ký thành công!',
+          );
           // Save user data if needed
           // await secureStorage.write(key: AppConstants.userKey, value: response.user.toJson());
-          context.push(AppRoutes.congratulations);
+          Navigator.pushNamed(context, '/congratulations');
         }
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Đăng ký thất bại: ${e.toString()}'),
-            backgroundColor: AppColors.error,
-          ),
-        );
+        // Use enhanced error handler
+        ApiErrorHandler.handleError(context, e);
       }
     } finally {
       if (mounted) {
@@ -347,9 +351,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen>
                                     return DropdownMenuItem<Role>(
                                       value: role,
                                       child: Text(
-                                        role.value == 'teacher'
-                                            ? 'Giáo viên'
-                                            : 'Học sinh',
+                                        role.displayName,
                                         style: AppTextStyles.bodyMedium,
                                       ),
                                     );

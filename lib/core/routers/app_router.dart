@@ -8,7 +8,8 @@ import '../../../presentation/screens/auth/verify_otp/verify_otp_screen.dart';
 import '../../../presentation/screens/auth/forgot_password/forgot_password_screen.dart';
 import '../../../presentation/screens/onboarding/onboarding_screen.dart';
 import '../../../presentation/screens/onboarding/role_selection_screen.dart';
-import '../../../presentation/screens/student/home/home_screen.dart';
+import '../../../presentation/screens/student/dashboard/student_dashboard_screen.dart';
+import '../../../presentation/screens/teacher/teacher_dashboard_screen.dart';
 import '../../../core/constants/app_constants.dart';
 
 class AppRoutes {
@@ -21,6 +22,7 @@ class AppRoutes {
   static const verifyOtp = '/verify-otp';
   static const forgotPassword = '/forgot-password';
   static const home = '/home';
+  static const teacherDashboard = '/teacher-dashboard';
 
   static final routerConfig = GoRouter(
     routes: [
@@ -67,13 +69,19 @@ class AppRoutes {
         builder: (context, state) {
           final extra = state.extra as Map<String, dynamic>?;
           if (extra != null && extra.containsKey('phone')) {
-            return VerifyOtpScreen(
-              phone: extra['phone'] as String,
-            );
+            return VerifyOtpScreen(phone: extra['phone'] as String);
           }
           // Fallback - redirect to forgot password
           return const ForgotPasswordScreen();
         },
+      ),
+      GoRoute(
+        path: AppRoutes.home,
+        builder: (context, state) => const StudentDashboardScreen(),
+      ),
+      GoRoute(
+        path: AppRoutes.teacherDashboard,
+        builder: (context, state) => const TeacherDashboardScreen(),
       ),
     ],
     initialLocation: AppRoutes.onboarding,

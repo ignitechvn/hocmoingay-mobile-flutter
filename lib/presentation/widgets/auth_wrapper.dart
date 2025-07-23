@@ -8,27 +8,31 @@ import '../../providers/auth/auth_state_provider.dart';
 import '../screens/auth/login/login_screen.dart';
 import '../screens/onboarding/onboarding_screen.dart';
 import '../screens/student/dashboard/student_dashboard_screen.dart';
+import '../screens/teacher/teacher_dashboard_screen.dart';
 
-class AuthWrapper extends ConsumerStatefulWidget {
+class AuthWrapper extends ConsumerWidget {
   const AuthWrapper({super.key});
 
   @override
-  ConsumerState<AuthWrapper> createState() => _AuthWrapperState();
-}
-
-class _AuthWrapperState extends ConsumerState<AuthWrapper> {
-  @override
-  void initState() {
-    super.initState();
-    // Check auth status when app starts
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      ref.read(authStateProvider.notifier).checkAuthStatus();
-    });
-  }
-
-  @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final authState = ref.watch(authStateProvider);
+
+    // Debug log
+    print(
+      '🔍 AuthWrapper rebuild - Status: ${authState.status}, IsAuthenticated: ${authState.isAuthenticated}, UserRole: ${authState.userRole}',
+    );
+
+    // Check auth status when app starts (only once)
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (authState.status == AuthStatus.initial) {
+        ref.read(authStateProvider.notifier).checkAuthStatus();
+      }
+    });
+
+    // Force rebuild when auth state changes
+    ref.listen(authStateProvider, (previous, next) {
+      print('🔄 Auth state changed: ${previous?.status} -> ${next.status}');
+    });
 
     return _buildScreen(authState);
   }
@@ -53,25 +57,24 @@ class _AuthWrapperState extends ConsumerState<AuthWrapper> {
   }
 
   Widget _buildDashboard(Role? userRole) {
+    // Debug log
+    print('🎯 Building dashboard for role: $userRole');
+
     switch (userRole) {
       case Role.student:
+        print('🎓 Showing StudentDashboardScreen');
         return const StudentDashboardScreen();
       case Role.teacher:
-        // TODO: Implement TeacherDashboardScreen
-        return const Scaffold(
-          body: Center(child: Text('Teacher Dashboard - Coming Soon')),
-        );
+        print('👨‍🏫 Showing TeacherDashboardScreen');
+        return const TeacherDashboardScreen();
       case Role.parent:
+        print('👨‍👩‍👧‍👦 Showing ParentDashboardScreen');
         // TODO: Implement ParentDashboardScreen
         return const Scaffold(
           body: Center(child: Text('Parent Dashboard - Coming Soon')),
         );
-      case Role.admin:
-        // TODO: Implement AdminDashboardScreen
-        return const Scaffold(
-          body: Center(child: Text('Admin Dashboard - Coming Soon')),
-        );
       default:
+        print('❌ Unknown role: $userRole, showing LoginScreen');
         return const LoginScreen();
     }
   }
@@ -143,65 +146,69 @@ class _AuthWrapperState extends ConsumerState<AuthWrapper> {
   }
 
   Widget _buildErrorScreen(String error) {
-    return Scaffold(
-      backgroundColor: AppColors.background,
-      body: Center(
-        child: Padding(
-          padding: const EdgeInsets.all(24),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Icon(Icons.error_outline, size: 80, color: AppColors.error),
+    return Consumer(
+      builder: (context, ref, child) {
+        return Scaffold(
+          backgroundColor: AppColors.background,
+          body: Center(
+            child: Padding(
+              padding: const EdgeInsets.all(24),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(Icons.error_outline, size: 80, color: AppColors.error),
 
-              const SizedBox(height: 24),
+                  const SizedBox(height: 24),
 
-              Text(
-                'Có lỗi xảy ra',
-                style: AppTextStyles.headlineSmall.copyWith(
-                  color: AppColors.error,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-
-              const SizedBox(height: 12),
-
-              Text(
-                error,
-                style: AppTextStyles.bodyMedium.copyWith(
-                  color: AppColors.textSecondary,
-                ),
-                textAlign: TextAlign.center,
-              ),
-
-              const SizedBox(height: 32),
-
-              ElevatedButton(
-                onPressed: () {
-                  ref.read(authStateProvider.notifier).checkAuthStatus();
-                },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: AppColors.primary,
-                  foregroundColor: Colors.white,
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 32,
-                    vertical: 12,
+                  Text(
+                    'Có lỗi xảy ra',
+                    style: AppTextStyles.headlineSmall.copyWith(
+                      color: AppColors.error,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(8),
+
+                  const SizedBox(height: 12),
+
+                  Text(
+                    error,
+                    style: AppTextStyles.bodyMedium.copyWith(
+                      color: AppColors.textSecondary,
+                    ),
+                    textAlign: TextAlign.center,
                   ),
-                ),
-                child: Text(
-                  'Thử lại',
-                  style: AppTextStyles.bodyMedium.copyWith(
-                    color: Colors.white,
-                    fontWeight: FontWeight.w600,
+
+                  const SizedBox(height: 32),
+
+                  ElevatedButton(
+                    onPressed: () {
+                      ref.read(authStateProvider.notifier).checkAuthStatus();
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: AppColors.primary,
+                      foregroundColor: Colors.white,
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 32,
+                        vertical: 12,
+                      ),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                    ),
+                    child: Text(
+                      'Thử lại',
+                      style: AppTextStyles.bodyMedium.copyWith(
+                        color: Colors.white,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
                   ),
-                ),
+                ],
               ),
-            ],
+            ),
           ),
-        ),
-      ),
+        );
+      },
     );
   }
 }

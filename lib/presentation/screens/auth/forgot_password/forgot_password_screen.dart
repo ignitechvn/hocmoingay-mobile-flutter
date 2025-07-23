@@ -72,16 +72,17 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen>
       final authApi = ref.read(authApiProvider);
       final forgotPasswordDto = ForgotPasswordDto(
         phone: _phoneController.text.trim(),
-        role: 'student', // Default role for forgot password
+        role: Role.student.value, // Default role for forgot password
       );
 
       await authApi.forgotPassword(forgotPasswordDto);
 
       if (mounted) {
         // Navigate to OTP verification screen with phone
-        context.push(
-          AppRoutes.verifyOtp,
-          extra: {'phone': _phoneController.text.trim()},
+        Navigator.pushNamed(
+          context,
+          '/verify-otp',
+          arguments: {'phone': _phoneController.text.trim()},
         );
       }
     } catch (e) {
