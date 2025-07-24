@@ -5,8 +5,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_text_styles.dart';
 import 'tabs/classes_tab.dart';
-import '../../profile/profile_screen.dart';
-import '../notifications/notification_screen.dart';
+import '../../common/profile_screen.dart';
+import '../../common/notification_screen.dart';
 import '../../../../providers/notification/notification_providers.dart';
 
 class StudentDashboardScreen extends ConsumerStatefulWidget {
@@ -24,8 +24,8 @@ class _StudentDashboardScreenState
   final List<Widget> _tabs = [
     const ClassesTab(),
     const _DiscoverTab(),
-    const NotificationScreen(),
-    const ProfileScreen(),
+    const CommonNotificationScreen(),
+    const CommonProfileScreen(),
   ];
 
   @override
@@ -73,7 +73,9 @@ class _StudentDashboardScreenState
                                 minHeight: 16,
                               ),
                               child: Text(
-                                unreadCount.count > 99 ? '99+' : '${unreadCount.count}',
+                                unreadCount.count > 99
+                                    ? '99+'
+                                    : '${unreadCount.count}',
                                 style: AppTextStyles.bodySmall.copyWith(
                                   color: Colors.white,
                                   fontSize: 10,

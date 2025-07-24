@@ -19,11 +19,15 @@ class AuthInterceptor extends Interceptor {
   ) async {
     // Skip auth for login, register, and refresh token endpoints
     if (_shouldSkipAuth(options.path)) {
+      print('🔍 AuthInterceptor: Skipping auth for path: ${options.path}');
       return handler.next(options);
     }
 
     // Add access token to request
     final accessToken = await TokenManager.getAccessToken();
+    print(
+      '🔍 AuthInterceptor: Request to ${options.path} - Token: ${accessToken != null ? 'Present' : 'Missing'}',
+    );
     if (accessToken != null) {
       options.headers['Authorization'] = 'Bearer $accessToken';
     }
@@ -33,19 +37,27 @@ class AuthInterceptor extends Interceptor {
 
   @override
   void onError(DioException err, ErrorInterceptorHandler handler) async {
+    print(
+      '❌ AuthInterceptor: Error ${err.response?.statusCode} for ${err.requestOptions.path}',
+    );
+    print('❌ AuthInterceptor: Error message: ${err.message}');
+
     // Handle 401 Unauthorized errors
     if (err.response?.statusCode == 401 && !_isRefreshing) {
       final requestOptions = err.requestOptions;
 
       // Skip if this is already a refresh token request
       if (requestOptions.path.contains('/auth/refresh')) {
+        print('🔍 AuthInterceptor: Skipping refresh for refresh token request');
         return handler.next(err);
       }
 
+      print('🔄 AuthInterceptor: Attempting to refresh token...');
       // Try to refresh token
       try {
         await _refreshTokenAndRetry(requestOptions, handler);
       } catch (refreshError) {
+        print('❌ AuthInterceptor: Refresh token failed: $refreshError');
         // Refresh failed, clear tokens and return original error
         await TokenManager.clearTokens();
         return handler.next(err);
@@ -61,21 +73,28 @@ class AuthInterceptor extends Interceptor {
   ) async {
     if (_isRefreshing) {
       // If already refreshing, queue this request
+      print('🔍 AuthInterceptor: Already refreshing, queuing request');
       _pendingRequests.add(requestOptions);
       return;
     }
 
     _isRefreshing = true;
+    print('🔄 AuthInterceptor: Starting token refresh...');
 
     try {
       // Get refresh token
       final refreshToken = await TokenManager.getRefreshToken();
+      print(
+        '🔍 AuthInterceptor: Refresh token: ${refreshToken != null ? 'Present' : 'Missing'}',
+      );
       if (refreshToken == null) {
         throw Exception('No refresh token available');
       }
 
       // Call refresh token API
+      print('🔄 AuthInterceptor: Calling refresh token API...');
       final refreshResponse = await _authApi.refreshToken(refreshToken);
+      print('✅ AuthInterceptor: Refresh token API success');
 
       // Update tokens in storage
       await TokenManager.updateAccessToken(
@@ -85,6 +104,7 @@ class AuthInterceptor extends Interceptor {
       if (refreshResponse.refreshToken != null) {
         await TokenManager.updateRefreshToken(refreshResponse.refreshToken!);
       }
+      print('✅ AuthInterceptor: Tokens updated in storage');
 
       // Retry the original request with new token
       final newRequestOptions = RequestOptions(
@@ -98,12 +118,15 @@ class AuthInterceptor extends Interceptor {
         },
       );
 
+      print('🔄 AuthInterceptor: Retrying original request...');
       final response = await _dio.fetch(newRequestOptions);
+      print('✅ AuthInterceptor: Original request retry success');
       handler.resolve(response);
 
       // Retry all pending requests
       await _retryPendingRequests(refreshResponse.accessToken);
     } catch (e) {
+      print('❌ AuthInterceptor: Refresh token error: $e');
       _isRefreshing = false;
       _pendingRequests.clear();
       rethrow;

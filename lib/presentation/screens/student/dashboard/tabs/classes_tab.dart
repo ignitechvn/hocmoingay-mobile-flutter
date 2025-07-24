@@ -11,6 +11,7 @@ import '../../../../../providers/student_classroom/student_classroom_providers.d
 import '../widgets/status_filter_bar.dart';
 import '../widgets/classroom_card_v2.dart';
 import '../widgets/join_classroom_dialog.dart';
+import '../../schedule/student_schedule_screen.dart';
 
 class ClassesTab extends ConsumerStatefulWidget {
   const ClassesTab({super.key});
@@ -70,7 +71,11 @@ class _ClassesTabState extends ConsumerState<ClassesTab> {
             margin: const EdgeInsets.only(right: 16),
             child: InkWell(
               onTap: () {
-                Navigator.of(context).pushNamed('/schedule');
+                Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (context) => const StudentScheduleScreen(),
+                  ),
+                );
               },
               borderRadius: BorderRadius.circular(20),
               child: Container(

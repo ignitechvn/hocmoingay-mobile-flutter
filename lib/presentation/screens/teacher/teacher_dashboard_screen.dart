@@ -1,21 +1,30 @@
 import 'package:flutter/material.dart';
-import '../../../core/theme/app_colors.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-class TeacherDashboardScreen extends StatefulWidget {
+import '../../../core/theme/app_colors.dart';
+import '../../../core/theme/app_text_styles.dart';
+import '../common/notification_screen.dart';
+import '../common/profile_screen.dart';
+import '../../../providers/notification/notification_providers.dart';
+import 'dashboard/tabs/teacher_classes_tab.dart';
+
+class TeacherDashboardScreen extends ConsumerStatefulWidget {
   const TeacherDashboardScreen({super.key});
 
   @override
-  State<TeacherDashboardScreen> createState() => _TeacherDashboardScreenState();
+  ConsumerState<TeacherDashboardScreen> createState() =>
+      _TeacherDashboardScreenState();
 }
 
-class _TeacherDashboardScreenState extends State<TeacherDashboardScreen> {
+class _TeacherDashboardScreenState
+    extends ConsumerState<TeacherDashboardScreen> {
   int _currentIndex = 0;
 
   final List<Widget> _tabs = [
-    const _ClassesTab(),
-    const _StudentsTab(),
-    const _NotificationsTab(),
-    const _ProfileTab(),
+    const TeacherClassesTab(),
+    const _TeacherResourcesTab(),
+    const CommonNotificationScreen(),
+    const CommonProfileScreen(),
   ];
 
   @override
@@ -36,82 +45,99 @@ class _TeacherDashboardScreenState extends State<TeacherDashboardScreen> {
         showSelectedLabels: false,
         showUnselectedLabels: false,
         elevation: 8,
-        items: const [
-          BottomNavigationBarItem(icon: Icon(Icons.school), label: ''),
-          BottomNavigationBarItem(icon: Icon(Icons.people), label: ''),
-          BottomNavigationBarItem(icon: Icon(Icons.notifications), label: ''),
-          BottomNavigationBarItem(icon: Icon(Icons.person), label: ''),
+        items: [
+          const BottomNavigationBarItem(icon: Icon(Icons.school), label: ''),
+          const BottomNavigationBarItem(icon: Icon(Icons.folder), label: ''),
+          BottomNavigationBarItem(
+            icon: Stack(
+              children: [
+                const Icon(Icons.notifications),
+                Consumer(
+                  builder: (context, ref, child) {
+                    final unreadCountAsync = ref.watch(unreadCountProvider);
+                    return unreadCountAsync.when(
+                      data: (unreadCount) {
+                        if (unreadCount.count > 0) {
+                          return Positioned(
+                            right: 0,
+                            top: 0,
+                            child: Container(
+                              padding: const EdgeInsets.all(2),
+                              decoration: BoxDecoration(
+                                color: AppColors.error,
+                                borderRadius: BorderRadius.circular(10),
+                              ),
+                              constraints: const BoxConstraints(
+                                minWidth: 16,
+                                minHeight: 16,
+                              ),
+                              child: Text(
+                                unreadCount.count > 99
+                                    ? '99+'
+                                    : '${unreadCount.count}',
+                                style: AppTextStyles.bodySmall.copyWith(
+                                  color: Colors.white,
+                                  fontSize: 10,
+                                ),
+                                textAlign: TextAlign.center,
+                              ),
+                            ),
+                          );
+                        }
+                        return const SizedBox.shrink();
+                      },
+                      loading: () => const SizedBox.shrink(),
+                      error: (_, __) => const SizedBox.shrink(),
+                    );
+                  },
+                ),
+              ],
+            ),
+            label: '',
+          ),
+          const BottomNavigationBarItem(icon: Icon(Icons.person), label: ''),
         ],
       ),
     );
   }
 }
 
-// Simple tab implementations
-class _ClassesTab extends StatelessWidget {
-  const _ClassesTab();
+
+
+// Teacher Resources Tab
+class _TeacherResourcesTab extends StatelessWidget {
+  const _TeacherResourcesTab();
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
-        title: const Text('Lớp học của tôi'),
+        title: const Text('Kho tài liệu'),
         backgroundColor: Colors.transparent,
         elevation: 0,
+        foregroundColor: AppColors.textPrimary,
       ),
-      body: const Center(child: Text('Danh sách lớp học')),
-    );
-  }
-}
-
-class _StudentsTab extends StatelessWidget {
-  const _StudentsTab();
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.white,
-      appBar: AppBar(
-        title: const Text('Học sinh'),
-        backgroundColor: Colors.transparent,
-        elevation: 0,
+      body: const Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(Icons.folder, size: 64, color: AppColors.textSecondary),
+            SizedBox(height: 16),
+            Text(
+              'Kho tài liệu cá nhân',
+              style: AppTextStyles.bodyLarge,
+              textAlign: TextAlign.center,
+            ),
+            SizedBox(height: 8),
+            Text(
+              'Tính năng đang được phát triển',
+              style: AppTextStyles.bodyMedium,
+              textAlign: TextAlign.center,
+            ),
+          ],
+        ),
       ),
-      body: const Center(child: Text('Danh sách học sinh')),
-    );
-  }
-}
-
-class _NotificationsTab extends StatelessWidget {
-  const _NotificationsTab();
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.white,
-      appBar: AppBar(
-        title: const Text('Thông báo'),
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-      ),
-      body: const Center(child: Text('Danh sách thông báo')),
-    );
-  }
-}
-
-class _ProfileTab extends StatelessWidget {
-  const _ProfileTab();
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.white,
-      appBar: AppBar(
-        title: const Text('Cá nhân'),
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-      ),
-      body: const Center(child: Text('Thông tin cá nhân')),
     );
   }
 }

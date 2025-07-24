@@ -168,6 +168,33 @@ class ClassroomStudent extends Classroom {
       studentStatus == ClassroomStudentStatus.rejectedByTeacher;
 }
 
+// Classroom Teacher Entity
+class ClassroomTeacher extends Classroom {
+  const ClassroomTeacher({
+    required super.id,
+    required super.name,
+    required super.code,
+    required super.joinCode,
+    required super.grade,
+    required super.status,
+    required super.lessonSessionCount,
+    required super.lessonLearnedCount,
+    required super.startDate,
+    required super.endDate,
+    required super.totalStudents,
+    required super.schedule,
+    required super.lessonSessions,
+  });
+
+  // Helper methods for teacher-specific functionality
+  bool get canManageStudents =>
+      status == EClassroomStatus.ENROLLING ||
+      status == EClassroomStatus.ONGOING;
+  bool get canCreateLessons => status == EClassroomStatus.ONGOING;
+  bool get canViewAnalytics =>
+      status == EClassroomStatus.ONGOING || status == EClassroomStatus.FINISHED;
+}
+
 // Student Classrooms Entity
 class StudentClassrooms {
   const StudentClassrooms({
@@ -192,6 +219,35 @@ class StudentClassrooms {
   ];
 
   List<ClassroomStudent> get activeClassrooms => [
+    ...enrollingClassrooms,
+    ...ongoingClassrooms,
+  ];
+}
+
+// Teacher Classrooms Entity
+class TeacherClassrooms {
+  const TeacherClassrooms({
+    required this.enrollingClassrooms,
+    required this.ongoingClassrooms,
+    required this.finishedClassrooms,
+  });
+  final List<ClassroomTeacher> enrollingClassrooms;
+  final List<ClassroomTeacher> ongoingClassrooms;
+  final List<ClassroomTeacher> finishedClassrooms;
+
+  // Helper methods
+  int get totalClassrooms =>
+      enrollingClassrooms.length +
+      ongoingClassrooms.length +
+      finishedClassrooms.length;
+
+  List<ClassroomTeacher> get allClassrooms => [
+    ...enrollingClassrooms,
+    ...ongoingClassrooms,
+    ...finishedClassrooms,
+  ];
+
+  List<ClassroomTeacher> get activeClassrooms => [
     ...enrollingClassrooms,
     ...ongoingClassrooms,
   ];

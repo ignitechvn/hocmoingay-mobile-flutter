@@ -15,9 +15,8 @@ import 'presentation/screens/auth/verify_otp/verify_otp_screen.dart';
 import 'presentation/screens/auth/forgot_password/forgot_password_screen.dart';
 import 'presentation/screens/onboarding/onboarding_screen.dart';
 import 'presentation/screens/onboarding/role_selection_screen.dart';
-import 'presentation/screens/profile/profile_screen.dart';
+import 'presentation/screens/common/profile_screen.dart';
 import 'presentation/screens/student/classroom/classroom_details_screen.dart';
-import 'presentation/screens/student/schedule/schedule_screen.dart';
 
 void main() {
   // Khởi tạo logging
@@ -89,7 +88,9 @@ class MyApp extends StatelessWidget {
             builder: (context) => const ForgotPasswordScreen(),
           );
         case '/profile':
-          return MaterialPageRoute(builder: (context) => const ProfileScreen());
+          return MaterialPageRoute(
+            builder: (context) => const CommonProfileScreen(),
+          );
         case '/classroom-details':
           final args = settings.arguments as Map<String, dynamic>?;
           final classroomId = args?['classroomId'] as String?;
@@ -100,10 +101,7 @@ class MyApp extends StatelessWidget {
             );
           }
           return MaterialPageRoute(builder: (context) => const AuthWrapper());
-        case '/schedule':
-          return MaterialPageRoute(
-            builder: (context) => const ScheduleScreen(),
-          );
+
         default:
           return MaterialPageRoute(builder: (context) => const AuthWrapper());
       }

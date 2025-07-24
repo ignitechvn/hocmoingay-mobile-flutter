@@ -6,8 +6,8 @@ import '../../../core/theme/app_dimensions.dart';
 import '../../../core/theme/app_text_styles.dart';
 import '../../../providers/auth/auth_state_provider.dart';
 
-class ProfileScreen extends ConsumerWidget {
-  const ProfileScreen({super.key});
+class CommonProfileScreen extends ConsumerWidget {
+  const CommonProfileScreen({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {

@@ -301,3 +301,103 @@ class StudentClassroomResponseListDto {
                 .toList(),
       );
 }
+
+// Teacher Classroom Response List DTO
+class TeacherClassroomResponseListDto {
+  final List<ClassroomTeacherResponseDto> enrollingClassrooms;
+  final List<ClassroomTeacherResponseDto> ongoingClassrooms;
+  final List<ClassroomTeacherResponseDto> finishedClassrooms;
+
+  const TeacherClassroomResponseListDto({
+    required this.enrollingClassrooms,
+    required this.ongoingClassrooms,
+    required this.finishedClassrooms,
+  });
+
+  Map<String, dynamic> toJson() => {
+    'enrollingClassrooms': enrollingClassrooms.map((c) => c.toJson()).toList(),
+    'ongoingClassrooms': ongoingClassrooms.map((c) => c.toJson()).toList(),
+    'finishedClassrooms': finishedClassrooms.map((c) => c.toJson()).toList(),
+  };
+
+  factory TeacherClassroomResponseListDto.fromJson(Map<String, dynamic> json) =>
+      TeacherClassroomResponseListDto(
+        enrollingClassrooms:
+            (json['enrollingClassrooms'] as List<dynamic>)
+                .map(
+                  (c) => ClassroomTeacherResponseDto.fromJson(
+                    c as Map<String, dynamic>,
+                  ),
+                )
+                .toList(),
+        ongoingClassrooms:
+            (json['ongoingClassrooms'] as List<dynamic>)
+                .map(
+                  (c) => ClassroomTeacherResponseDto.fromJson(
+                    c as Map<String, dynamic>,
+                  ),
+                )
+                .toList(),
+        finishedClassrooms:
+            (json['finishedClassrooms'] as List<dynamic>)
+                .map(
+                  (c) => ClassroomTeacherResponseDto.fromJson(
+                    c as Map<String, dynamic>,
+                  ),
+                )
+                .toList(),
+      );
+}
+
+// Classroom Teacher Response DTO
+class ClassroomTeacherResponseDto extends ClassroomResponseDto {
+  const ClassroomTeacherResponseDto({
+    required super.id,
+    required super.name,
+    required super.code,
+    required super.joinCode,
+    required super.grade,
+    required super.status,
+    required super.lessonSessionCount,
+    required super.lessonLearnedCount,
+    required super.startDate,
+    required super.endDate,
+    required super.totalStudents,
+    required super.schedule,
+    required super.lessonSessions,
+  });
+
+  @override
+  Map<String, dynamic> toJson() => super.toJson();
+
+  factory ClassroomTeacherResponseDto.fromJson(
+    Map<String, dynamic> json,
+  ) => ClassroomTeacherResponseDto(
+    id: json['id'] as String,
+    name: json['name'] as String,
+    code: ESubjectCode.fromString(json['code'] as String),
+    joinCode: json['joinCode'] as String,
+    grade: EGradeLevel.fromString(json['grade'] as String),
+    status: EClassroomStatus.fromString(json['status'] as String),
+    lessonSessionCount: json['lessonSessionCount'] as int,
+    lessonLearnedCount: json['lessonLearnedCount'] as int,
+    startDate: json['startDate'] as String,
+    endDate: json['endDate'] as String,
+    totalStudents: json['totalStudents'] as int,
+    schedule:
+        (json['schedule'] as List<dynamic>?)
+            ?.map(
+              (s) => ScheduleResponseDto.fromJson(s as Map<String, dynamic>),
+            )
+            .toList() ??
+        [],
+    lessonSessions:
+        (json['lessonSessions'] as List<dynamic>?)
+            ?.map(
+              (ls) =>
+                  LessonSessionResponseDto.fromJson(ls as Map<String, dynamic>),
+            )
+            .toList() ??
+        [],
+  );
+}

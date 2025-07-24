@@ -2,23 +2,25 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 
-import '../../../../core/theme/app_colors.dart';
-import '../../../../core/theme/app_dimensions.dart';
-import '../../../../core/theme/app_text_styles.dart';
-import '../../../../core/widgets/empty_state_widget.dart';
-import '../../../../data/dto/notification_dto.dart';
-import '../../../../providers/notification/notification_providers.dart';
-import '../../../../core/utils/toast_utils.dart';
-import '../../../../core/constants/notification_constants.dart';
+import '../../../core/theme/app_colors.dart';
+import '../../../core/theme/app_dimensions.dart';
+import '../../../core/theme/app_text_styles.dart';
+import '../../../core/widgets/empty_state_widget.dart';
+import '../../../data/dto/notification_dto.dart';
+import '../../../providers/notification/notification_providers.dart';
+import '../../../core/utils/toast_utils.dart';
+import '../../../core/constants/notification_constants.dart';
 
-class NotificationScreen extends ConsumerStatefulWidget {
-  const NotificationScreen({super.key});
+class CommonNotificationScreen extends ConsumerStatefulWidget {
+  const CommonNotificationScreen({super.key});
 
   @override
-  ConsumerState<NotificationScreen> createState() => _NotificationScreenState();
+  ConsumerState<CommonNotificationScreen> createState() =>
+      _CommonNotificationScreenState();
 }
 
-class _NotificationScreenState extends ConsumerState<NotificationScreen> {
+class _CommonNotificationScreenState
+    extends ConsumerState<CommonNotificationScreen> {
   @override
   Widget build(BuildContext context) {
     final notificationsAsync = ref.watch(notificationsProvider);

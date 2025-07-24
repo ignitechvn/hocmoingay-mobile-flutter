@@ -9,7 +9,7 @@ import '../../../presentation/screens/auth/forgot_password/forgot_password_scree
 import '../../../presentation/screens/onboarding/onboarding_screen.dart';
 import '../../../presentation/screens/onboarding/role_selection_screen.dart';
 import '../../../presentation/screens/student/dashboard/student_dashboard_screen.dart';
-import '../../../presentation/screens/student/notifications/notification_screen.dart';
+import '../../../presentation/screens/common/notification_screen.dart';
 import '../../../presentation/screens/student/classroom/classroom_details_screen.dart';
 import '../../../presentation/screens/student/chapter/chapters_screen.dart';
 import '../../../presentation/screens/student/chapter/chapter_details_screen.dart';
@@ -89,7 +89,7 @@ class AppRoutes {
       ),
       GoRoute(
         path: AppRoutes.notifications,
-        builder: (context, state) => const NotificationScreen(),
+        builder: (context, state) => const CommonNotificationScreen(),
       ),
       GoRoute(
         path: AppRoutes.classroomDetails,

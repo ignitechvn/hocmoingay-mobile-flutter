@@ -2,21 +2,28 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 
-import '../../../../core/theme/app_colors.dart';
-import '../../../../core/theme/app_text_styles.dart';
-import '../../../../domain/entities/classroom.dart';
-import '../../../../providers/student_classroom/student_classroom_providers.dart';
-import 'widgets/schedule_event_card.dart';
-import 'widgets/week_selector.dart';
+import '../../../core/theme/app_colors.dart';
+import '../../../core/theme/app_text_styles.dart';
+import '../../../domain/entities/classroom.dart';
+import '../student/schedule/widgets/week_selector.dart';
+import 'widgets/common_schedule_event_card.dart';
 
-class ScheduleScreen extends ConsumerStatefulWidget {
-  const ScheduleScreen({super.key});
+class CommonScheduleScreen extends ConsumerStatefulWidget {
+  final List<Classroom> classrooms;
+  final String title;
+
+  const CommonScheduleScreen({
+    super.key,
+    required this.classrooms,
+    this.title = 'Thời khóa biểu',
+  });
 
   @override
-  ConsumerState<ScheduleScreen> createState() => _ScheduleScreenState();
+  ConsumerState<CommonScheduleScreen> createState() =>
+      _CommonScheduleScreenState();
 }
 
-class _ScheduleScreenState extends ConsumerState<ScheduleScreen> {
+class _CommonScheduleScreenState extends ConsumerState<CommonScheduleScreen> {
   DateTime _selectedDate = DateTime.now();
   late DateTime _weekStart;
   late DateTime _weekEnd;
@@ -37,13 +44,11 @@ class _ScheduleScreenState extends ConsumerState<ScheduleScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final classroomsAsync = ref.watch(studentClassroomsProvider);
-
     return Scaffold(
       backgroundColor: AppColors.grey50,
       appBar: AppBar(
         title: Text(
-          'Thời khóa biểu',
+          widget.title,
           style: AppTextStyles.headlineSmall.copyWith(
             color: AppColors.textPrimary,
             fontWeight: FontWeight.bold,
@@ -97,19 +102,7 @@ class _ScheduleScreenState extends ConsumerState<ScheduleScreen> {
                   ),
                 ],
               ),
-              child: classroomsAsync.when(
-                data: (classrooms) => _buildScheduleTimeline(classrooms),
-                loading: () => const Center(child: CircularProgressIndicator()),
-                error:
-                    (error, stack) => Center(
-                      child: Text(
-                        'Đã xảy ra lỗi khi tải thời khóa biểu',
-                        style: AppTextStyles.bodyMedium.copyWith(
-                          color: AppColors.textSecondary,
-                        ),
-                      ),
-                    ),
-              ),
+              child: _buildScheduleTimeline(),
             ),
           ),
         ],
@@ -117,16 +110,10 @@ class _ScheduleScreenState extends ConsumerState<ScheduleScreen> {
     );
   }
 
-  Widget _buildScheduleTimeline(StudentClassrooms classrooms) {
-    // Get all active classrooms (ongoing and enrolling)
-    final activeClassrooms = [
-      ...classrooms.ongoingClassrooms,
-      ...classrooms.enrollingClassrooms,
-    ];
-
+  Widget _buildScheduleTimeline() {
     // Filter classrooms that are active in current week
     final weekClassrooms =
-        activeClassrooms.where((classroom) {
+        widget.classrooms.where((classroom) {
           return classroom.startDate.isBefore(
                 _weekEnd.add(const Duration(days: 1)),
               ) &&
@@ -139,9 +126,9 @@ class _ScheduleScreenState extends ConsumerState<ScheduleScreen> {
     print(
       '🕐 Week range: ${_weekStart.toString().split(' ')[0]} to ${_weekEnd.toString().split(' ')[0]}',
     );
-    print('📚 Active classrooms: ${activeClassrooms.length}');
+    print('📚 Total classrooms: ${widget.classrooms.length}');
     print('📅 Week classrooms: ${weekClassrooms.length}');
-    for (final classroom in activeClassrooms) {
+    for (final classroom in widget.classrooms) {
       print(
         '  - ${classroom.name}: ${classroom.startDate.toString().split(' ')[0]} to ${classroom.endDate.toString().split(' ')[0]}',
       );
@@ -151,7 +138,7 @@ class _ScheduleScreenState extends ConsumerState<ScheduleScreen> {
     }
 
     // Group classrooms by day and time
-    final scheduleMap = <int, List<ClassroomStudent>>{};
+    final scheduleMap = <int, List<Classroom>>{};
     for (final classroom in weekClassrooms) {
       for (final schedule in classroom.schedule) {
         final dayOfWeek = schedule.dayOfWeek;
@@ -180,9 +167,7 @@ class _ScheduleScreenState extends ConsumerState<ScheduleScreen> {
     );
   }
 
-  List<Widget> _buildTimelineRows(
-    Map<int, List<ClassroomStudent>> scheduleMap,
-  ) {
+  List<Widget> _buildTimelineRows(Map<int, List<Classroom>> scheduleMap) {
     // Define time slots based on actual API data
     final timeSlots = [
       {'start': '12:00', 'end': '15:00'}, // Thứ 3: Lớp toán 12 ca tối
@@ -257,7 +242,7 @@ class _ScheduleScreenState extends ConsumerState<ScheduleScreen> {
   }
 
   bool _hasClassInTimeSlot(
-    Map<int, List<ClassroomStudent>> scheduleMap,
+    Map<int, List<Classroom>> scheduleMap,
     Map<String, String> slot,
   ) {
     for (final day in scheduleMap.keys) {
@@ -271,10 +256,7 @@ class _ScheduleScreenState extends ConsumerState<ScheduleScreen> {
     return false;
   }
 
-  bool _isClassInTimeSlot(
-    ClassroomStudent classroom,
-    Map<String, String> slot,
-  ) {
+  bool _isClassInTimeSlot(Classroom classroom, Map<String, String> slot) {
     // Check if any schedule matches the time slot
     for (final schedule in classroom.schedule) {
       // Convert API time format (HH:mm:ss) to slot format (HH:mm)
@@ -297,7 +279,7 @@ class _ScheduleScreenState extends ConsumerState<ScheduleScreen> {
   }
 
   Widget _buildScheduleContent(
-    Map<int, List<ClassroomStudent>> scheduleMap,
+    Map<int, List<Classroom>> scheduleMap,
     Map<String, String> slot,
   ) {
     // Get the selected day of week (1 = Monday, 7 = Sunday)
@@ -305,7 +287,7 @@ class _ScheduleScreenState extends ConsumerState<ScheduleScreen> {
 
     // Find classrooms for the selected day and time slot
     final classroomsForDay = scheduleMap[selectedDayOfWeek] ?? [];
-    List<ClassroomStudent> classroomsInSlot = [];
+    List<Classroom> classroomsInSlot = [];
 
     for (final classroom in classroomsForDay) {
       if (_isClassInTimeSlot(classroom, slot)) {
@@ -323,7 +305,7 @@ class _ScheduleScreenState extends ConsumerState<ScheduleScreen> {
     return Container(
       height: 100,
       margin: const EdgeInsets.only(left: 8),
-      child: ScheduleEventCard(classroom: classroom),
+      child: CommonScheduleEventCard(classroom: classroom),
     );
   }
 
