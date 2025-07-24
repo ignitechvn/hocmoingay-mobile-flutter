@@ -1,25 +1,30 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_text_styles.dart';
 import 'tabs/classes_tab.dart';
 import '../../profile/profile_screen.dart';
+import '../notifications/notification_screen.dart';
+import '../../../../providers/notification/notification_providers.dart';
 
-class StudentDashboardScreen extends StatefulWidget {
+class StudentDashboardScreen extends ConsumerStatefulWidget {
   const StudentDashboardScreen({super.key});
 
   @override
-  State<StudentDashboardScreen> createState() => _StudentDashboardScreenState();
+  ConsumerState<StudentDashboardScreen> createState() =>
+      _StudentDashboardScreenState();
 }
 
-class _StudentDashboardScreenState extends State<StudentDashboardScreen> {
+class _StudentDashboardScreenState
+    extends ConsumerState<StudentDashboardScreen> {
   int _currentIndex = 0;
 
   final List<Widget> _tabs = [
     const ClassesTab(),
     const _DiscoverTab(),
-    const _NotificationsTab(),
+    const NotificationScreen(),
     const ProfileScreen(),
   ];
 
@@ -41,11 +46,55 @@ class _StudentDashboardScreenState extends State<StudentDashboardScreen> {
         showSelectedLabels: false,
         showUnselectedLabels: false,
         elevation: 8,
-        items: const [
-          BottomNavigationBarItem(icon: Icon(Icons.school), label: ''),
-          BottomNavigationBarItem(icon: Icon(Icons.explore), label: ''),
-          BottomNavigationBarItem(icon: Icon(Icons.notifications), label: ''),
-          BottomNavigationBarItem(icon: Icon(Icons.person), label: ''),
+        items: [
+          const BottomNavigationBarItem(icon: Icon(Icons.school), label: ''),
+          const BottomNavigationBarItem(icon: Icon(Icons.explore), label: ''),
+          BottomNavigationBarItem(
+            icon: Stack(
+              children: [
+                const Icon(Icons.notifications),
+                Consumer(
+                  builder: (context, ref, child) {
+                    final unreadCountAsync = ref.watch(unreadCountProvider);
+                    return unreadCountAsync.when(
+                      data: (unreadCount) {
+                        if (unreadCount.count > 0) {
+                          return Positioned(
+                            right: 0,
+                            top: 0,
+                            child: Container(
+                              padding: const EdgeInsets.all(2),
+                              decoration: BoxDecoration(
+                                color: AppColors.error,
+                                borderRadius: BorderRadius.circular(10),
+                              ),
+                              constraints: const BoxConstraints(
+                                minWidth: 16,
+                                minHeight: 16,
+                              ),
+                              child: Text(
+                                unreadCount.count > 99 ? '99+' : '${unreadCount.count}',
+                                style: AppTextStyles.bodySmall.copyWith(
+                                  color: Colors.white,
+                                  fontSize: 10,
+                                ),
+                                textAlign: TextAlign.center,
+                              ),
+                            ),
+                          );
+                        }
+                        return const SizedBox.shrink();
+                      },
+                      loading: () => const SizedBox.shrink(),
+                      error: (_, __) => const SizedBox.shrink(),
+                    );
+                  },
+                ),
+              ],
+            ),
+            label: '',
+          ),
+          const BottomNavigationBarItem(icon: Icon(Icons.person), label: ''),
         ],
       ),
     );
@@ -66,23 +115,6 @@ class _DiscoverTab extends StatelessWidget {
         elevation: 0,
       ),
       body: const Center(child: Text('Khám phá khóa học')),
-    );
-  }
-}
-
-class _NotificationsTab extends StatelessWidget {
-  const _NotificationsTab();
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.white,
-      appBar: AppBar(
-        title: const Text('Thông báo'),
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-      ),
-      body: const Center(child: Text('Danh sách thông báo')),
     );
   }
 }

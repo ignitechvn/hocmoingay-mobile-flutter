@@ -11,52 +11,30 @@ class $UsersTable extends Users with TableInfo<$UsersTable, UserEntity> {
   static const VerificationMeta _idMeta = const VerificationMeta('id');
   @override
   late final GeneratedColumn<String> id = GeneratedColumn<String>(
-    'id',
-    aliasedName,
-    false,
-    type: DriftSqlType.string,
-    requiredDuringInsert: true,
-  );
-  static const VerificationMeta _fullNameMeta = const VerificationMeta(
-    'fullName',
-  );
+      'id', aliasedName, false,
+      type: DriftSqlType.string, requiredDuringInsert: true);
+  static const VerificationMeta _fullNameMeta =
+      const VerificationMeta('fullName');
   @override
   late final GeneratedColumn<String> fullName = GeneratedColumn<String>(
-    'full_name',
-    aliasedName,
-    false,
-    type: DriftSqlType.string,
-    requiredDuringInsert: true,
-  );
+      'full_name', aliasedName, false,
+      type: DriftSqlType.string, requiredDuringInsert: true);
   static const VerificationMeta _phoneMeta = const VerificationMeta('phone');
   @override
   late final GeneratedColumn<String> phone = GeneratedColumn<String>(
-    'phone',
-    aliasedName,
-    false,
-    type: DriftSqlType.string,
-    requiredDuringInsert: true,
-  );
-  static const VerificationMeta _addressMeta = const VerificationMeta(
-    'address',
-  );
+      'phone', aliasedName, false,
+      type: DriftSqlType.string, requiredDuringInsert: true);
+  static const VerificationMeta _addressMeta =
+      const VerificationMeta('address');
   @override
   late final GeneratedColumn<String> address = GeneratedColumn<String>(
-    'address',
-    aliasedName,
-    false,
-    type: DriftSqlType.string,
-    requiredDuringInsert: true,
-  );
+      'address', aliasedName, false,
+      type: DriftSqlType.string, requiredDuringInsert: true);
   static const VerificationMeta _gradeMeta = const VerificationMeta('grade');
   @override
   late final GeneratedColumn<String> grade = GeneratedColumn<String>(
-    'grade',
-    aliasedName,
-    false,
-    type: DriftSqlType.string,
-    requiredDuringInsert: true,
-  );
+      'grade', aliasedName, false,
+      type: DriftSqlType.string, requiredDuringInsert: true);
   @override
   List<GeneratedColumn> get $columns => [id, fullName, phone, address, grade];
   @override
@@ -65,10 +43,8 @@ class $UsersTable extends Users with TableInfo<$UsersTable, UserEntity> {
   String get actualTableName => $name;
   static const String $name = 'users';
   @override
-  VerificationContext validateIntegrity(
-    Insertable<UserEntity> instance, {
-    bool isInserting = false,
-  }) {
+  VerificationContext validateIntegrity(Insertable<UserEntity> instance,
+      {bool isInserting = false}) {
     final context = VerificationContext();
     final data = instance.toColumns(true);
     if (data.containsKey('id')) {
@@ -77,34 +53,26 @@ class $UsersTable extends Users with TableInfo<$UsersTable, UserEntity> {
       context.missing(_idMeta);
     }
     if (data.containsKey('full_name')) {
-      context.handle(
-        _fullNameMeta,
-        fullName.isAcceptableOrUnknown(data['full_name']!, _fullNameMeta),
-      );
+      context.handle(_fullNameMeta,
+          fullName.isAcceptableOrUnknown(data['full_name']!, _fullNameMeta));
     } else if (isInserting) {
       context.missing(_fullNameMeta);
     }
     if (data.containsKey('phone')) {
       context.handle(
-        _phoneMeta,
-        phone.isAcceptableOrUnknown(data['phone']!, _phoneMeta),
-      );
+          _phoneMeta, phone.isAcceptableOrUnknown(data['phone']!, _phoneMeta));
     } else if (isInserting) {
       context.missing(_phoneMeta);
     }
     if (data.containsKey('address')) {
-      context.handle(
-        _addressMeta,
-        address.isAcceptableOrUnknown(data['address']!, _addressMeta),
-      );
+      context.handle(_addressMeta,
+          address.isAcceptableOrUnknown(data['address']!, _addressMeta));
     } else if (isInserting) {
       context.missing(_addressMeta);
     }
     if (data.containsKey('grade')) {
       context.handle(
-        _gradeMeta,
-        grade.isAcceptableOrUnknown(data['grade']!, _gradeMeta),
-      );
+          _gradeMeta, grade.isAcceptableOrUnknown(data['grade']!, _gradeMeta));
     } else if (isInserting) {
       context.missing(_gradeMeta);
     }
@@ -117,31 +85,16 @@ class $UsersTable extends Users with TableInfo<$UsersTable, UserEntity> {
   UserEntity map(Map<String, dynamic> data, {String? tablePrefix}) {
     final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
     return UserEntity(
-      id:
-          attachedDatabase.typeMapping.read(
-            DriftSqlType.string,
-            data['${effectivePrefix}id'],
-          )!,
-      fullName:
-          attachedDatabase.typeMapping.read(
-            DriftSqlType.string,
-            data['${effectivePrefix}full_name'],
-          )!,
-      phone:
-          attachedDatabase.typeMapping.read(
-            DriftSqlType.string,
-            data['${effectivePrefix}phone'],
-          )!,
-      address:
-          attachedDatabase.typeMapping.read(
-            DriftSqlType.string,
-            data['${effectivePrefix}address'],
-          )!,
-      grade:
-          attachedDatabase.typeMapping.read(
-            DriftSqlType.string,
-            data['${effectivePrefix}grade'],
-          )!,
+      id: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}id'])!,
+      fullName: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}full_name'])!,
+      phone: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}phone'])!,
+      address: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}address'])!,
+      grade: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}grade'])!,
     );
   }
 
@@ -157,13 +110,12 @@ class UserEntity extends DataClass implements Insertable<UserEntity> {
   final String phone;
   final String address;
   final String grade;
-  const UserEntity({
-    required this.id,
-    required this.fullName,
-    required this.phone,
-    required this.address,
-    required this.grade,
-  });
+  const UserEntity(
+      {required this.id,
+      required this.fullName,
+      required this.phone,
+      required this.address,
+      required this.grade});
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
@@ -185,10 +137,8 @@ class UserEntity extends DataClass implements Insertable<UserEntity> {
     );
   }
 
-  factory UserEntity.fromJson(
-    Map<String, dynamic> json, {
-    ValueSerializer? serializer,
-  }) {
+  factory UserEntity.fromJson(Map<String, dynamic> json,
+      {ValueSerializer? serializer}) {
     serializer ??= driftRuntimeOptions.defaultSerializer;
     return UserEntity(
       id: serializer.fromJson<String>(json['id']),
@@ -210,19 +160,19 @@ class UserEntity extends DataClass implements Insertable<UserEntity> {
     };
   }
 
-  UserEntity copyWith({
-    String? id,
-    String? fullName,
-    String? phone,
-    String? address,
-    String? grade,
-  }) => UserEntity(
-    id: id ?? this.id,
-    fullName: fullName ?? this.fullName,
-    phone: phone ?? this.phone,
-    address: address ?? this.address,
-    grade: grade ?? this.grade,
-  );
+  UserEntity copyWith(
+          {String? id,
+          String? fullName,
+          String? phone,
+          String? address,
+          String? grade}) =>
+      UserEntity(
+        id: id ?? this.id,
+        fullName: fullName ?? this.fullName,
+        phone: phone ?? this.phone,
+        address: address ?? this.address,
+        grade: grade ?? this.grade,
+      );
   UserEntity copyWithCompanion(UsersCompanion data) {
     return UserEntity(
       id: data.id.present ? data.id.value : this.id,
@@ -280,11 +230,11 @@ class UsersCompanion extends UpdateCompanion<UserEntity> {
     required String address,
     required String grade,
     this.rowid = const Value.absent(),
-  }) : id = Value(id),
-       fullName = Value(fullName),
-       phone = Value(phone),
-       address = Value(address),
-       grade = Value(grade);
+  })  : id = Value(id),
+        fullName = Value(fullName),
+        phone = Value(phone),
+        address = Value(address),
+        grade = Value(grade);
   static Insertable<UserEntity> custom({
     Expression<String>? id,
     Expression<String>? fullName,
@@ -303,14 +253,13 @@ class UsersCompanion extends UpdateCompanion<UserEntity> {
     });
   }
 
-  UsersCompanion copyWith({
-    Value<String>? id,
-    Value<String>? fullName,
-    Value<String>? phone,
-    Value<String>? address,
-    Value<String>? grade,
-    Value<int>? rowid,
-  }) {
+  UsersCompanion copyWith(
+      {Value<String>? id,
+      Value<String>? fullName,
+      Value<String>? phone,
+      Value<String>? address,
+      Value<String>? grade,
+      Value<int>? rowid}) {
     return UsersCompanion(
       id: id ?? this.id,
       fullName: fullName ?? this.fullName,
@@ -371,24 +320,22 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   List<DatabaseSchemaEntity> get allSchemaEntities => [users];
 }
 
-typedef $$UsersTableCreateCompanionBuilder =
-    UsersCompanion Function({
-      required String id,
-      required String fullName,
-      required String phone,
-      required String address,
-      required String grade,
-      Value<int> rowid,
-    });
-typedef $$UsersTableUpdateCompanionBuilder =
-    UsersCompanion Function({
-      Value<String> id,
-      Value<String> fullName,
-      Value<String> phone,
-      Value<String> address,
-      Value<String> grade,
-      Value<int> rowid,
-    });
+typedef $$UsersTableCreateCompanionBuilder = UsersCompanion Function({
+  required String id,
+  required String fullName,
+  required String phone,
+  required String address,
+  required String grade,
+  Value<int> rowid,
+});
+typedef $$UsersTableUpdateCompanionBuilder = UsersCompanion Function({
+  Value<String> id,
+  Value<String> fullName,
+  Value<String> phone,
+  Value<String> address,
+  Value<String> grade,
+  Value<int> rowid,
+});
 
 class $$UsersTableFilterComposer extends Composer<_$AppDatabase, $UsersTable> {
   $$UsersTableFilterComposer({
@@ -399,29 +346,19 @@ class $$UsersTableFilterComposer extends Composer<_$AppDatabase, $UsersTable> {
     super.$removeJoinBuilderFromRootComposer,
   });
   ColumnFilters<String> get id => $composableBuilder(
-    column: $table.id,
-    builder: (column) => ColumnFilters(column),
-  );
+      column: $table.id, builder: (column) => ColumnFilters(column));
 
   ColumnFilters<String> get fullName => $composableBuilder(
-    column: $table.fullName,
-    builder: (column) => ColumnFilters(column),
-  );
+      column: $table.fullName, builder: (column) => ColumnFilters(column));
 
   ColumnFilters<String> get phone => $composableBuilder(
-    column: $table.phone,
-    builder: (column) => ColumnFilters(column),
-  );
+      column: $table.phone, builder: (column) => ColumnFilters(column));
 
   ColumnFilters<String> get address => $composableBuilder(
-    column: $table.address,
-    builder: (column) => ColumnFilters(column),
-  );
+      column: $table.address, builder: (column) => ColumnFilters(column));
 
   ColumnFilters<String> get grade => $composableBuilder(
-    column: $table.grade,
-    builder: (column) => ColumnFilters(column),
-  );
+      column: $table.grade, builder: (column) => ColumnFilters(column));
 }
 
 class $$UsersTableOrderingComposer
@@ -434,29 +371,19 @@ class $$UsersTableOrderingComposer
     super.$removeJoinBuilderFromRootComposer,
   });
   ColumnOrderings<String> get id => $composableBuilder(
-    column: $table.id,
-    builder: (column) => ColumnOrderings(column),
-  );
+      column: $table.id, builder: (column) => ColumnOrderings(column));
 
   ColumnOrderings<String> get fullName => $composableBuilder(
-    column: $table.fullName,
-    builder: (column) => ColumnOrderings(column),
-  );
+      column: $table.fullName, builder: (column) => ColumnOrderings(column));
 
   ColumnOrderings<String> get phone => $composableBuilder(
-    column: $table.phone,
-    builder: (column) => ColumnOrderings(column),
-  );
+      column: $table.phone, builder: (column) => ColumnOrderings(column));
 
   ColumnOrderings<String> get address => $composableBuilder(
-    column: $table.address,
-    builder: (column) => ColumnOrderings(column),
-  );
+      column: $table.address, builder: (column) => ColumnOrderings(column));
 
   ColumnOrderings<String> get grade => $composableBuilder(
-    column: $table.grade,
-    builder: (column) => ColumnOrderings(column),
-  );
+      column: $table.grade, builder: (column) => ColumnOrderings(column));
 }
 
 class $$UsersTableAnnotationComposer
@@ -484,93 +411,79 @@ class $$UsersTableAnnotationComposer
       $composableBuilder(column: $table.grade, builder: (column) => column);
 }
 
-class $$UsersTableTableManager
-    extends
-        RootTableManager<
-          _$AppDatabase,
-          $UsersTable,
-          UserEntity,
-          $$UsersTableFilterComposer,
-          $$UsersTableOrderingComposer,
-          $$UsersTableAnnotationComposer,
-          $$UsersTableCreateCompanionBuilder,
-          $$UsersTableUpdateCompanionBuilder,
-          (UserEntity, BaseReferences<_$AppDatabase, $UsersTable, UserEntity>),
-          UserEntity,
-          PrefetchHooks Function()
-        > {
+class $$UsersTableTableManager extends RootTableManager<
+    _$AppDatabase,
+    $UsersTable,
+    UserEntity,
+    $$UsersTableFilterComposer,
+    $$UsersTableOrderingComposer,
+    $$UsersTableAnnotationComposer,
+    $$UsersTableCreateCompanionBuilder,
+    $$UsersTableUpdateCompanionBuilder,
+    (UserEntity, BaseReferences<_$AppDatabase, $UsersTable, UserEntity>),
+    UserEntity,
+    PrefetchHooks Function()> {
   $$UsersTableTableManager(_$AppDatabase db, $UsersTable table)
-    : super(
-        TableManagerState(
+      : super(TableManagerState(
           db: db,
           table: table,
-          createFilteringComposer:
-              () => $$UsersTableFilterComposer($db: db, $table: table),
-          createOrderingComposer:
-              () => $$UsersTableOrderingComposer($db: db, $table: table),
-          createComputedFieldComposer:
-              () => $$UsersTableAnnotationComposer($db: db, $table: table),
-          updateCompanionCallback:
-              ({
-                Value<String> id = const Value.absent(),
-                Value<String> fullName = const Value.absent(),
-                Value<String> phone = const Value.absent(),
-                Value<String> address = const Value.absent(),
-                Value<String> grade = const Value.absent(),
-                Value<int> rowid = const Value.absent(),
-              }) => UsersCompanion(
-                id: id,
-                fullName: fullName,
-                phone: phone,
-                address: address,
-                grade: grade,
-                rowid: rowid,
-              ),
-          createCompanionCallback:
-              ({
-                required String id,
-                required String fullName,
-                required String phone,
-                required String address,
-                required String grade,
-                Value<int> rowid = const Value.absent(),
-              }) => UsersCompanion.insert(
-                id: id,
-                fullName: fullName,
-                phone: phone,
-                address: address,
-                grade: grade,
-                rowid: rowid,
-              ),
-          withReferenceMapper:
-              (p0) =>
-                  p0
-                      .map(
-                        (e) => (
-                          e.readTable(table),
-                          BaseReferences(db, table, e),
-                        ),
-                      )
-                      .toList(),
+          createFilteringComposer: () =>
+              $$UsersTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$UsersTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$UsersTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback: ({
+            Value<String> id = const Value.absent(),
+            Value<String> fullName = const Value.absent(),
+            Value<String> phone = const Value.absent(),
+            Value<String> address = const Value.absent(),
+            Value<String> grade = const Value.absent(),
+            Value<int> rowid = const Value.absent(),
+          }) =>
+              UsersCompanion(
+            id: id,
+            fullName: fullName,
+            phone: phone,
+            address: address,
+            grade: grade,
+            rowid: rowid,
+          ),
+          createCompanionCallback: ({
+            required String id,
+            required String fullName,
+            required String phone,
+            required String address,
+            required String grade,
+            Value<int> rowid = const Value.absent(),
+          }) =>
+              UsersCompanion.insert(
+            id: id,
+            fullName: fullName,
+            phone: phone,
+            address: address,
+            grade: grade,
+            rowid: rowid,
+          ),
+          withReferenceMapper: (p0) => p0
+              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
+              .toList(),
           prefetchHooksCallback: null,
-        ),
-      );
+        ));
 }
 
-typedef $$UsersTableProcessedTableManager =
-    ProcessedTableManager<
-      _$AppDatabase,
-      $UsersTable,
-      UserEntity,
-      $$UsersTableFilterComposer,
-      $$UsersTableOrderingComposer,
-      $$UsersTableAnnotationComposer,
-      $$UsersTableCreateCompanionBuilder,
-      $$UsersTableUpdateCompanionBuilder,
-      (UserEntity, BaseReferences<_$AppDatabase, $UsersTable, UserEntity>),
-      UserEntity,
-      PrefetchHooks Function()
-    >;
+typedef $$UsersTableProcessedTableManager = ProcessedTableManager<
+    _$AppDatabase,
+    $UsersTable,
+    UserEntity,
+    $$UsersTableFilterComposer,
+    $$UsersTableOrderingComposer,
+    $$UsersTableAnnotationComposer,
+    $$UsersTableCreateCompanionBuilder,
+    $$UsersTableUpdateCompanionBuilder,
+    (UserEntity, BaseReferences<_$AppDatabase, $UsersTable, UserEntity>),
+    UserEntity,
+    PrefetchHooks Function()>;
 
 class $AppDatabaseManager {
   final _$AppDatabase _db;

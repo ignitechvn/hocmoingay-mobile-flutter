@@ -1,6 +1,7 @@
 import 'package:dio/dio.dart';
 
 import '../../dto/classroom_dto.dart';
+import '../../dto/classroom_details_dto.dart';
 import '../../../core/error/api_error_handler.dart';
 import 'base_api_service.dart';
 
@@ -21,8 +22,24 @@ class StudentClassroomApi {
     }
   }
 
+  // Get classroom details
+  Future<ClassroomDetailsStudentResponseDto> getDetails(
+    String classroomId,
+  ) async {
+    try {
+      final response = await _apiService.get(
+        '/student-classrooms/$classroomId/details',
+      );
+      return ClassroomDetailsStudentResponseDto.fromJson(response.data);
+    } on DioException catch (e) {
+      throw _handleDioError(e);
+    } catch (e) {
+      throw Exception('Get classroom details failed: $e');
+    }
+  }
+
   // Error handling
   Exception _handleDioError(DioException e) {
     return ApiErrorHandler.createException(e);
   }
-} 
+}

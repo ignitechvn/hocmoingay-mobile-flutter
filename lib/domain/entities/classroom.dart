@@ -1,16 +1,18 @@
 import '../../core/constants/app_constants.dart';
+import '../../core/constants/classroom_status_constants.dart';
+import '../../core/constants/grade_constants.dart';
+import '../../core/constants/subject_constants.dart';
 
 // Schedule Entity
 class Schedule {
-  final int dayOfWeek;
-  final String startTime;
-  final String endTime;
-
   const Schedule({
     required this.dayOfWeek,
     required this.startTime,
     required this.endTime,
   });
+  final int dayOfWeek;
+  final String startTime;
+  final String endTime;
 
   // Helper methods
   String get dayOfWeekText {
@@ -39,14 +41,6 @@ class Schedule {
 
 // Lesson Session Entity
 class LessonSession {
-  final String id;
-  final DateTime date;
-  final String startTime;
-  final String endTime;
-  final String status;
-  final String? note;
-  final String? originalSessionId;
-
   const LessonSession({
     required this.id,
     required this.date,
@@ -56,6 +50,13 @@ class LessonSession {
     this.note,
     this.originalSessionId,
   });
+  final String id;
+  final DateTime date;
+  final String startTime;
+  final String endTime;
+  final String status;
+  final String? note;
+  final String? originalSessionId;
 
   // Helper methods
   String get timeRange => '$startTime - $endTime';
@@ -66,12 +67,6 @@ class LessonSession {
 
 // Teacher Entity
 class Teacher {
-  final String id;
-  final String fullName;
-  final String? avatar;
-  final String? email;
-  final String phone;
-
   const Teacher({
     required this.id,
     required this.fullName,
@@ -79,24 +74,15 @@ class Teacher {
     this.email,
     required this.phone,
   });
+  final String id;
+  final String fullName;
+  final String? avatar;
+  final String? email;
+  final String phone;
 }
 
 // Classroom Entity
 class Classroom {
-  final String id;
-  final String name;
-  final String code;
-  final String joinCode;
-  final GradeLevel grade;
-  final String status;
-  final int lessonSessionCount;
-  final int lessonLearnedCount;
-  final DateTime startDate;
-  final DateTime endDate;
-  final int totalStudents;
-  final List<Schedule> schedule;
-  final List<LessonSession> lessonSessions;
-
   const Classroom({
     required this.id,
     required this.name,
@@ -112,6 +98,19 @@ class Classroom {
     required this.schedule,
     required this.lessonSessions,
   });
+  final String id;
+  final String name;
+  final ESubjectCode code;
+  final String joinCode;
+  final EGradeLevel grade;
+  final EClassroomStatus status;
+  final int lessonSessionCount;
+  final int lessonLearnedCount;
+  final DateTime startDate;
+  final DateTime endDate;
+  final int totalStudents;
+  final List<Schedule> schedule;
+  final List<LessonSession> lessonSessions;
 
   // Helper methods
   double get progressPercentage {
@@ -119,9 +118,9 @@ class Classroom {
     return (lessonLearnedCount / lessonSessionCount) * 100;
   }
 
-  bool get isActive => status == 'active';
-  bool get isFinished => status == 'finished';
-  bool get isEnrolling => status == 'enrolling';
+  bool get isActive => status == EClassroomStatus.ONGOING;
+  bool get isFinished => status == EClassroomStatus.FINISHED;
+  bool get isEnrolling => status == EClassroomStatus.ENROLLING;
 
   String get nextLessonTime {
     final now = DateTime.now();
@@ -139,9 +138,6 @@ class Classroom {
 
 // Classroom Student Entity
 class ClassroomStudent extends Classroom {
-  final ClassroomStudentStatus studentStatus;
-  final Teacher teacher;
-
   const ClassroomStudent({
     required super.id,
     required super.name,
@@ -159,6 +155,8 @@ class ClassroomStudent extends Classroom {
     required this.studentStatus,
     required this.teacher,
   });
+  final ClassroomStudentStatus studentStatus;
+  final Teacher teacher;
 
   // Helper methods
   bool get isEnrolled => studentStatus == ClassroomStudentStatus.actived;
@@ -172,15 +170,14 @@ class ClassroomStudent extends Classroom {
 
 // Student Classrooms Entity
 class StudentClassrooms {
-  final List<ClassroomStudent> enrollingClassrooms;
-  final List<ClassroomStudent> ongoingClassrooms;
-  final List<ClassroomStudent> finishedClassrooms;
-
   const StudentClassrooms({
     required this.enrollingClassrooms,
     required this.ongoingClassrooms,
     required this.finishedClassrooms,
   });
+  final List<ClassroomStudent> enrollingClassrooms;
+  final List<ClassroomStudent> ongoingClassrooms;
+  final List<ClassroomStudent> finishedClassrooms;
 
   // Helper methods
   int get totalClassrooms =>

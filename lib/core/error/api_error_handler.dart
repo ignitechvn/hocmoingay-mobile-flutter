@@ -53,7 +53,7 @@ class ApiErrorHandler {
 
       // Classroom Related
       case '400CLASSROOM_STATUS_ENROLLING_REJECT':
-        return 'Không thể thực hiện thao tác này với trạng thái lớp học hiện tại';
+        return 'Lớp học này đang trong quá trình tuyển sinh. Vui lòng đợi khi lớp học chính thức bắt đầu để xem chi tiết';
       case '400STUDENT_NOT_IN_CLASSROOM':
         return 'Học sinh không thuộc lớp học này';
       case '400STUDENT_NOT_APPROVED':

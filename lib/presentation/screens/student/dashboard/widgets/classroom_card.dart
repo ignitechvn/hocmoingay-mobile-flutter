@@ -53,7 +53,7 @@ class ClassroomCard extends StatelessWidget {
                 ],
               ),
               child: Icon(
-                _getSubjectIcon(classroom.code),
+                _getSubjectIcon(classroom.code.value),
                 size: 28,
                 color: AppColors.primary,
               ),

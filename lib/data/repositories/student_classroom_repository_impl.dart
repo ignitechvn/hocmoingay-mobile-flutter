@@ -3,6 +3,7 @@ import '../../domain/entities/classroom.dart';
 import '../../domain/repositories/student_classroom_repository.dart';
 import '../datasources/api/student_classroom_api.dart';
 import '../dto/classroom_dto.dart';
+import '../dto/classroom_details_dto.dart';
 
 // Helper function to parse date strings
 DateTime _parseDateString(String dateString) {
@@ -83,9 +84,12 @@ class StudentClassroomRepositoryImpl implements StudentClassroomRepository {
 
   StudentClassrooms _mapToEntity(StudentClassroomResponseListDto dto) {
     return StudentClassrooms(
-      enrollingClassrooms: dto.enrollingClassrooms.map(_mapToClassroomStudent).toList(),
-      ongoingClassrooms: dto.ongoingClassrooms.map(_mapToClassroomStudent).toList(),
-      finishedClassrooms: dto.finishedClassrooms.map(_mapToClassroomStudent).toList(),
+      enrollingClassrooms:
+          dto.enrollingClassrooms.map(_mapToClassroomStudent).toList(),
+      ongoingClassrooms:
+          dto.ongoingClassrooms.map(_mapToClassroomStudent).toList(),
+      finishedClassrooms:
+          dto.finishedClassrooms.map(_mapToClassroomStudent).toList(),
     );
   }
 
@@ -95,7 +99,7 @@ class StudentClassroomRepositoryImpl implements StudentClassroomRepository {
       name: dto.name,
       code: dto.code,
       joinCode: dto.joinCode,
-      grade: dto.gradeEnum ?? GradeLevel.grade1,
+      grade: dto.grade,
       status: dto.status,
       lessonSessionCount: dto.lessonSessionCount,
       lessonLearnedCount: dto.lessonLearnedCount,
@@ -137,5 +141,11 @@ class StudentClassroomRepositoryImpl implements StudentClassroomRepository {
       email: dto.email,
       phone: dto.phone,
     );
+  }
+
+  Future<ClassroomDetailsStudentResponseDto> getDetails(
+    String classroomId,
+  ) async {
+    return await _api.getDetails(classroomId);
   }
 }

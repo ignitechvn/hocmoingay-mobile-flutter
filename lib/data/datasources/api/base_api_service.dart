@@ -43,4 +43,8 @@ class BaseApiService {
   Future<Response> delete(String path, {Map<String, dynamic>? data}) async {
     return await dio.delete(path, data: data);
   }
+
+  Future<Response> patch(String path, {Map<String, dynamic>? data}) async {
+    return await dio.patch(path, data: data);
+  }
 }

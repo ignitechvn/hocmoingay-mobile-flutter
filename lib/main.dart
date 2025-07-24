@@ -16,6 +16,7 @@ import 'presentation/screens/auth/forgot_password/forgot_password_screen.dart';
 import 'presentation/screens/onboarding/onboarding_screen.dart';
 import 'presentation/screens/onboarding/role_selection_screen.dart';
 import 'presentation/screens/profile/profile_screen.dart';
+import 'presentation/screens/student/classroom/classroom_details_screen.dart';
 
 void main() {
   // Khởi tạo logging
@@ -74,6 +75,13 @@ class MyApp extends StatelessWidget {
             return MaterialPageRoute(builder: (context) => const ForgotPasswordScreen());
           case '/profile':
             return MaterialPageRoute(builder: (context) => const ProfileScreen());
+          case '/classroom-details':
+            final args = settings.arguments as Map<String, dynamic>?;
+            final classroomId = args?['classroomId'] as String?;
+            if (classroomId != null) {
+              return MaterialPageRoute(builder: (context) => ClassroomDetailsScreen(classroomId: classroomId));
+            }
+            return MaterialPageRoute(builder: (context) => const AuthWrapper());
           default:
             return MaterialPageRoute(builder: (context) => const AuthWrapper());
         }

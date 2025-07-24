@@ -1,4 +1,7 @@
 import '../../core/constants/app_constants.dart';
+import '../../core/constants/subject_constants.dart';
+import '../../core/constants/grade_constants.dart';
+import '../../core/constants/classroom_status_constants.dart';
 
 // Schedule Response DTO
 class ScheduleResponseDto {
@@ -93,11 +96,11 @@ class TeacherDto {
   };
 
   factory TeacherDto.fromJson(Map<String, dynamic> json) => TeacherDto(
-    id: json['id'] as String,
-    fullName: json['fullName'] as String,
+    id: json['id'] as String? ?? '',
+    fullName: json['fullName'] as String? ?? '',
     avatar: json['avatar'] as String?,
     email: json['email'] as String?,
-    phone: json['phone'] as String,
+    phone: json['phone'] as String? ?? '',
   );
 }
 
@@ -105,10 +108,10 @@ class TeacherDto {
 class ClassroomResponseDto {
   final String id;
   final String name;
-  final String code;
+  final ESubjectCode code;
   final String joinCode;
-  final String grade;
-  final String status;
+  final EGradeLevel grade;
+  final EClassroomStatus status;
   final int lessonSessionCount;
   final int lessonLearnedCount;
   final String startDate;
@@ -136,10 +139,10 @@ class ClassroomResponseDto {
   Map<String, dynamic> toJson() => {
     'id': id,
     'name': name,
-    'code': code,
+    'code': code.value,
     'joinCode': joinCode,
-    'grade': grade,
-    'status': status,
+    'grade': grade.value,
+    'status': status.value,
     'lessonSessionCount': lessonSessionCount,
     'lessonLearnedCount': lessonLearnedCount,
     'startDate': startDate,
@@ -154,10 +157,10 @@ class ClassroomResponseDto {
   ) => ClassroomResponseDto(
     id: json['id'] as String,
     name: json['name'] as String,
-    code: json['code'] as String,
+    code: ESubjectCode.fromString(json['code'] as String),
     joinCode: json['joinCode'] as String,
-    grade: json['grade'] as String,
-    status: json['status'] as String,
+    grade: EGradeLevel.fromString(json['grade'] as String),
+    status: EClassroomStatus.fromString(json['status'] as String),
     lessonSessionCount: json['lessonSessionCount'] as int,
     lessonLearnedCount: json['lessonLearnedCount'] as int,
     startDate: json['startDate'] as String,
@@ -181,7 +184,7 @@ class ClassroomResponseDto {
   );
 
   // Helper methods
-  GradeLevel? get gradeEnum => GradeLevel.fromString(grade);
+  GradeLevel? get gradeEnum => GradeLevel.fromString(grade.value);
 }
 
 // Classroom Student Response DTO
@@ -219,10 +222,10 @@ class ClassroomStudentResponseDto extends ClassroomResponseDto {
   ) => ClassroomStudentResponseDto(
     id: json['id'] as String,
     name: json['name'] as String,
-    code: json['code'] as String,
+    code: ESubjectCode.fromString(json['code'] as String),
     joinCode: json['joinCode'] as String,
-    grade: json['grade'] as String,
-    status: json['status'] as String,
+    grade: EGradeLevel.fromString(json['grade'] as String),
+    status: EClassroomStatus.fromString(json['status'] as String),
     lessonSessionCount: json['lessonSessionCount'] as int,
     lessonLearnedCount: json['lessonLearnedCount'] as int,
     startDate: json['startDate'] as String,
