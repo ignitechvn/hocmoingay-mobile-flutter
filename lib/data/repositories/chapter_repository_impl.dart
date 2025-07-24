@@ -1,5 +1,6 @@
 import '../../domain/repositories/chapter_repository.dart';
 import '../dto/chapter_dto.dart';
+import '../dto/chapter_details_dto.dart';
 import '../datasources/api/chapter_api.dart';
 
 class ChapterRepositoryImpl implements ChapterRepository {
@@ -12,5 +13,10 @@ class ChapterRepositoryImpl implements ChapterRepository {
     String classroomId,
   ) async {
     return await _api.getAllByClassroom(classroomId);
+  }
+
+  @override
+  Future<ChapterDetailsStudentResponseDto> getDetails(String chapterId) async {
+    return await _api.getDetails(chapterId);
   }
 }

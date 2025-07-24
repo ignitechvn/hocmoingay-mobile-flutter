@@ -12,6 +12,7 @@ import '../../../presentation/screens/student/dashboard/student_dashboard_screen
 import '../../../presentation/screens/student/notifications/notification_screen.dart';
 import '../../../presentation/screens/student/classroom/classroom_details_screen.dart';
 import '../../../presentation/screens/student/chapter/chapters_screen.dart';
+import '../../../presentation/screens/student/chapter/chapter_details_screen.dart';
 import '../../../presentation/screens/teacher/teacher_dashboard_screen.dart';
 import '../../../core/constants/app_constants.dart';
 
@@ -28,6 +29,7 @@ class AppRoutes {
   static const notifications = '/notifications';
   static const classroomDetails = '/classroom-details';
   static const chapters = '/chapters';
+  static const chapterDetails = '/chapter-details';
   static const teacherDashboard = '/teacher-dashboard';
 
   static final routerConfig = GoRouter(
@@ -113,6 +115,17 @@ class AppRoutes {
             return ChaptersScreen(classroomId: classroomId);
           }
           print('DEBUG: Returning StudentDashboardScreen as fallback');
+          return const StudentDashboardScreen();
+        },
+      ),
+      GoRoute(
+        path: AppRoutes.chapterDetails,
+        builder: (context, state) {
+          final extra = state.extra as Map<String, dynamic>?;
+          final chapterId = extra?['chapterId'] as String?;
+          if (chapterId != null) {
+            return ChapterDetailsScreen(chapterId: chapterId);
+          }
           return const StudentDashboardScreen();
         },
       ),

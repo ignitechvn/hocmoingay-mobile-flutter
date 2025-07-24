@@ -10,6 +10,7 @@ import '../../../../core/widgets/empty_state_widget.dart';
 import '../../../../data/dto/chapter_dto.dart';
 import '../../../../providers/chapter/chapter_providers.dart';
 import 'widgets/chapter_status_filter_bar.dart';
+import 'chapter_details_screen.dart';
 
 class ChaptersScreen extends ConsumerStatefulWidget {
   const ChaptersScreen({super.key, required this.classroomId});
@@ -130,92 +131,101 @@ class _ChaptersScreenState extends ConsumerState<ChaptersScreen> {
             ? ((chapter.answeredCount / chapter.questionCount) * 100).round()
             : 0;
 
-    return Container(
-      margin: const EdgeInsets.only(bottom: 12),
-      padding: const EdgeInsets.all(AppDimensions.defaultPadding),
-      decoration: BoxDecoration(
-        color: _getStatusBackgroundColor(chapter.status),
-        borderRadius: BorderRadius.circular(12),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // Row 1: Title
-          Row(
-            children: [
-              Expanded(
-                child: Text(
-                  chapter.title,
-                  style: AppTextStyles.headlineSmall.copyWith(
-                    fontWeight: FontWeight.bold,
-                    color: AppColors.textPrimary,
+    return GestureDetector(
+      onTap: () {
+        Navigator.of(context).push(
+          MaterialPageRoute(
+            builder: (context) => ChapterDetailsScreen(chapterId: chapter.id),
+          ),
+        );
+      },
+      child: Container(
+        margin: const EdgeInsets.only(bottom: 12),
+        padding: const EdgeInsets.all(AppDimensions.defaultPadding),
+        decoration: BoxDecoration(
+          color: _getStatusBackgroundColor(chapter.status),
+          borderRadius: BorderRadius.circular(12),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Row 1: Title
+            Row(
+              children: [
+                Expanded(
+                  child: Text(
+                    chapter.title,
+                    style: AppTextStyles.headlineSmall.copyWith(
+                      fontWeight: FontWeight.bold,
+                      color: AppColors.textPrimary,
+                    ),
                   ),
                 ),
-              ),
-            ],
-          ),
-
-          const SizedBox(height: 6),
-
-          // Row 2: Description
-          if (chapter.description != null && chapter.description!.isNotEmpty)
-            Text(
-              chapter.description!,
-              style: AppTextStyles.bodySmall.copyWith(
-                color: AppColors.textPrimary,
-              ),
+              ],
             ),
 
-          const SizedBox(height: 6),
+            const SizedBox(height: 6),
 
-          // Row 3: Stats and Progress
-          Row(
-            children: [
-              // Left column: Question count and date range
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      '${chapter.questionCount} câu hỏi',
-                      style: AppTextStyles.bodyMedium.copyWith(
-                        color: AppColors.textPrimary,
-                      ),
-                    ),
-                    const SizedBox(height: 6),
-                    Text(
-                      '${_formatDate(chapter.startDate ?? '')} - ${_formatDate(chapter.deadline ?? '')}',
-                      style: AppTextStyles.bodySmall.copyWith(
-                        color: AppColors.textPrimary,
-                      ),
-                    ),
-                  ],
+            // Row 2: Description
+            if (chapter.description != null && chapter.description!.isNotEmpty)
+              Text(
+                chapter.description!,
+                style: AppTextStyles.bodySmall.copyWith(
+                  color: AppColors.textPrimary,
                 ),
               ),
 
-              // Right column: Progress circle (only for OPEN and CLOSED status)
-              if (chapter.status == EChapterStatus.OPEN ||
-                  chapter.status == EChapterStatus.CLOSED)
-                Container(
-                  width: 50,
-                  height: 50,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    color: AppColors.primary.withOpacity(0.1),
+            const SizedBox(height: 6),
+
+            // Row 3: Stats and Progress
+            Row(
+              children: [
+                // Left column: Question count and date range
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        '${chapter.questionCount} câu hỏi',
+                        style: AppTextStyles.bodyMedium.copyWith(
+                          color: AppColors.textPrimary,
+                        ),
+                      ),
+                      const SizedBox(height: 6),
+                      Text(
+                        '${_formatDate(chapter.startDate ?? '')} - ${_formatDate(chapter.deadline ?? '')}',
+                        style: AppTextStyles.bodySmall.copyWith(
+                          color: AppColors.textPrimary,
+                        ),
+                      ),
+                    ],
                   ),
-                  child: Center(
-                    child: Text(
-                      '$answeredPercent%',
-                      style: AppTextStyles.bodySmall.copyWith(
-                        fontWeight: FontWeight.bold,
-                        color: AppColors.primary,
+                ),
+
+                // Right column: Progress circle (only for OPEN and CLOSED status)
+                if (chapter.status == EChapterStatus.OPEN ||
+                    chapter.status == EChapterStatus.CLOSED)
+                  Container(
+                    width: 50,
+                    height: 50,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: AppColors.primary.withOpacity(0.1),
+                    ),
+                    child: Center(
+                      child: Text(
+                        '$answeredPercent%',
+                        style: AppTextStyles.bodySmall.copyWith(
+                          fontWeight: FontWeight.bold,
+                          color: AppColors.primary,
+                        ),
                       ),
                     ),
                   ),
-                ),
-            ],
-          ),
-        ],
+              ],
+            ),
+          ],
+        ),
       ),
     );
   }
