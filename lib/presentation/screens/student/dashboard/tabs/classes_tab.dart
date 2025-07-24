@@ -37,6 +37,36 @@ class _ClassesTabState extends ConsumerState<ClassesTab> {
         ),
         backgroundColor: Colors.transparent,
         elevation: 0,
+        actions: [
+          Container(
+            margin: const EdgeInsets.only(right: 16),
+            child: InkWell(
+              onTap: () {
+                // TODO: Navigate to schedule screen
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text('Thời khóa biểu đang được phát triển'),
+                    backgroundColor: AppColors.primary,
+                  ),
+                );
+              },
+              borderRadius: BorderRadius.circular(20),
+              child: Container(
+                width: 40,
+                height: 40,
+                decoration: BoxDecoration(
+                  color: AppColors.primary.withOpacity(0.1),
+                  shape: BoxShape.circle,
+                ),
+                child: Icon(
+                  Icons.calendar_today,
+                  color: AppColors.primary,
+                  size: 20,
+                ),
+              ),
+            ),
+          ),
+        ],
       ),
       body: Column(
         children: [
