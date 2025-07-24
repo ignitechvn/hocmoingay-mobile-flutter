@@ -43,8 +43,7 @@ class _CommonScheduleScreenState extends ConsumerState<CommonScheduleScreen> {
   }
 
   @override
-  Widget build(BuildContext context) {
-    return Scaffold(
+  Widget build(BuildContext context) => Scaffold(
       backgroundColor: AppColors.grey50,
       appBar: AppBar(
         title: Text(
@@ -94,11 +93,11 @@ class _CommonScheduleScreenState extends ConsumerState<CommonScheduleScreen> {
               decoration: BoxDecoration(
                 color: Colors.white,
                 borderRadius: BorderRadius.circular(16),
-                boxShadow: [
+                boxShadow: const [
                   BoxShadow(
                     color: AppColors.shadowLight,
                     blurRadius: 8,
-                    offset: const Offset(0, 2),
+                    offset: Offset(0, 2),
                   ),
                 ],
               ),
@@ -108,34 +107,16 @@ class _CommonScheduleScreenState extends ConsumerState<CommonScheduleScreen> {
         ],
       ),
     );
-  }
 
   Widget _buildScheduleTimeline() {
     // Filter classrooms that are active in current week
     final weekClassrooms =
-        widget.classrooms.where((classroom) {
-          return classroom.startDate.isBefore(
+        widget.classrooms.where((Classroom classroom) => classroom.startDate.isBefore(
                 _weekEnd.add(const Duration(days: 1)),
               ) &&
               classroom.endDate.isAfter(
                 _weekStart.subtract(const Duration(days: 1)),
-              );
-        }).toList();
-
-    // Debug: Print week range and classrooms
-    print(
-      '🕐 Week range: ${_weekStart.toString().split(' ')[0]} to ${_weekEnd.toString().split(' ')[0]}',
-    );
-    print('📚 Total classrooms: ${widget.classrooms.length}');
-    print('📅 Week classrooms: ${weekClassrooms.length}');
-    for (final classroom in widget.classrooms) {
-      print(
-        '  - ${classroom.name}: ${classroom.startDate.toString().split(' ')[0]} to ${classroom.endDate.toString().split(' ')[0]}',
-      );
-      print(
-        '    Schedule: ${classroom.schedule.map((s) => '${s.dayOfWeekText} ${s.startTime}-${s.endTime}').join(', ')}',
-      );
-    }
+              )).toList();
 
     // Group classrooms by day and time
     final scheduleMap = <int, List<Classroom>>{};
@@ -180,8 +161,7 @@ class _CommonScheduleScreenState extends ConsumerState<CommonScheduleScreen> {
       '⏰ Time slots: ${timeSlots.map((slot) => '${slot['start']}-${slot['end']}').join(', ')}',
     );
 
-    return timeSlots.map((slot) {
-      return Container(
+    return timeSlots.map((slot) => Container(
         margin: const EdgeInsets.only(top: 24),
         child: Row(
           children: [
@@ -237,8 +217,7 @@ class _CommonScheduleScreenState extends ConsumerState<CommonScheduleScreen> {
             Expanded(child: _buildScheduleContent(scheduleMap, slot)),
           ],
         ),
-      );
-    }).toList();
+      )).toList();
   }
 
   bool _hasClassInTimeSlot(

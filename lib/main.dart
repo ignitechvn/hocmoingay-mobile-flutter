@@ -6,17 +6,17 @@ import 'core/theme/app_colors.dart';
 import 'core/theme/app_material_colors.dart';
 import 'core/theme/app_text_styles.dart';
 import 'core/utils/logger.dart';
-import 'presentation/widgets/auth_wrapper.dart';
+import 'presentation/screens/auth/forgot_password/forgot_password_screen.dart';
 import 'presentation/screens/auth/login/login_screen.dart';
-import 'presentation/screens/auth/register/register_screen.dart';
 import 'presentation/screens/auth/register/congratulations_screen.dart';
+import 'presentation/screens/auth/register/register_screen.dart';
 import 'presentation/screens/auth/reset_password/reset_password_screen.dart';
 import 'presentation/screens/auth/verify_otp/verify_otp_screen.dart';
-import 'presentation/screens/auth/forgot_password/forgot_password_screen.dart';
+import 'presentation/screens/common/profile_screen.dart';
 import 'presentation/screens/onboarding/onboarding_screen.dart';
 import 'presentation/screens/onboarding/role_selection_screen.dart';
-import 'presentation/screens/common/profile_screen.dart';
 import 'presentation/screens/student/classroom/classroom_details_screen.dart';
+import 'presentation/widgets/auth_wrapper.dart';
 
 void main() {
   // Khởi tạo logging

@@ -10,11 +10,11 @@ import '../../../../../core/theme/app_text_styles.dart';
 import '../../../../../core/utils/toast_utils.dart';
 import '../../../../../domain/entities/classroom.dart';
 
-class ClassroomCardV2 extends StatelessWidget {
+class StudentClassroomCard extends StatelessWidget {
   final ClassroomStudent classroom;
   final VoidCallback? onTap;
 
-  const ClassroomCardV2({super.key, required this.classroom, this.onTap});
+  const StudentClassroomCard({super.key, required this.classroom, this.onTap});
 
   @override
   Widget build(BuildContext context) {

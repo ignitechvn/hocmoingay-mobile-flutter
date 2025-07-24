@@ -9,18 +9,18 @@ import '../../../../../core/widgets/empty_state_widget.dart';
 import '../../../../../domain/entities/classroom.dart';
 import '../../../../../providers/student_classroom/student_classroom_providers.dart';
 import '../widgets/status_filter_bar.dart';
-import '../widgets/classroom_card_v2.dart';
+import '../widgets/student_classroom_card.dart';
 import '../widgets/join_classroom_dialog.dart';
 import '../../schedule/student_schedule_screen.dart';
 
-class ClassesTab extends ConsumerStatefulWidget {
-  const ClassesTab({super.key});
+class StudentClassesTab extends ConsumerStatefulWidget {
+  const StudentClassesTab({super.key});
 
   @override
-  ConsumerState<ClassesTab> createState() => _ClassesTabState();
+  ConsumerState<StudentClassesTab> createState() => _StudentClassesTabState();
 }
 
-class _ClassesTabState extends ConsumerState<ClassesTab> {
+class _StudentClassesTabState extends ConsumerState<StudentClassesTab> {
   int _selectedStatusIndex = 0;
 
   @override
@@ -58,7 +58,7 @@ class _ClassesTabState extends ConsumerState<ClassesTab> {
                   color: AppColors.primary.withOpacity(0.1),
                   shape: BoxShape.circle,
                 ),
-                child: Icon(
+                child: const Icon(
                   Icons.add_circle_outline,
                   color: AppColors.primary,
                   size: 20,
@@ -85,7 +85,7 @@ class _ClassesTabState extends ConsumerState<ClassesTab> {
                   color: AppColors.primary.withOpacity(0.1),
                   shape: BoxShape.circle,
                 ),
-                child: Icon(
+                child: const Icon(
                   Icons.calendar_today,
                   color: AppColors.primary,
                   size: 20,
@@ -156,7 +156,7 @@ class _ClassesTabState extends ConsumerState<ClassesTab> {
         final classroom = selectedClassrooms[index];
         return Padding(
           padding: const EdgeInsets.only(bottom: 16),
-          child: ClassroomCardV2(
+          child: StudentClassroomCard(
             classroom: classroom,
             onTap: () => _handleClassroomAction(classroom),
           ),

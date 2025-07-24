@@ -4,7 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_text_styles.dart';
-import 'tabs/classes_tab.dart';
+import 'tabs/student_classes_tab.dart';
 import '../../common/profile_screen.dart';
 import '../../common/notification_screen.dart';
 import '../../../../providers/notification/notification_providers.dart';
@@ -22,7 +22,7 @@ class _StudentDashboardScreenState
   int _currentIndex = 0;
 
   final List<Widget> _tabs = [
-    const ClassesTab(),
+    const StudentClassesTab(),
     const _DiscoverTab(),
     const CommonNotificationScreen(),
     const CommonProfileScreen(),
