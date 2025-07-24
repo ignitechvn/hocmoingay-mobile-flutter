@@ -79,10 +79,9 @@ class ValidationFailure extends Failure {
 class RequiredFieldFailure extends Failure {
   const RequiredFieldFailure({
     required String fieldName,
-    super.message = 'Trường này là bắt buộc.',
     super.code = 'REQUIRED_FIELD',
     super.details,
-  }) : super(message: '$fieldName: $message');
+  }) : super(message: '$fieldName: Trường này là bắt buộc.');
 }
 
 // Data Failures

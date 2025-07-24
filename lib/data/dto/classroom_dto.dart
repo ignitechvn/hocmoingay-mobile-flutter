@@ -184,7 +184,7 @@ class ClassroomResponseDto {
   );
 
   // Helper methods
-  GradeLevel? get gradeEnum => GradeLevel.fromString(grade.value);
+  EGradeLevel? get gradeEnum => EGradeLevel.fromString(grade.value);
 }
 
 // Classroom Student Response DTO

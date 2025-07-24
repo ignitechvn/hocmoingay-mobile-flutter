@@ -3,16 +3,15 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../../core/constants/app_constants.dart';
-import '../../../../core/routers/app_router.dart';
+import '../../../../core/constants/grade_constants.dart';
+import '../../../../core/error/api_error_handler.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_dimensions.dart';
 import '../../../../core/theme/app_text_styles.dart';
-import '../../../../core/utils/validators.dart';
 import '../../../../core/utils/toast_utils.dart';
-import '../../../../core/error/api_error_handler.dart';
+import '../../../../core/utils/validators.dart';
 import '../../../../core/widgets/app_button.dart';
 import '../../../../core/widgets/app_text_field.dart';
-
 import '../../../../data/dto/auth_dto.dart';
 import '../../../../providers/api/api_providers.dart';
 
@@ -39,7 +38,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen>
   bool _isLoading = false;
   bool _agreeToTerms = false;
   Role _selectedRole = Role.student;
-  GradeLevel? _selectedGrade;
+  EGradeLevel? _selectedGrade;
   Gender _selectedGender = Gender.male;
 
   @override
@@ -75,7 +74,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen>
     super.dispose();
   }
 
-  void _handleRegister() async {
+  Future<void> _handleRegister() async {
     if (!_formKey.currentState!.validate()) return;
 
     if (!_agreeToTerms) {
@@ -112,7 +111,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen>
           gender: _selectedGender.value,
           grade: _selectedGrade!.value,
         );
-        final response = await authApi.registerStudent(registerDto);
+        final _ = await authApi.registerStudent(registerDto);
 
         if (mounted) {
           // Show success toast
@@ -122,7 +121,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen>
           );
           // Save user data if needed
           // await secureStorage.write(key: AppConstants.userKey, value: response.user.toJson());
-          Navigator.pushNamed(context, '/congratulations');
+          await Navigator.pushNamed(context, '/congratulations');
         }
       } else if (_selectedRole == Role.teacher) {
         // Register Teacher
@@ -133,7 +132,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen>
           address: _addressController.text.trim(),
           gender: _selectedGender.value,
         );
-        final response = await authApi.registerTeacher(registerDto);
+        final _ = await authApi.registerTeacher(registerDto);
 
         if (mounted) {
           // Show success toast
@@ -143,7 +142,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen>
           );
           // Save user data if needed
           // await secureStorage.write(key: AppConstants.userKey, value: response.user.toJson());
-          Navigator.pushNamed(context, '/congratulations');
+          await Navigator.pushNamed(context, '/congratulations');
         }
       }
     } catch (e) {
@@ -192,9 +191,9 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen>
                 child: SlideTransition(
                   position: _slideAnimation,
                   child: Column(
-                    children: [
+                    children: <Widget>[
                       // Title
-                      Text(
+                      const Text(
                         'Tạo tài khoản',
                         style: AppTextStyles.displaySmall,
                         textAlign: TextAlign.center,
@@ -243,7 +242,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen>
                       // Email Field (Optional)
                       EmailTextField(
                         controller: _emailController,
-                        validator: (value) {
+                        validator: (String? value) {
                           if (value != null && value.isNotEmpty) {
                             return Validators.validateEmail(value);
                           }
@@ -258,7 +257,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen>
                         controller: _addressController,
                         label: 'Địa chỉ',
                         hint: 'Nhập địa chỉ của bạn',
-                        validator: (value) {
+                        validator: (String? value) {
                           if (value == null || value.trim().isEmpty) {
                             return 'Địa chỉ là bắt buộc';
                           }
@@ -292,15 +291,13 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen>
                                 contentPadding: EdgeInsets.zero,
                               ),
                               items:
-                                  Gender.values.map((gender) {
-                                    return DropdownMenuItem<Gender>(
+                                  Gender.values.map((Gender gender) => DropdownMenuItem<Gender>(
                                       value: gender,
                                       child: Text(
                                         gender.label,
                                         style: AppTextStyles.bodyMedium,
                                       ),
-                                    );
-                                  }).toList(),
+                                    )).toList(),
                               onChanged: (Gender? value) {
                                 if (value != null) {
                                   setState(() {
@@ -347,15 +344,13 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen>
                                 contentPadding: EdgeInsets.zero,
                               ),
                               items:
-                                  [Role.student, Role.teacher].map((role) {
-                                    return DropdownMenuItem<Role>(
+                                  <Role>[Role.student, Role.teacher].map((Role role) => DropdownMenuItem<Role>(
                                       value: role,
                                       child: Text(
                                         role.displayName,
                                         style: AppTextStyles.bodyMedium,
                                       ),
-                                    );
-                                  }).toList(),
+                                    )).toList(),
                               onChanged: (Role? value) {
                                 if (value != null) {
                                   setState(() {
@@ -391,7 +386,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen>
                                 ),
                                 border: Border.all(color: AppColors.grey300),
                               ),
-                              child: DropdownButtonFormField<GradeLevel>(
+                              child: DropdownButtonFormField<EGradeLevel>(
                                 value: _selectedGrade,
                                 decoration: InputDecoration(
                                   border: InputBorder.none,
@@ -408,16 +403,14 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen>
                                   color: AppColors.textSecondary,
                                 ),
                                 items:
-                                    GradeLevel.values.map((grade) {
-                                      return DropdownMenuItem<GradeLevel>(
+                                    EGradeLevel.values.map((EGradeLevel grade) => DropdownMenuItem<EGradeLevel>(
                                         value: grade,
                                         child: Text(
                                           grade.label,
                                           style: AppTextStyles.bodyMedium,
                                         ),
-                                      );
-                                    }).toList(),
-                                onChanged: (GradeLevel? value) {
+                                      )).toList(),
+                                onChanged: (EGradeLevel? value) {
                                   setState(() {
                                     _selectedGrade = value;
                                   });
@@ -436,7 +429,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen>
                         children: [
                           Checkbox(
                             value: _agreeToTerms,
-                            onChanged: (value) {
+                            onChanged: (bool? value) {
                               setState(() {
                                 _agreeToTerms = value ?? false;
                               });

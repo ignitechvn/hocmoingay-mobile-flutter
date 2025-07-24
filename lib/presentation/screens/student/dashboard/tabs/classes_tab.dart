@@ -10,6 +10,7 @@ import '../../../../../domain/entities/classroom.dart';
 import '../../../../../providers/student_classroom/student_classroom_providers.dart';
 import '../widgets/status_filter_bar.dart';
 import '../widgets/classroom_card_v2.dart';
+import '../widgets/join_classroom_dialog.dart';
 
 class ClassesTab extends ConsumerStatefulWidget {
   const ClassesTab({super.key});
@@ -38,17 +39,38 @@ class _ClassesTabState extends ConsumerState<ClassesTab> {
         backgroundColor: Colors.transparent,
         elevation: 0,
         actions: [
+          // Join class button
+          Container(
+            margin: const EdgeInsets.only(right: 8),
+            child: InkWell(
+              onTap: () {
+                showDialog(
+                  context: context,
+                  builder: (context) => const JoinClassroomDialog(),
+                );
+              },
+              borderRadius: BorderRadius.circular(20),
+              child: Container(
+                width: 40,
+                height: 40,
+                decoration: BoxDecoration(
+                  color: AppColors.primary.withOpacity(0.1),
+                  shape: BoxShape.circle,
+                ),
+                child: Icon(
+                  Icons.add_circle_outline,
+                  color: AppColors.primary,
+                  size: 20,
+                ),
+              ),
+            ),
+          ),
+          // Schedule button
           Container(
             margin: const EdgeInsets.only(right: 16),
             child: InkWell(
               onTap: () {
-                // TODO: Navigate to schedule screen
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    content: Text('Thời khóa biểu đang được phát triển'),
-                    backgroundColor: AppColors.primary,
-                  ),
-                );
+                Navigator.of(context).pushNamed('/schedule');
               },
               borderRadius: BorderRadius.circular(20),
               child: Container(

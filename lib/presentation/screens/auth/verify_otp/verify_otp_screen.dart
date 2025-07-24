@@ -74,17 +74,17 @@ class _VerifyOtpScreenState extends ConsumerState<VerifyOtpScreen>
       final verifyOtpDto = VerifyOtpDto(
         phone: widget.phone,
         otp: _otpController.text.trim(),
-        role: Role.student.value, // Default role for forgot password
+        role: Role.student, // Default role for forgot password
       );
 
       await authApi.verifyOtp(verifyOtpDto);
 
       if (mounted) {
         // Navigate to reset password screen
-        Navigator.pushNamed(
+        await Navigator.pushNamed(
           context,
           '/reset-password',
-          arguments: {'phone': widget.phone, 'otp': _otpController.text.trim()},
+          arguments: <String, String>{'phone': widget.phone, 'otp': _otpController.text.trim()},
         );
       }
     } catch (e) {
@@ -105,12 +105,12 @@ class _VerifyOtpScreenState extends ConsumerState<VerifyOtpScreen>
     }
   }
 
-  void _handleResendOtp() async {
+  Future<void> _handleResendOtp() async {
     try {
       final authApi = ref.read(authApiProvider);
       final forgotPasswordDto = ForgotPasswordDto(
         phone: widget.phone,
-        role: Role.student.value, // Default role for forgot password
+        role: Role.student, // Default role for forgot password
       );
 
       await authApi.forgotPassword(forgotPasswordDto);

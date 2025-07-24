@@ -1,38 +1,32 @@
 import '../../core/constants/app_constants.dart';
+import '../../core/constants/grade_constants.dart';
 
 // Login Request DTO
 class LoginDto {
-  final String userName; // User name (phone number)
-  final String password;
-  final String role;
-
   const LoginDto({
     required this.userName,
     required this.password,
     required this.role,
   });
 
-  Map<String, dynamic> toJson() => {
-    'userName': userName,
-    'password': password,
-    'role': role,
-  };
-
   factory LoginDto.fromJson(Map<String, dynamic> json) => LoginDto(
     userName: json['userName'] as String,
     password: json['password'] as String,
-    role: json['role'] as String,
+    role: Role.fromString(json['role'] as String),
   );
+  final String userName; // User name (phone number)
+  final String password;
+  final Role role;
+
+  Map<String, dynamic> toJson() => {
+    'userName': userName,
+    'password': password,
+    'role': role.value,
+  };
 }
 
 // Base Register DTO
 class RegisterBaseDto {
-  final String phone;
-  final String fullName;
-  final String password;
-  final String address;
-  final String gender;
-
   const RegisterBaseDto({
     required this.phone,
     required this.fullName,
@@ -40,6 +34,11 @@ class RegisterBaseDto {
     required this.address,
     required this.gender,
   });
+  final String phone;
+  final String fullName;
+  final String password;
+  final String address;
+  final String gender;
 
   Map<String, dynamic> toJson() => {
     'phone': phone,
@@ -52,9 +51,6 @@ class RegisterBaseDto {
 
 // Register Student DTO
 class RegisterStudentDto extends RegisterBaseDto {
-  final String grade;
-  final String role;
-
   const RegisterStudentDto({
     required super.phone,
     required super.fullName,
@@ -62,15 +58,8 @@ class RegisterStudentDto extends RegisterBaseDto {
     required super.address,
     required super.gender,
     required this.grade,
-    this.role = 'student',
+    this.role = Role.student,
   });
-
-  @override
-  Map<String, dynamic> toJson() => {
-    ...super.toJson(),
-    'grade': grade,
-    'role': role,
-  };
 
   factory RegisterStudentDto.fromJson(Map<String, dynamic> json) =>
       RegisterStudentDto(
@@ -80,25 +69,29 @@ class RegisterStudentDto extends RegisterBaseDto {
         address: json['address'] as String,
         gender: json['gender'] as String,
         grade: json['grade'] as String,
-        role: json['role'] as String? ?? Role.student.value,
+        role: Role.fromString(json['role'] as String? ?? Role.student.value),
       );
+  final String grade;
+  final Role role;
+
+  @override
+  Map<String, dynamic> toJson() => {
+    ...super.toJson(),
+    'grade': grade,
+    'role': role.value,
+  };
 }
 
 // Register Teacher DTO
 class RegisterTeacherDto extends RegisterBaseDto {
-  final String role;
-
   const RegisterTeacherDto({
     required super.phone,
     required super.fullName,
     required super.password,
     required super.address,
     required super.gender,
-    this.role = 'teacher',
+    this.role = Role.teacher,
   });
-
-  @override
-  Map<String, dynamic> toJson() => {...super.toJson(), 'role': role};
 
   factory RegisterTeacherDto.fromJson(Map<String, dynamic> json) =>
       RegisterTeacherDto(
@@ -107,22 +100,16 @@ class RegisterTeacherDto extends RegisterBaseDto {
         password: json['password'] as String,
         address: json['address'] as String,
         gender: json['gender'] as String,
-        role: json['role'] as String? ?? Role.teacher.value,
+        role: Role.fromString(json['role'] as String? ?? Role.teacher.value),
       );
+  final Role role;
+
+  @override
+  Map<String, dynamic> toJson() => {...super.toJson(), 'role': role.value};
 }
 
 // User DTO
 class UserDto {
-  final String id;
-  final String phone;
-  final String fullName;
-  final String address;
-  final String? avatar;
-  final String? email;
-  final String role;
-  final String? grade;
-  final String gender;
-
   const UserDto({
     required this.id,
     required this.phone,
@@ -135,18 +122,6 @@ class UserDto {
     required this.gender,
   });
 
-  Map<String, dynamic> toJson() => {
-    'id': id,
-    'phone': phone,
-    'fullName': fullName,
-    'address': address,
-    if (avatar != null) 'avatar': avatar,
-    if (email != null) 'email': email,
-    'role': role,
-    if (grade != null) 'grade': grade,
-    'gender': gender,
-  };
-
   factory UserDto.fromJson(Map<String, dynamic> json) => UserDto(
     id: json['id'] as String,
     phone: json['phone'] as String,
@@ -154,36 +129,46 @@ class UserDto {
     address: json['address'] as String,
     avatar: json['avatar'] as String?,
     email: json['email'] as String?,
-    role: json['role'] as String,
+    role: Role.fromString(json['role'] as String),
     grade: json['grade'] as String?,
     gender:
         json['gender'] as String? ??
         'male', // Default to 'male' if not provided
   );
+  final String id;
+  final String phone;
+  final String fullName;
+  final String address;
+  final String? avatar;
+  final String? email;
+  final Role role;
+  final String? grade;
+  final String gender;
+
+  Map<String, dynamic> toJson() => {
+    'id': id,
+    'phone': phone,
+    'fullName': fullName,
+    'address': address,
+    if (avatar != null) 'avatar': avatar,
+    if (email != null) 'email': email,
+    'role': role.value,
+    if (grade != null) 'grade': grade,
+    'gender': gender,
+  };
 
   // Helper methods
-  Role get roleEnum => Role.fromString(role);
-  GradeLevel? get gradeEnum => GradeLevel.fromString(grade);
+  EGradeLevel? get gradeEnum => EGradeLevel.fromString(grade ?? '');
   Gender get genderEnum => Gender.fromString(gender);
 }
 
 // Login Response DTO
 class LoginResponseDto {
-  final String accessToken;
-  final String? refreshToken;
-  final UserDto user;
-
   const LoginResponseDto({
     required this.accessToken,
     this.refreshToken,
     required this.user,
   });
-
-  Map<String, dynamic> toJson() => {
-    'access_token': accessToken,
-    if (refreshToken != null) 'refresh_token': refreshToken,
-    'user': user.toJson(),
-  };
 
   factory LoginResponseDto.fromJson(Map<String, dynamic> json) =>
       LoginResponseDto(
@@ -191,117 +176,142 @@ class LoginResponseDto {
         refreshToken: json['refresh_token'] as String?,
         user: UserDto.fromJson(json['user'] as Map<String, dynamic>),
       );
+  final String accessToken;
+  final String? refreshToken;
+  final UserDto user;
+
+  Map<String, dynamic> toJson() => {
+    'access_token': accessToken,
+    if (refreshToken != null) 'refresh_token': refreshToken,
+    'user': user.toJson(),
+  };
 }
 
 // Register Response DTO
 class RegisterResponseDto {
-  final String message;
-  final UserDto user;
-
   const RegisterResponseDto({required this.message, required this.user});
-
-  Map<String, dynamic> toJson() => {'message': message, 'user': user.toJson()};
 
   factory RegisterResponseDto.fromJson(Map<String, dynamic> json) =>
       RegisterResponseDto(
         message: json['message'] as String,
         user: UserDto.fromJson(json['user'] as Map<String, dynamic>),
       );
+  final String message;
+  final UserDto user;
+
+  Map<String, dynamic> toJson() => {'message': message, 'user': user.toJson()};
 }
 
 // Reset Password DTO
 class ResetPasswordDto {
-  final String password;
-  final String confirmPassword;
-
   const ResetPasswordDto({
     required this.password,
     required this.confirmPassword,
+    required this.token,
   });
-
-  Map<String, dynamic> toJson() => {
-    'password': password,
-    'confirmPassword': confirmPassword,
-  };
 
   factory ResetPasswordDto.fromJson(Map<String, dynamic> json) =>
       ResetPasswordDto(
         password: json['password'] as String,
         confirmPassword: json['confirmPassword'] as String,
+        token: json['token'] as String,
       );
+  final String password;
+  final String confirmPassword;
+  final String token;
+
+  Map<String, dynamic> toJson() => {
+    'password': password,
+    'confirmPassword': confirmPassword,
+    'token': token,
+  };
 }
 
 // Forgot Password DTO
 class ForgotPasswordDto {
-  final String phone;
-  final String role;
-
   const ForgotPasswordDto({required this.phone, required this.role});
-
-  Map<String, dynamic> toJson() => {'phone': phone, 'role': role};
 
   factory ForgotPasswordDto.fromJson(Map<String, dynamic> json) =>
       ForgotPasswordDto(
         phone: json['phone'] as String,
-        role: json['role'] as String,
+        role: Role.fromString(json['role'] as String),
       );
+  final String phone;
+  final Role role;
+
+  Map<String, dynamic> toJson() => {'phone': phone, 'role': role.value};
 }
 
 // Verify OTP DTO
 class VerifyOtpDto {
-  final String phone;
-  final String otp;
-  final String role;
-
   const VerifyOtpDto({
     required this.phone,
     required this.otp,
     required this.role,
   });
 
-  Map<String, dynamic> toJson() => {'phone': phone, 'otp': otp, 'role': role};
-
   factory VerifyOtpDto.fromJson(Map<String, dynamic> json) => VerifyOtpDto(
     phone: json['phone'] as String,
     otp: json['otp'] as String,
-    role: json['role'] as String,
+    role: Role.fromString(json['role'] as String),
   );
+  final String phone;
+  final String otp;
+  final Role role;
+
+  Map<String, dynamic> toJson() => {
+    'phone': phone,
+    'otp': otp,
+    'role': role.value,
+  };
 }
 
 // Refresh Token DTO
 class RefreshTokenDto {
-  final String refreshToken;
-
   const RefreshTokenDto({required this.refreshToken});
-
-  Map<String, dynamic> toJson() => {'refresh_token': refreshToken};
 
   factory RefreshTokenDto.fromJson(Map<String, dynamic> json) =>
       RefreshTokenDto(refreshToken: json['refresh_token'] as String);
+  final String refreshToken;
+
+  Map<String, dynamic> toJson() => {'refresh_token': refreshToken};
 }
 
 // Refresh Token Response DTO
 class RefreshTokenResponseDto {
-  final String accessToken;
-  final String refreshToken;
-  final int expiresIn;
-
-  const RefreshTokenResponseDto({
-    required this.accessToken,
-    required this.refreshToken,
-    required this.expiresIn,
-  });
-
-  Map<String, dynamic> toJson() => {
-    'access_token': accessToken,
-    'refresh_token': refreshToken,
-    'expires_in': expiresIn,
-  };
+  const RefreshTokenResponseDto({required this.accessToken, this.refreshToken});
 
   factory RefreshTokenResponseDto.fromJson(Map<String, dynamic> json) =>
       RefreshTokenResponseDto(
         accessToken: json['access_token'] as String,
-        refreshToken: json['refresh_token'] as String,
-        expiresIn: json['expires_in'] as int,
+        refreshToken: json['refresh_token'] as String?,
       );
+  final String accessToken;
+  final String? refreshToken;
+
+  Map<String, dynamic> toJson() => {
+    'access_token': accessToken,
+    if (refreshToken != null) 'refresh_token': refreshToken,
+  };
+}
+
+// Error Response DTO
+class ErrorResponseDto {
+  const ErrorResponseDto({required this.message, this.errors, this.statusCode});
+
+  factory ErrorResponseDto.fromJson(Map<String, dynamic> json) =>
+      ErrorResponseDto(
+        message: json['message'] as String,
+        errors: json['errors'] as Map<String, dynamic>?,
+        statusCode: json['statusCode'] as int?,
+      );
+  final String message;
+  final Map<String, dynamic>? errors;
+  final int? statusCode;
+
+  Map<String, dynamic> toJson() => {
+    'message': message,
+    if (errors != null) 'errors': errors,
+    if (statusCode != null) 'statusCode': statusCode,
+  };
 }

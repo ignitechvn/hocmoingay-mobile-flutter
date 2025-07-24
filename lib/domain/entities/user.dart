@@ -1,4 +1,5 @@
 import '../../core/constants/app_constants.dart';
+import '../../core/constants/grade_constants.dart';
 
 class User {
   final String id;
@@ -7,7 +8,7 @@ class User {
   final String address;
   final String? email;
   final Role role;
-  final GradeLevel? grade;
+  final EGradeLevel? grade;
   final Gender gender;
 
   const User({

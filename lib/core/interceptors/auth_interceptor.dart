@@ -80,9 +80,11 @@ class AuthInterceptor extends Interceptor {
       // Update tokens in storage
       await TokenManager.updateAccessToken(
         accessToken: refreshResponse.accessToken,
-        expiresIn: refreshResponse.expiresIn,
+        expiresIn: 3600, // Default 1 hour
       );
-      await TokenManager.updateRefreshToken(refreshResponse.refreshToken);
+      if (refreshResponse.refreshToken != null) {
+        await TokenManager.updateRefreshToken(refreshResponse.refreshToken!);
+      }
 
       // Retry the original request with new token
       final newRequestOptions = RequestOptions(

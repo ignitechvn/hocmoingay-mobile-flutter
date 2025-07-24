@@ -18,15 +18,11 @@ class ResetPasswordScreen extends ConsumerStatefulWidget {
   final Role? role;
   final String? otp;
 
-  const ResetPasswordScreen({
-    super.key,
-    this.phone,
-    this.role,
-    this.otp,
-  });
+  const ResetPasswordScreen({super.key, this.phone, this.role, this.otp});
 
   @override
-  ConsumerState<ResetPasswordScreen> createState() => _ResetPasswordScreenState();
+  ConsumerState<ResetPasswordScreen> createState() =>
+      _ResetPasswordScreenState();
 }
 
 class _ResetPasswordScreenState extends ConsumerState<ResetPasswordScreen>
@@ -81,7 +77,7 @@ class _ResetPasswordScreenState extends ConsumerState<ResetPasswordScreen>
     return null;
   }
 
-    void _handleResetPassword() async {
+  void _handleResetPassword() async {
     if (!_formKey.currentState!.validate()) return;
 
     setState(() {
@@ -93,10 +89,11 @@ class _ResetPasswordScreenState extends ConsumerState<ResetPasswordScreen>
       final resetPasswordDto = ResetPasswordDto(
         password: _passwordController.text,
         confirmPassword: _confirmPasswordController.text,
+        token: widget.otp ?? '', // Use OTP as token
       );
-      
+
       await authApi.resetPassword(resetPasswordDto);
-      
+
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
@@ -129,7 +126,7 @@ class _ResetPasswordScreenState extends ConsumerState<ResetPasswordScreen>
   }
 
   void _handleRegister() {
-            Navigator.pushNamed(context, '/register');
+    Navigator.pushNamed(context, '/register');
   }
 
   @override

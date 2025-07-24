@@ -15,7 +15,9 @@ import '../../../../core/widgets/app_text_field.dart';
 import '../../../../providers/auth/auth_state_provider.dart';
 
 class LoginScreen extends ConsumerStatefulWidget {
-  const LoginScreen({super.key});
+  final Role? selectedRole;
+
+  const LoginScreen({super.key, this.selectedRole});
 
   @override
   ConsumerState<LoginScreen> createState() => _LoginScreenState();
@@ -55,6 +57,11 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
     );
 
     _animationController.forward();
+
+    // Set selected role from constructor if provided
+    if (widget.selectedRole != null) {
+      _selectedRole = widget.selectedRole!;
+    }
   }
 
   @override

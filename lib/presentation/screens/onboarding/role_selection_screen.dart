@@ -7,6 +7,7 @@ import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_dimensions.dart';
 import '../../../core/theme/app_text_styles.dart';
 import '../../../core/widgets/app_button.dart';
+import '../auth/login/login_screen.dart';
 
 class RoleSelectionScreen extends StatefulWidget {
   const RoleSelectionScreen({super.key});
@@ -21,7 +22,7 @@ class _RoleSelectionScreenState extends State<RoleSelectionScreen>
   late Animation<double> _fadeAnimation;
   late Animation<Offset> _slideAnimation;
 
-  String? selectedRole;
+  Role? selectedRole;
 
   @override
   void initState() {
@@ -51,7 +52,7 @@ class _RoleSelectionScreenState extends State<RoleSelectionScreen>
     super.dispose();
   }
 
-  void _selectRole(String role) {
+  void _selectRole(Role role) {
     setState(() {
       selectedRole = role;
     });
@@ -59,8 +60,13 @@ class _RoleSelectionScreenState extends State<RoleSelectionScreen>
 
   void _proceedToLogin() {
     if (selectedRole != null) {
-      // TODO: Save selected role to preferences
-      Navigator.pushNamed(context, '/login');
+      // Pass selected role to login screen
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => LoginScreen(selectedRole: selectedRole),
+        ),
+      );
     }
   }
 
@@ -155,21 +161,20 @@ class _RoleSelectionScreenState extends State<RoleSelectionScreen>
                           // Teacher Role
                           Expanded(
                             child: GestureDetector(
-                              onTap:
-                                  () => _selectRole(AppConstants.roleTeacher),
+                              onTap: () => _selectRole(Role.teacher),
                               child: AnimatedContainer(
                                 duration: const Duration(milliseconds: 200),
                                 height: 120,
                                 decoration: BoxDecoration(
                                   color:
-                                      selectedRole == AppConstants.roleTeacher
+                                      selectedRole == Role.teacher
                                           ? AppColors.teacherLight
                                           : AppColors.surface,
                                   borderRadius: BorderRadius.circular(
                                     AppDimensions.defaultRadius,
                                   ),
                                   border:
-                                      selectedRole == AppConstants.roleTeacher
+                                      selectedRole == Role.teacher
                                           ? Border.all(
                                             color: AppColors.teacherPrimary,
                                             width: 2,
@@ -210,21 +215,20 @@ class _RoleSelectionScreenState extends State<RoleSelectionScreen>
                           // Student Role
                           Expanded(
                             child: GestureDetector(
-                              onTap:
-                                  () => _selectRole(AppConstants.roleStudent),
+                              onTap: () => _selectRole(Role.student),
                               child: AnimatedContainer(
                                 duration: const Duration(milliseconds: 200),
                                 height: 120,
                                 decoration: BoxDecoration(
                                   color:
-                                      selectedRole == AppConstants.roleStudent
+                                      selectedRole == Role.student
                                           ? AppColors.teacherLight
                                           : AppColors.surface,
                                   borderRadius: BorderRadius.circular(
                                     AppDimensions.defaultRadius,
                                   ),
                                   border:
-                                      selectedRole == AppConstants.roleStudent
+                                      selectedRole == Role.student
                                           ? Border.all(
                                             color: AppColors.teacherPrimary,
                                             width: 2,
@@ -265,20 +269,20 @@ class _RoleSelectionScreenState extends State<RoleSelectionScreen>
                           // Parent Role
                           Expanded(
                             child: GestureDetector(
-                              onTap: () => _selectRole(AppConstants.roleParent),
+                              onTap: () => _selectRole(Role.parent),
                               child: AnimatedContainer(
                                 duration: const Duration(milliseconds: 200),
                                 height: 120,
                                 decoration: BoxDecoration(
                                   color:
-                                      selectedRole == AppConstants.roleParent
+                                      selectedRole == Role.parent
                                           ? AppColors.teacherLight
                                           : AppColors.surface,
                                   borderRadius: BorderRadius.circular(
                                     AppDimensions.defaultRadius,
                                   ),
                                   border:
-                                      selectedRole == AppConstants.roleParent
+                                      selectedRole == Role.parent
                                           ? Border.all(
                                             color: AppColors.teacherPrimary,
                                             width: 2,

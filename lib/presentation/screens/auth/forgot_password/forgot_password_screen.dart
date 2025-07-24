@@ -72,7 +72,7 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen>
       final authApi = ref.read(authApiProvider);
       final forgotPasswordDto = ForgotPasswordDto(
         phone: _phoneController.text.trim(),
-        role: Role.student.value, // Default role for forgot password
+        role: Role.student, // Default role for forgot password
       );
 
       await authApi.forgotPassword(forgotPasswordDto);

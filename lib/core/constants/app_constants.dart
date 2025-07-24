@@ -116,42 +116,11 @@ enum Role {
   final String value;
   final String displayName;
 
-  static Role fromString(String value) {
-    return Role.values.firstWhere(
-      (role) => role.value == value,
+  static Role fromString(String value) => Role.values.firstWhere(
+      (Role role) => role.value == value,
       orElse: () => Role.student,
     );
-  }
 }
-
-// Grade Level Enum
-enum GradeLevel {
-  grade1('grade1', 'Lớp 1'),
-  grade2('grade2', 'Lớp 2'),
-  grade3('grade3', 'Lớp 3'),
-  grade4('grade4', 'Lớp 4'),
-  grade5('grade5', 'Lớp 5'),
-  grade6('grade6', 'Lớp 6'),
-  grade7('grade7', 'Lớp 7'),
-  grade8('grade8', 'Lớp 8'),
-  grade9('grade9', 'Lớp 9'),
-  grade10('grade10', 'Lớp 10'),
-  grade11('grade11', 'Lớp 11'),
-  grade12('grade12', 'Lớp 12');
-
-  const GradeLevel(this.value, this.label);
-  final String value;
-  final String label;
-
-  static GradeLevel? fromString(String? value) {
-    if (value == null) return null;
-    return GradeLevel.values.firstWhere(
-      (grade) => grade.value == value,
-      orElse: () => GradeLevel.grade1,
-    );
-  }
-}
-
 // Gender Enum
 enum Gender {
   male('male', 'Nam'),
@@ -162,12 +131,10 @@ enum Gender {
   final String value;
   final String label;
 
-  static Gender fromString(String value) {
-    return Gender.values.firstWhere(
-      (gender) => gender.value == value,
+  static Gender fromString(String value) => Gender.values.firstWhere(
+      (Gender gender) => gender.value == value,
       orElse: () => Gender.male,
     );
-  }
 }
 
 // Classroom Status Enum
@@ -181,12 +148,10 @@ enum ClassroomStatus {
   final String value;
   final String label;
 
-  static ClassroomStatus fromString(String value) {
-    return ClassroomStatus.values.firstWhere(
-      (status) => status.value == value,
+  static ClassroomStatus fromString(String value) => ClassroomStatus.values.firstWhere(
+      (ClassroomStatus status) => status.value == value,
       orElse: () => ClassroomStatus.enrolling,
     );
-  }
 }
 
 // Classroom Student Status Enum
@@ -201,10 +166,8 @@ enum ClassroomStudentStatus {
   final String value;
   final String label;
 
-  static ClassroomStudentStatus fromString(String value) {
-    return ClassroomStudentStatus.values.firstWhere(
-      (status) => status.value == value,
+  static ClassroomStudentStatus fromString(String value) => ClassroomStudentStatus.values.firstWhere(
+      (ClassroomStudentStatus status) => status.value == value,
       orElse: () => ClassroomStudentStatus.waitingTeacherConfirm,
     );
-  }
 }

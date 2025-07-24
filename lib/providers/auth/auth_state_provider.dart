@@ -1,6 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../core/constants/app_constants.dart';
+import '../../core/constants/grade_constants.dart';
 import '../../core/services/token_manager.dart';
 import '../../data/datasources/api/auth_api.dart';
 import '../../data/dto/auth_dto.dart';
@@ -11,31 +12,28 @@ import '../../providers/api/api_providers.dart';
 enum AuthStatus { initial, loading, authenticated, unauthenticated, error }
 
 class AuthState {
-  final AuthStatus status;
-  final User? user;
-  final String? error;
-  final Role? userRole;
-
   const AuthState({
     this.status = AuthStatus.initial,
     this.user,
     this.error,
     this.userRole,
   });
+  final AuthStatus status;
+  final User? user;
+  final String? error;
+  final Role? userRole;
 
   AuthState copyWith({
     AuthStatus? status,
     User? user,
     String? error,
     Role? userRole,
-  }) {
-    return AuthState(
-      status: status ?? this.status,
-      user: user ?? this.user,
-      error: error ?? this.error,
-      userRole: userRole ?? this.userRole,
-    );
-  }
+  }) => AuthState(
+    status: status ?? this.status,
+    user: user ?? this.user,
+    error: error ?? this.error,
+    userRole: userRole ?? this.userRole,
+  );
 
   bool get isAuthenticated => status == AuthStatus.authenticated;
   bool get isLoading => status == AuthStatus.loading;
@@ -44,9 +42,8 @@ class AuthState {
 
 // Auth State Notifier
 class AuthStateNotifier extends StateNotifier<AuthState> {
-  final AuthApi _authApi;
-
   AuthStateNotifier(this._authApi) : super(const AuthState());
+  final AuthApi _authApi;
 
   // Check if user is already logged in (from local storage)
   Future<void> checkAuthStatus() async {
@@ -65,14 +62,14 @@ class AuthStateNotifier extends StateNotifier<AuthState> {
             address: userData['address'] as String,
             email: userData['email'] as String?,
             role: Role.values.firstWhere(
-              (r) => r.value == userData['role'],
+              (Role r) => r.value == userData['role'],
               orElse: () => Role.student,
             ),
             grade:
                 userData['grade'] != null
-                    ? GradeLevel.values.firstWhere(
+                    ? EGradeLevel.values.firstWhere(
                       (g) => g.value == userData['grade'],
-                      orElse: () => GradeLevel.grade9,
+                      orElse: () => EGradeLevel.GRADE_9,
                     )
                     : null,
             gender: Gender.values.firstWhere(
@@ -110,7 +107,7 @@ class AuthStateNotifier extends StateNotifier<AuthState> {
       final loginDto = LoginDto(
         userName: phone,
         password: password,
-        role: role.value,
+        role: role,
       );
 
       // Call real API
@@ -123,7 +120,7 @@ class AuthStateNotifier extends StateNotifier<AuthState> {
         phone: response.user.phone,
         address: response.user.address,
         email: response.user.email,
-        role: response.user.roleEnum,
+        role: response.user.role,
         grade: response.user.gradeEnum,
         gender: response.user.genderEnum,
       );
@@ -132,7 +129,9 @@ class AuthStateNotifier extends StateNotifier<AuthState> {
       await TokenManager.saveTokens(
         accessToken: response.accessToken,
         refreshToken:
-            response.refreshToken ?? response.accessToken, // Use refresh token if available, fallback to access token
+            response.refreshToken ??
+            response
+                .accessToken, // Use refresh token if available, fallback to access token
         expiresIn: 3600, // 1 hour
         userData: {
           'id': user.id,
@@ -152,7 +151,7 @@ class AuthStateNotifier extends StateNotifier<AuthState> {
         userRole: user.role,
         error: null,
       );
-      
+
       // Debug log
       print('✅ Login successful - User: ${user.fullName}, Role: ${user.role}');
     } catch (e) {
@@ -194,9 +193,11 @@ class AuthStateNotifier extends StateNotifier<AuthState> {
       // Update tokens
       await TokenManager.updateAccessToken(
         accessToken: response.accessToken,
-        expiresIn: response.expiresIn,
+        expiresIn: 3600, // Default 1 hour
       );
-      await TokenManager.updateRefreshToken(response.refreshToken);
+      if (response.refreshToken != null) {
+        await TokenManager.updateRefreshToken(response.refreshToken!);
+      }
     } catch (e) {
       // If refresh fails, clear tokens and logout
       await TokenManager.clearTokens();
