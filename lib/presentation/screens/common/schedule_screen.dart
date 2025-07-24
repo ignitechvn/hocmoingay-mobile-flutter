@@ -9,14 +9,14 @@ import '../student/schedule/widgets/week_selector.dart';
 import 'widgets/common_schedule_event_card.dart';
 
 class CommonScheduleScreen extends ConsumerStatefulWidget {
-  final List<Classroom> classrooms;
-  final String title;
 
   const CommonScheduleScreen({
     super.key,
     required this.classrooms,
     this.title = 'Thời khóa biểu',
   });
+  final List<Classroom> classrooms;
+  final String title;
 
   @override
   ConsumerState<CommonScheduleScreen> createState() =>
@@ -301,27 +301,6 @@ class _CommonScheduleScreenState extends ConsumerState<CommonScheduleScreen> {
       return '$dateString (Hôm nay)';
     } else {
       return dateString;
-    }
-  }
-
-  String _getDayName(int index) {
-    switch (index) {
-      case 0:
-        return 'T2';
-      case 1:
-        return 'T3';
-      case 2:
-        return 'T4';
-      case 3:
-        return 'T5';
-      case 4:
-        return 'T6';
-      case 5:
-        return 'T7';
-      case 6:
-        return 'CN';
-      default:
-        return '';
     }
   }
 }

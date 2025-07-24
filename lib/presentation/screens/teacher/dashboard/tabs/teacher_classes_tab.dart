@@ -13,6 +13,7 @@ import '../../../../../providers/teacher_classroom/teacher_classroom_providers.d
 import '../../../student/dashboard/widgets/status_filter_bar.dart';
 import '../../schedule/teacher_schedule_screen.dart';
 import '../widgets/teacher_classroom_card.dart';
+import '../../classroom/create_classroom_screen.dart';
 
 class TeacherClassesTab extends ConsumerStatefulWidget {
   const TeacherClassesTab({super.key});
@@ -47,11 +48,9 @@ class _TeacherClassesTabState extends ConsumerState<TeacherClassesTab> {
             margin: const EdgeInsets.only(right: 8),
             child: InkWell(
               onTap: () {
-                // TODO: Implement create class
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                    content: Text('Chức năng tạo lớp học đang được phát triển'),
-                    backgroundColor: AppColors.primary,
+                Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (context) => const CreateClassroomScreen(),
                   ),
                 );
               },

@@ -4,6 +4,7 @@ import '../../data/datasources/api/teacher_classroom_api.dart';
 import '../../data/repositories/teacher_classroom/teacher_classroom_repository_impl.dart';
 import '../../domain/repositories/teacher_classroom_repository.dart';
 import '../../domain/usecases/teacher_classroom/get_teacher_classrooms_usecase.dart';
+import '../../domain/usecases/teacher_classroom/create_classroom_usecase.dart';
 import '../../providers/api/api_providers.dart';
 
 // API Provider
@@ -20,12 +21,17 @@ final teacherClassroomRepositoryProvider = Provider<TeacherClassroomRepository>(
   },
 );
 
-// Use Case Provider
+// Use Case Providers
 final getTeacherClassroomsUseCaseProvider =
     Provider<GetTeacherClassroomsUseCase>((ref) {
       final repository = ref.watch(teacherClassroomRepositoryProvider);
       return GetTeacherClassroomsUseCase(repository);
     });
+
+final createClassroomUseCaseProvider = Provider<CreateClassroomUseCase>((ref) {
+  final repository = ref.watch(teacherClassroomRepositoryProvider);
+  return CreateClassroomUseCase(repository);
+});
 
 // Data Provider
 final teacherClassroomsProvider = FutureProvider((ref) async {
