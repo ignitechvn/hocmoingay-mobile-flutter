@@ -11,6 +11,7 @@ import '../../../../core/widgets/empty_state_widget.dart';
 import '../../../../data/dto/classroom_details_dto.dart';
 import '../../../../data/dto/classroom_dto.dart';
 import '../../../../providers/student_classroom/student_classroom_providers.dart';
+import '../chapter/chapters_screen.dart';
 
 class ClassroomDetailsScreen extends ConsumerWidget {
   const ClassroomDetailsScreen({super.key, required this.classroomId});
@@ -86,7 +87,7 @@ class ClassroomDetailsScreen extends ConsumerWidget {
           const SizedBox(height: 16),
 
           // Statistics Cards
-          _buildStatisticsCards(classroom),
+          _buildStatisticsCards(context, classroom),
 
           const SizedBox(height: 16),
 
@@ -165,7 +166,7 @@ class ClassroomDetailsScreen extends ConsumerWidget {
                 borderRadius: BorderRadius.circular(8),
               ),
               child: Text(
-                classroom.code.value,
+                SubjectLabels.getLabel(classroom.code),
                 style: AppTextStyles.bodySmall.copyWith(
                   color: AppColors.primary,
                   fontWeight: FontWeight.w600,
@@ -174,9 +175,9 @@ class ClassroomDetailsScreen extends ConsumerWidget {
             ),
             const SizedBox(width: 8),
             Text(
-              'Lớp ${classroom.grade.label}',
+              classroom.grade.label,
               style: AppTextStyles.bodyMedium.copyWith(
-                color: AppColors.textSecondary,
+                color: AppColors.textPrimary,
               ),
             ),
           ],
@@ -296,37 +297,54 @@ class ClassroomDetailsScreen extends ConsumerWidget {
     ),
   );
 
-  Widget _buildStatisticsCards(ClassroomDetailsStudentResponseDto classroom) =>
-      Row(
-        children: <Widget>[
-          Expanded(
-            child: _buildStatCard(
-              'Chủ đề',
-              '${classroom.chaptersCount}',
-              Icons.book,
-              AppColors.primary,
-            ),
+  Widget _buildStatisticsCards(
+    BuildContext context,
+    ClassroomDetailsStudentResponseDto classroom,
+  ) => Row(
+    children: <Widget>[
+      Expanded(
+        child: GestureDetector(
+          onTap: () {
+            print('DEBUG: Clicking on Chủ đề with classroomId: $classroomId');
+            try {
+              Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder:
+                      (context) => ChaptersScreen(classroomId: classroomId),
+                ),
+              );
+            } catch (e) {
+              print('DEBUG: Navigation error: $e');
+            }
+          },
+          child: _buildStatCard(
+            'Chủ đề',
+            '${classroom.chaptersCount}',
+            Icons.book,
+            AppColors.primary,
           ),
-          const SizedBox(width: 12),
-          Expanded(
-            child: _buildStatCard(
-              'Bài tập',
-              '${classroom.practiceSetsCount}',
-              Icons.assignment,
-              AppColors.warning,
-            ),
-          ),
-          const SizedBox(width: 12),
-          Expanded(
-            child: _buildStatCard(
-              'Bài thi',
-              '${classroom.examsCount}',
-              Icons.quiz,
-              AppColors.error,
-            ),
-          ),
-        ],
-      );
+        ),
+      ),
+      const SizedBox(width: 12),
+      Expanded(
+        child: _buildStatCard(
+          'Bài tập',
+          '${classroom.practiceSetsCount}',
+          Icons.assignment,
+          AppColors.warning,
+        ),
+      ),
+      const SizedBox(width: 12),
+      Expanded(
+        child: _buildStatCard(
+          'Bài thi',
+          '${classroom.examsCount}',
+          Icons.quiz,
+          AppColors.error,
+        ),
+      ),
+    ],
+  );
 
   Widget _buildStatCard(
     String title,
@@ -348,11 +366,9 @@ class ClassroomDetailsScreen extends ConsumerWidget {
     ),
     child: Column(
       children: [
-        Icon(icon, color: color, size: 24),
-        const SizedBox(height: 8),
         Text(
           value,
-          style: AppTextStyles.headlineSmall.copyWith(
+          style: AppTextStyles.headlineLarge.copyWith(
             fontWeight: FontWeight.bold,
             color: color,
           ),
@@ -444,13 +460,18 @@ class ClassroomDetailsScreen extends ConsumerWidget {
             const SizedBox(height: 12),
             ...sessions
                 .take(5)
-                .map(_buildSessionItem)
-                ,
+                .toList()
+                .asMap()
+                .entries
+                .map((entry) => _buildSessionItem(entry.value, entry.key + 1)),
           ],
         ),
       );
 
-  Widget _buildSessionItem(LessonSessionResponseDto session) => Padding(
+  Widget _buildSessionItem(
+    LessonSessionResponseDto session,
+    int index,
+  ) => Padding(
     padding: const EdgeInsets.only(bottom: 12),
     child: Row(
       children: <Widget>[
@@ -475,7 +496,7 @@ class ClassroomDetailsScreen extends ConsumerWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                'Buổi ${session.originalSessionId}',
+                'Buổi $index',
                 style: AppTextStyles.bodyMedium.copyWith(
                   fontWeight: FontWeight.w600,
                 ),

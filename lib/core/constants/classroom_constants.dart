@@ -70,15 +70,15 @@ class ClassroomConstants {
   static Color getStatusColor(String status) {
     switch (status.toLowerCase()) {
       case 'enrolling':
-        return const Color(0xFFECF4FE);
+        return const Color(0xFF2196F3); // Blue
       case 'ongoing':
-        return const Color(0xFFE2F7F0);
+        return const Color(0xFF4CAF50); // Green
       case 'finished':
-        return const Color(0xFFFDE9E9);
+        return const Color(0xFFF44336); // Red
       case 'canceled':
-        return const Color(0xFFFDE9E9);
+        return const Color(0xFF9E9E9E); // Grey
       default:
-        return const Color(0xFFECF4FE);
+        return const Color(0xFF2196F3);
     }
   }
 
