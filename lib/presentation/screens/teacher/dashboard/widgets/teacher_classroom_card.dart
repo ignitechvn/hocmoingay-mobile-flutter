@@ -9,6 +9,7 @@ import '../../../../../core/theme/app_colors.dart';
 import '../../../../../core/theme/app_text_styles.dart';
 import '../../../../../core/utils/toast_utils.dart';
 import '../../../../../domain/entities/classroom.dart';
+import '../../classroom/teacher_classroom_details_screen.dart';
 
 class TeacherClassroomCard extends StatelessWidget {
   final ClassroomTeacher classroom;
@@ -18,7 +19,8 @@ class TeacherClassroomCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isClassActive = classroom.status != EClassroomStatus.ENROLLING &&
+    final isClassActive =
+        classroom.status != EClassroomStatus.ENROLLING &&
         classroom.status != EClassroomStatus.CANCELED;
 
     // Get background color based on classroom status
@@ -26,9 +28,11 @@ class TeacherClassroomCard extends StatelessWidget {
     if (ClassroomStatusBackgroundColor.colors.containsKey(
       ClassroomStatus.fromString(classroom.status.value),
     )) {
-      backgroundColor = ClassroomStatusBackgroundColor.colors[
-        ClassroomStatus.fromString(classroom.status.value)
-      ] ?? '#fff';
+      backgroundColor =
+          ClassroomStatusBackgroundColor.colors[ClassroomStatus.fromString(
+            classroom.status.value,
+          )] ??
+          '#fff';
     }
 
     return Card(
@@ -37,7 +41,6 @@ class TeacherClassroomCard extends StatelessWidget {
       color: Color(int.parse(backgroundColor.replaceAll('#', '0xFF'))),
       child: InkWell(
         onTap: () {
-          // Check if classroom is in enrolling status
           if (classroom.status == EClassroomStatus.ENROLLING) {
             ToastUtils.showWarning(
               context: context,
@@ -55,16 +58,20 @@ class TeacherClassroomCard extends StatelessWidget {
             } else {
               ToastUtils.showWarning(
                 context: context,
-                message: 'Lớp học hiện tại đang trong quá trình tuyển sinh và xếp lịch.',
+                message:
+                    'Lớp học hiện tại đang trong quá trình tuyển sinh và xếp lịch.',
               );
             }
             return;
           }
 
-          // TODO: Navigate to teacher classroom management
-          ToastUtils.showSuccess(
-            context: context,
-            message: 'Chức năng quản lý lớp học sẽ được thêm sau',
+          // Navigate to details screen
+          Navigator.of(context).push(
+            MaterialPageRoute(
+              builder:
+                  (_) =>
+                      TeacherClassroomDetailsScreen(classroomId: classroom.id),
+            ),
           );
 
           onTap?.call();
@@ -94,41 +101,51 @@ class TeacherClassroomCard extends StatelessWidget {
                           Icons.more_vert,
                           color: AppColors.textSecondary,
                         ),
-                        onSelected: (value) => _handleMenuAction(context, value),
-                        itemBuilder: (context) => [
-                          if (classroom.status != EClassroomStatus.FINISHED) ...[
-                            const PopupMenuItem(
-                              value: 'edit-info',
-                              child: Row(
-                                children: [
-                                  Icon(Icons.edit, size: 16),
-                                  SizedBox(width: 8),
-                                  Text('Chỉnh sửa thông tin'),
-                                ],
-                              ),
-                            ),
-                            const PopupMenuItem(
-                              value: 'edit-status',
-                              child: Row(
-                                children: [
-                                  Icon(Icons.update, size: 16),
-                                  SizedBox(width: 8),
-                                  Text('Cập nhật trạng thái'),
-                                ],
-                              ),
-                            ),
-                          ],
-                          const PopupMenuItem(
-                            value: 'delete',
-                            child: Row(
-                              children: [
-                                Icon(Icons.delete, size: 16, color: Colors.red),
-                                SizedBox(width: 8),
-                                Text('Xóa', style: TextStyle(color: Colors.red)),
+                        onSelected:
+                            (value) => _handleMenuAction(context, value),
+                        itemBuilder:
+                            (context) => [
+                              if (classroom.status !=
+                                  EClassroomStatus.FINISHED) ...[
+                                const PopupMenuItem(
+                                  value: 'edit-info',
+                                  child: Row(
+                                    children: [
+                                      Icon(Icons.edit, size: 16),
+                                      SizedBox(width: 8),
+                                      Text('Chỉnh sửa thông tin'),
+                                    ],
+                                  ),
+                                ),
+                                const PopupMenuItem(
+                                  value: 'edit-status',
+                                  child: Row(
+                                    children: [
+                                      Icon(Icons.update, size: 16),
+                                      SizedBox(width: 8),
+                                      Text('Cập nhật trạng thái'),
+                                    ],
+                                  ),
+                                ),
                               ],
-                            ),
-                          ),
-                        ],
+                              const PopupMenuItem(
+                                value: 'delete',
+                                child: Row(
+                                  children: [
+                                    Icon(
+                                      Icons.delete,
+                                      size: 16,
+                                      color: Colors.red,
+                                    ),
+                                    SizedBox(width: 8),
+                                    Text(
+                                      'Xóa',
+                                      style: TextStyle(color: Colors.red),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ],
                       ),
                     ],
                   ),
@@ -182,9 +199,12 @@ class TeacherClassroomCard extends StatelessWidget {
                       children: [
                         const TextSpan(text: 'Lịch học trong tuần '),
                         TextSpan(
-                          text: classroom.schedule.isNotEmpty
-                              ? convertScheduleListToText(classroom.schedule).join(", ")
-                              : "Chưa có lịch học",
+                          text:
+                              classroom.schedule.isNotEmpty
+                                  ? convertScheduleListToText(
+                                    classroom.schedule,
+                                  ).join(", ")
+                                  : "Chưa có lịch học",
                           style: AppTextStyles.bodyMedium.copyWith(
                             color: AppColors.textPrimary,
                             fontWeight: FontWeight.bold,
