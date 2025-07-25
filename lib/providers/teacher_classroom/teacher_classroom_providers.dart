@@ -2,6 +2,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../data/datasources/api/teacher_classroom_api.dart';
 import '../../data/dto/teacher_classroom_dto.dart';
+import '../../data/dto/chapter_dto.dart';
 import '../../data/repositories/teacher_classroom/teacher_classroom_repository_impl.dart';
 import '../../domain/repositories/teacher_classroom_repository.dart';
 import '../../domain/usecases/teacher_classroom/get_teacher_classrooms_usecase.dart';
@@ -12,6 +13,7 @@ import '../../domain/usecases/teacher_classroom/remove_student_usecase.dart';
 import '../../domain/usecases/teacher_classroom/get_pending_students_usecase.dart';
 import '../../domain/usecases/teacher_classroom/approve_student_usecase.dart';
 import '../../domain/usecases/teacher_classroom/reject_student_usecase.dart';
+import '../../domain/usecases/teacher_classroom/get_teacher_chapters_usecase.dart';
 import '../../providers/api/api_providers.dart';
 
 // API Provider
@@ -76,6 +78,11 @@ final rejectStudentUseCaseProvider = Provider<RejectStudentUseCase>((ref) {
   return RejectStudentUseCase(repository);
 });
 
+final getTeacherChaptersUseCaseProvider = Provider<GetTeacherChaptersUseCase>((ref) {
+  final repository = ref.watch(teacherClassroomRepositoryProvider);
+  return GetTeacherChaptersUseCase(repository);
+});
+
 // Data Providers
 final teacherClassroomsProvider = FutureProvider((ref) async {
   final useCase = ref.watch(getTeacherClassroomsUseCaseProvider);
@@ -106,5 +113,14 @@ final pendingStudentsProvider =
       classroomId,
     ) async {
       final useCase = ref.watch(getPendingStudentsUseCaseProvider);
+      return await useCase(classroomId);
+    });
+
+final teacherChaptersProvider =
+    FutureProvider.family<TeacherChapterResponseListDto, String>((
+      ref,
+      classroomId,
+    ) async {
+      final useCase = ref.watch(getTeacherChaptersUseCaseProvider);
       return await useCase(classroomId);
     });

@@ -1,5 +1,6 @@
 import '../../data/dto/classroom_dto.dart';
 import '../../data/dto/teacher_classroom_dto.dart';
+import '../../data/dto/chapter_dto.dart';
 
 abstract class TeacherClassroomRepository {
   Future<TeacherClassroomResponseListDto> getAllClassrooms();
@@ -14,4 +15,5 @@ abstract class TeacherClassroomRepository {
   );
   Future<String> approveStudent(String classroomId, String studentId);
   Future<String> rejectStudent(String classroomId, String studentId);
+  Future<TeacherChapterResponseListDto> getChapters(String classroomId);
 }

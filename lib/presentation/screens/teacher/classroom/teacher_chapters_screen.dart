@@ -8,30 +8,34 @@ import '../../../../core/theme/app_dimensions.dart';
 import '../../../../core/theme/app_text_styles.dart';
 import '../../../../core/widgets/empty_state_widget.dart';
 import '../../../../data/dto/chapter_dto.dart';
-import '../../../../providers/chapter/chapter_providers.dart';
-import 'widgets/chapter_status_filter_bar.dart';
-import 'chapter_details_screen.dart';
+import '../../../../providers/teacher_classroom/teacher_classroom_providers.dart';
+import '../widgets/chapter_status_filter_bar.dart';
+import 'teacher_chapter_details_screen.dart';
+import 'create_chapter_screen.dart';
 
-class ChaptersScreen extends ConsumerStatefulWidget {
-  const ChaptersScreen({super.key, required this.classroomId});
+class TeacherChaptersScreen extends ConsumerStatefulWidget {
+  const TeacherChaptersScreen({super.key, required this.classroomId});
   final String classroomId;
 
   @override
-  ConsumerState<ChaptersScreen> createState() => _ChaptersScreenState();
+  ConsumerState<TeacherChaptersScreen> createState() =>
+      _TeacherChaptersScreenState();
 }
 
-class _ChaptersScreenState extends ConsumerState<ChaptersScreen> {
+class _TeacherChaptersScreenState extends ConsumerState<TeacherChaptersScreen> {
   int _selectedStatusIndex = 0;
 
   @override
   Widget build(BuildContext context) {
-    final chaptersAsync = ref.watch(chaptersProvider(widget.classroomId));
+    final chaptersAsync = ref.watch(
+      teacherChaptersProvider(widget.classroomId),
+    );
 
     return Scaffold(
       backgroundColor: AppColors.background,
       appBar: AppBar(
         title: const Text(
-          'Danh sách chủ đề',
+          'Quản lý chủ đề',
           style: AppTextStyles.headlineMedium,
         ),
         backgroundColor: AppColors.background,
@@ -40,6 +44,43 @@ class _ChaptersScreenState extends ConsumerState<ChaptersScreen> {
           icon: const Icon(Icons.arrow_back),
           onPressed: () => Navigator.of(context).pop(),
         ),
+        actions: [
+          // Add button
+          Container(
+            margin: const EdgeInsets.only(right: 16),
+            child: InkWell(
+              onTap: () async {
+                final result = await Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder:
+                        (context) => CreateChapterScreen(
+                          classroomId: widget.classroomId,
+                        ),
+                  ),
+                );
+
+                // Refresh data if chapter was created successfully
+                if (result == true) {
+                  ref.refresh(teacherChaptersProvider(widget.classroomId));
+                }
+              },
+              borderRadius: BorderRadius.circular(20),
+              child: Container(
+                width: 40,
+                height: 40,
+                decoration: BoxDecoration(
+                  color: AppColors.primary.withOpacity(0.1),
+                  shape: BoxShape.circle,
+                ),
+                child: const Icon(
+                  Icons.add,
+                  color: AppColors.primary,
+                  size: 20,
+                ),
+              ),
+            ),
+          ),
+        ],
       ),
       body: Column(
         children: [
@@ -63,7 +104,9 @@ class _ChaptersScreenState extends ConsumerState<ChaptersScreen> {
                     child: EmptyStateWidgets.error(
                       message: 'Không thể tải danh sách chủ đề',
                       onRetry: () {
-                        ref.invalidate(chaptersProvider(widget.classroomId));
+                        ref.invalidate(
+                          teacherChaptersProvider(widget.classroomId),
+                        );
                       },
                     ),
                   ),
@@ -76,25 +119,20 @@ class _ChaptersScreenState extends ConsumerState<ChaptersScreen> {
 
   Widget _buildContent(
     BuildContext context,
-    List<ChapterStudentResponseDto> chapters,
+    TeacherChapterResponseListDto chapters,
   ) {
-    List<ChapterStudentResponseDto> filteredChapters = [];
+    List<ChapterTeacherResponseDto> filteredChapters = [];
 
     // Filter chapters based on selected status
     switch (_selectedStatusIndex) {
       case 0: // Đã lên lịch
-        filteredChapters =
-            chapters
-                .where((c) => c.status == EChapterStatus.SCHEDULED)
-                .toList();
+        filteredChapters = chapters.scheduledChapters;
         break;
       case 1: // Đang mở
-        filteredChapters =
-            chapters.where((c) => c.status == EChapterStatus.OPEN).toList();
+        filteredChapters = chapters.openChapters;
         break;
       case 2: // Đã đóng
-        filteredChapters =
-            chapters.where((c) => c.status == EChapterStatus.CLOSED).toList();
+        filteredChapters = chapters.closedChapters;
         break;
     }
 
@@ -105,14 +143,14 @@ class _ChaptersScreenState extends ConsumerState<ChaptersScreen> {
           showAction: true,
           actionText: 'Làm mới',
           onActionPressed:
-              () => ref.refresh(chaptersProvider(widget.classroomId)),
+              () => ref.refresh(teacherChaptersProvider(widget.classroomId)),
         ),
       );
     }
 
     return RefreshIndicator(
       onRefresh: () async {
-        // Refresh data
+        ref.refresh(teacherChaptersProvider(widget.classroomId));
       },
       child: ListView.builder(
         padding: const EdgeInsets.all(AppDimensions.defaultPadding),
@@ -125,17 +163,13 @@ class _ChaptersScreenState extends ConsumerState<ChaptersScreen> {
     );
   }
 
-  Widget _buildChapterCard(ChapterStudentResponseDto chapter) {
-    final answeredPercent =
-        chapter.questionCount > 0
-            ? ((chapter.answeredCount / chapter.questionCount) * 100).round()
-            : 0;
-
+  Widget _buildChapterCard(ChapterTeacherResponseDto chapter) {
     return GestureDetector(
       onTap: () {
         Navigator.of(context).push(
           MaterialPageRoute(
-            builder: (context) => ChapterDetailsScreen(chapterId: chapter.id),
+            builder:
+                (context) => TeacherChapterDetailsScreen(chapterId: chapter.id),
           ),
         );
       },
@@ -149,7 +183,7 @@ class _ChaptersScreenState extends ConsumerState<ChaptersScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Row 1: Title
+            // Row 1: Title and Actions
             Row(
               children: [
                 Expanded(
@@ -159,6 +193,48 @@ class _ChaptersScreenState extends ConsumerState<ChaptersScreen> {
                       fontWeight: FontWeight.bold,
                       color: AppColors.textPrimary,
                     ),
+                  ),
+                ),
+                PopupMenuButton<String>(
+                  onSelected: (value) {
+                    _handleChapterAction(value, chapter);
+                  },
+                  itemBuilder:
+                      (context) => [
+                        const PopupMenuItem(
+                          value: 'update_info',
+                          child: Row(
+                            children: [
+                              Icon(Icons.edit, size: 16),
+                              SizedBox(width: 8),
+                              Text('Cập nhật thông tin'),
+                            ],
+                          ),
+                        ),
+                        const PopupMenuItem(
+                          value: 'update_status',
+                          child: Row(
+                            children: [
+                              Icon(Icons.update, size: 16),
+                              SizedBox(width: 8),
+                              Text('Cập nhật trạng thái'),
+                            ],
+                          ),
+                        ),
+                        const PopupMenuItem(
+                          value: 'delete',
+                          child: Row(
+                            children: [
+                              Icon(Icons.delete, size: 16, color: Colors.red),
+                              SizedBox(width: 8),
+                              Text('Xóa', style: TextStyle(color: Colors.red)),
+                            ],
+                          ),
+                        ),
+                      ],
+                  child: const Icon(
+                    Icons.more_vert,
+                    color: AppColors.textSecondary,
                   ),
                 ),
               ],
@@ -177,57 +253,43 @@ class _ChaptersScreenState extends ConsumerState<ChaptersScreen> {
 
             const SizedBox(height: 6),
 
-            // Row 3: Stats and Progress
-            Row(
+            // Row 3: Stats and Date Range
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Left column: Question count and date range
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        '${chapter.questionCount} câu hỏi',
-                        style: AppTextStyles.bodyMedium.copyWith(
-                          color: AppColors.textPrimary,
-                        ),
-                      ),
-                      const SizedBox(height: 6),
-                      Text(
-                        '${_formatDate(chapter.startDate ?? '')} - ${_formatDate(chapter.deadline ?? '')}',
-                        style: AppTextStyles.bodySmall.copyWith(
-                          color: AppColors.textPrimary,
-                        ),
-                      ),
-                    ],
+                Text(
+                  '${chapter.questionCount} câu hỏi',
+                  style: AppTextStyles.bodyMedium.copyWith(
+                    color: AppColors.textPrimary,
                   ),
                 ),
-
-                // Right column: Progress circle (only for OPEN and CLOSED status)
-                if (chapter.status == EChapterStatus.OPEN ||
-                    chapter.status == EChapterStatus.CLOSED)
-                  Container(
-                    width: 50,
-                    height: 50,
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      color: AppColors.primary.withOpacity(0.1),
-                    ),
-                    child: Center(
-                      child: Text(
-                        '$answeredPercent%',
-                        style: AppTextStyles.bodySmall.copyWith(
-                          fontWeight: FontWeight.bold,
-                          color: AppColors.primary,
-                        ),
-                      ),
-                    ),
+                const SizedBox(height: 6),
+                Text(
+                  '${_formatDate(chapter.startDate ?? '')} - ${_formatDate(chapter.deadline ?? '')}',
+                  style: AppTextStyles.bodySmall.copyWith(
+                    color: AppColors.textPrimary,
                   ),
+                ),
               ],
             ),
           ],
         ),
       ),
     );
+  }
+
+  void _handleChapterAction(String action, ChapterTeacherResponseDto chapter) {
+    switch (action) {
+      case 'update_info':
+        // TODO: Navigate to update chapter info screen
+        break;
+      case 'update_status':
+        // TODO: Show status update dialog
+        break;
+      case 'delete':
+        // TODO: Show confirmation dialog and delete chapter
+        break;
+    }
   }
 
   Color _getStatusBackgroundColor(EChapterStatus status) {
@@ -270,6 +332,7 @@ class _ChaptersScreenState extends ConsumerState<ChaptersScreen> {
   }
 
   String _formatDate(String dateString) {
+    if (dateString.isEmpty) return 'Chưa có';
     try {
       final date = DateTime.parse(dateString);
       return DateFormat('dd/MM/yyyy HH:mm').format(date);

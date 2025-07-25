@@ -34,7 +34,9 @@ class ChapterApi {
   // Get chapter details
   Future<ChapterDetailsStudentResponseDto> getDetails(String chapterId) async {
     try {
-      final response = await _apiService.get('/student-chapters/$chapterId/details');
+      final response = await _apiService.get(
+        '/student-chapters/$chapterId/details',
+      );
       return ChapterDetailsStudentResponseDto.fromJson(response.data);
     } on DioException catch (e) {
       throw Exception('Get chapter details failed: ${e.message}');

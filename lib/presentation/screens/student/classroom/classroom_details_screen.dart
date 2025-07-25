@@ -11,7 +11,7 @@ import '../../../../core/widgets/empty_state_widget.dart';
 import '../../../../data/dto/classroom_details_dto.dart';
 import '../../../../data/dto/classroom_dto.dart';
 import '../../../../providers/student_classroom/student_classroom_providers.dart';
-import '../chapter/chapters_screen.dart';
+import '../chapter/student_chapters_screen.dart';
 
 class ClassroomDetailsScreen extends ConsumerWidget {
   const ClassroomDetailsScreen({super.key, required this.classroomId});
@@ -310,7 +310,8 @@ class ClassroomDetailsScreen extends ConsumerWidget {
               Navigator.of(context).push(
                 MaterialPageRoute(
                   builder:
-                      (context) => ChaptersScreen(classroomId: classroomId),
+                      (context) =>
+                          StudentChaptersScreen(classroomId: classroomId),
                 ),
               );
             } catch (e) {

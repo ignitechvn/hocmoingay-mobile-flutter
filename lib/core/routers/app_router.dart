@@ -11,7 +11,7 @@ import '../../../presentation/screens/onboarding/role_selection_screen.dart';
 import '../../../presentation/screens/student/dashboard/student_dashboard_screen.dart';
 import '../../../presentation/screens/common/notification_screen.dart';
 import '../../../presentation/screens/student/classroom/classroom_details_screen.dart';
-import '../../../presentation/screens/student/chapter/chapters_screen.dart';
+import '../../presentation/screens/student/chapter/student_chapters_screen.dart';
 import '../../../presentation/screens/student/chapter/chapter_details_screen.dart';
 import '../../../presentation/screens/teacher/teacher_dashboard_screen.dart';
 import '../../../core/constants/app_constants.dart';
@@ -112,7 +112,7 @@ class AppRoutes {
           print('DEBUG: ClassroomId: $classroomId');
           if (classroomId != null) {
             print('DEBUG: Returning ChaptersScreen');
-            return ChaptersScreen(classroomId: classroomId);
+            return StudentChaptersScreen(classroomId: classroomId);
           }
           print('DEBUG: Returning StudentDashboardScreen as fallback');
           return const StudentDashboardScreen();

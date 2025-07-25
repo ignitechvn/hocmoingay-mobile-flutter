@@ -63,7 +63,7 @@ class _TeacherClassesTabState extends ConsumerState<TeacherClassesTab> {
                   shape: BoxShape.circle,
                 ),
                 child: const Icon(
-                  Icons.add_circle_outline,
+                  Icons.add, // Đổi từ add_circle_outline sang add
                   color: AppColors.primary,
                   size: 20,
                 ),

@@ -16,16 +16,24 @@ import '../../../../providers/teacher_classroom/teacher_classroom_providers.dart
 import '../../../../domain/entities/classroom.dart';
 import 'edit_classroom_screen.dart';
 import 'student_management_screen.dart';
+import 'teacher_chapters_screen.dart';
 
-class TeacherClassroomDetailsScreen extends ConsumerWidget {
+class TeacherClassroomDetailsScreen extends ConsumerStatefulWidget {
   final String classroomId;
 
   const TeacherClassroomDetailsScreen({super.key, required this.classroomId});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<TeacherClassroomDetailsScreen> createState() =>
+      _TeacherClassroomDetailsScreenState();
+}
+
+class _TeacherClassroomDetailsScreenState
+    extends ConsumerState<TeacherClassroomDetailsScreen> {
+  @override
+  Widget build(BuildContext context) {
     final classroomDetailsAsync = ref.watch(
-      teacherClassroomDetailsProvider(classroomId),
+      teacherClassroomDetailsProvider(widget.classroomId),
     );
 
     return Scaffold(
@@ -44,6 +52,65 @@ class TeacherClassroomDetailsScreen extends ConsumerWidget {
           icon: const Icon(Icons.arrow_back, color: AppColors.textPrimary),
           onPressed: () => Navigator.of(context).pop(),
         ),
+        actions: [
+          // Edit button
+          Container(
+            margin: const EdgeInsets.only(right: 8),
+            child: InkWell(
+              onTap: () {
+                classroomDetailsAsync.whenData((classroom) {
+                  Navigator.of(context).push(
+                    MaterialPageRoute(
+                      builder:
+                          (context) =>
+                              EditClassroomScreen(classroom: classroom),
+                    ),
+                  );
+                });
+              },
+              borderRadius: BorderRadius.circular(20),
+              child: Container(
+                width: 40,
+                height: 40,
+                decoration: BoxDecoration(
+                  color: AppColors.primary.withOpacity(0.1),
+                  shape: BoxShape.circle,
+                ),
+                child: const Icon(
+                  Icons.edit,
+                  color: AppColors.primary,
+                  size: 20,
+                ),
+              ),
+            ),
+          ),
+          // Settings button
+          Container(
+            margin: const EdgeInsets.only(right: 16),
+            child: InkWell(
+              onTap: () {
+                ToastUtils.showSuccess(
+                  context: context,
+                  message: 'Chức năng cài đặt sẽ được thêm sau',
+                );
+              },
+              borderRadius: BorderRadius.circular(20),
+              child: Container(
+                width: 40,
+                height: 40,
+                decoration: BoxDecoration(
+                  color: AppColors.primary.withOpacity(0.1),
+                  shape: BoxShape.circle,
+                ),
+                child: const Icon(
+                  Icons.settings,
+                  color: AppColors.primary,
+                  size: 20,
+                ),
+              ),
+            ),
+          ),
+        ],
       ),
       body: classroomDetailsAsync.when(
         data: (classroomDetails) => _buildContent(context, classroomDetails),
@@ -52,8 +119,9 @@ class TeacherClassroomDetailsScreen extends ConsumerWidget {
             (error, stack) => EmptyStateWidgets.error(
               message: 'Có lỗi xảy ra\n${error.toString()}',
               onRetry:
-                  () =>
-                      ref.refresh(teacherClassroomDetailsProvider(classroomId)),
+                  () => ref.refresh(
+                    teacherClassroomDetailsProvider(widget.classroomId),
+                  ),
               icon: Icons.error_outline,
             ),
       ),
@@ -424,21 +492,6 @@ class TeacherClassroomDetailsScreen extends ConsumerWidget {
                       Navigator.of(context).push(
                         MaterialPageRoute(
                           builder:
-                              (context) =>
-                                  EditClassroomScreen(classroom: classroom),
-                        ),
-                      );
-                    },
-                    text: 'Chỉnh sửa thông tin',
-                  ),
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: AppButton(
-                    onPressed: () {
-                      Navigator.of(context).push(
-                        MaterialPageRoute(
-                          builder:
                               (context) => StudentManagementScreen(
                                 classroomId: classroom.id,
                                 classroomName: classroom.name,
@@ -449,6 +502,8 @@ class TeacherClassroomDetailsScreen extends ConsumerWidget {
                     text: 'Quản lý học sinh',
                   ),
                 ),
+                const SizedBox(width: 12),
+                const Expanded(child: SizedBox()), // Empty space for alignment
               ],
             ),
             const SizedBox(height: 12),
@@ -457,9 +512,13 @@ class TeacherClassroomDetailsScreen extends ConsumerWidget {
                 Expanded(
                   child: AppButton(
                     onPressed: () {
-                      ToastUtils.showSuccess(
-                        context: context,
-                        message: 'Chức năng quản lý chủ đề sẽ được thêm sau',
+                      Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder:
+                              (context) => TeacherChaptersScreen(
+                                classroomId: classroom.id,
+                              ),
+                        ),
                       );
                     },
                     text: 'Quản lý chủ đề',
@@ -508,23 +567,7 @@ class TeacherClassroomDetailsScreen extends ConsumerWidget {
               ],
             ),
             const SizedBox(height: 12),
-            Row(
-              children: [
-                Expanded(
-                  child: AppButton(
-                    onPressed: () {
-                      ToastUtils.showSuccess(
-                        context: context,
-                        message: 'Chức năng cài đặt sẽ được thêm sau',
-                      );
-                    },
-                    text: 'Cài đặt',
-                  ),
-                ),
-                const SizedBox(width: 12),
-                const Expanded(child: SizedBox()), // Empty space for alignment
-              ],
-            ),
+            // Removed settings button - moved to AppBar
           ],
         ),
       ),

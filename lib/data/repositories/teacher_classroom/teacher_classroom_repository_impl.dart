@@ -1,6 +1,7 @@
 import '../../datasources/api/teacher_classroom_api.dart';
 import '../../dto/classroom_dto.dart';
 import '../../dto/teacher_classroom_dto.dart';
+import '../../dto/chapter_dto.dart';
 import '../../../domain/repositories/teacher_classroom_repository.dart';
 
 class TeacherClassroomRepositoryImpl implements TeacherClassroomRepository {
@@ -54,5 +55,10 @@ class TeacherClassroomRepositoryImpl implements TeacherClassroomRepository {
   @override
   Future<String> rejectStudent(String classroomId, String studentId) async {
     return await _api.rejectStudent(classroomId, studentId);
+  }
+
+  @override
+  Future<TeacherChapterResponseListDto> getChapters(String classroomId) async {
+    return await _api.getChapters(classroomId);
   }
 }

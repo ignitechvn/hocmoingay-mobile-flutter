@@ -2,6 +2,7 @@ import 'package:dio/dio.dart';
 
 import '../../dto/classroom_dto.dart';
 import '../../dto/teacher_classroom_dto.dart';
+import '../../dto/chapter_dto.dart';
 import '../../../core/error/api_error_handler.dart';
 import 'base_api_service.dart';
 
@@ -196,6 +197,32 @@ class TeacherClassroomApi {
     } catch (e) {
       print('❌ TeacherClassroomApi: General exception: $e');
       throw Exception('Failed to reject student: $e');
+    }
+  }
+
+  /// Get chapters for teacher classroom
+  Future<TeacherChapterResponseListDto> getChapters(String classroomId) async {
+    try {
+      print(
+        '🔍 TeacherClassroomApi: Calling GET /teacher-classrooms/$classroomId/chapters',
+      );
+      final response = await _apiService.get(
+        '/teacher-classrooms/$classroomId/chapters',
+      );
+      print(
+        '✅ TeacherClassroomApi: Get chapters success response: ${response.data}',
+      );
+      return TeacherChapterResponseListDto.fromJson(
+        response.data as Map<String, dynamic>,
+      );
+    } on DioException catch (e) {
+      print('❌ TeacherClassroomApi: DioException: ${e.message}');
+      print('❌ TeacherClassroomApi: Status code: ${e.response?.statusCode}');
+      print('❌ TeacherClassroomApi: Response data: ${e.response?.data}');
+      throw _handleDioError(e);
+    } catch (e) {
+      print('❌ TeacherClassroomApi: General exception: $e');
+      throw Exception('Failed to get chapters: $e');
     }
   }
 
