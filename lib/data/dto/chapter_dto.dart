@@ -1,4 +1,8 @@
+import 'package:flutter/material.dart';
+
 import '../../core/constants/chapter_constants.dart';
+import '../../core/constants/question_constants.dart';
+import 'question_dto.dart';
 
 // Chapter Response DTO
 class ChapterResponseDto {
@@ -168,6 +172,32 @@ class TeacherChapterResponseListDto {
         [],
   );
 
+  // Factory method to handle the actual API response format
+  factory TeacherChapterResponseListDto.fromList(List<dynamic> jsonList) {
+    final chapters =
+        jsonList
+            .map(
+              (item) => ChapterTeacherResponseDto.fromJson(
+                item as Map<String, dynamic>,
+              ),
+            )
+            .toList();
+
+    // Categorize chapters by status
+    final scheduledChapters =
+        chapters.where((c) => c.status == EChapterStatus.SCHEDULED).toList();
+    final openChapters =
+        chapters.where((c) => c.status == EChapterStatus.OPEN).toList();
+    final closedChapters =
+        chapters.where((c) => c.status == EChapterStatus.CLOSED).toList();
+
+    return TeacherChapterResponseListDto(
+      scheduledChapters: scheduledChapters,
+      openChapters: openChapters,
+      closedChapters: closedChapters,
+    );
+  }
+
   Map<String, dynamic> toJson() => {
     'scheduledChapters': scheduledChapters.map((e) => e.toJson()).toList(),
     'openChapters': openChapters.map((e) => e.toJson()).toList(),
@@ -285,4 +315,74 @@ class CreateChapterDto {
     'deadline': deadline,
     'startDate': startDate,
   };
+}
+
+// Teacher Chapter Questions Response DTO
+class TeacherChapterQuestionsResponseDto {
+  final String id;
+  final EChapterStatus status;
+  final List<QuestionTeacherDto> questions;
+
+  const TeacherChapterQuestionsResponseDto({
+    required this.id,
+    required this.status,
+    required this.questions,
+  });
+
+  factory TeacherChapterQuestionsResponseDto.fromJson(
+    Map<String, dynamic> json,
+  ) => TeacherChapterQuestionsResponseDto(
+    id: json['id'] as String? ?? '',
+    status: EChapterStatus.fromString(json['status'] as String? ?? 'SCHEDULED'),
+    questions:
+        (json['questions'] as List<dynamic>?)
+            ?.map(
+              (item) =>
+                  QuestionTeacherDto.fromJson(item as Map<String, dynamic>),
+            )
+            .toList() ??
+        [],
+  );
+
+  Map<String, dynamic> toJson() => {
+    'id': id,
+    'status': status.value,
+    'questions': questions.map((e) => e.toJson()).toList(),
+  };
+}
+
+// Question Teacher DTO (extends QuestionResponseDto)
+class QuestionTeacherDto extends QuestionResponseDto {
+  const QuestionTeacherDto({
+    required super.id,
+    required super.questionNumber,
+    required super.questionType,
+    required super.difficulty,
+    required super.contentBlocks,
+    required super.answers,
+    required super.point,
+    required super.explanation,
+    super.bankQuestionId,
+    super.chapterId,
+    super.practiceSetId,
+    super.examId,
+  });
+
+  factory QuestionTeacherDto.fromJson(Map<String, dynamic> json) {
+    final base = QuestionResponseDto.fromJson(json);
+    return QuestionTeacherDto(
+      id: base.id,
+      questionNumber: base.questionNumber,
+      questionType: base.questionType,
+      difficulty: base.difficulty,
+      contentBlocks: base.contentBlocks,
+      answers: base.answers,
+      point: base.point,
+      explanation: base.explanation,
+      bankQuestionId: base.bankQuestionId,
+      chapterId: base.chapterId,
+      practiceSetId: base.practiceSetId,
+      examId: base.examId,
+    );
+  }
 }

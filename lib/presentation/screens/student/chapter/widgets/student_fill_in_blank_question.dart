@@ -5,12 +5,12 @@ import '../../../../../core/theme/app_dimensions.dart';
 import '../../../../../data/dto/question_dto.dart';
 import '../../../../../core/constants/question_constants.dart';
 
-class FillInBlankQuestion extends StatelessWidget {
+class StudentFillInBlankQuestion extends StatelessWidget {
   final QuestionStudentDto question;
   final String studentAnswer;
   final Function(String) onAnswerChanged;
 
-  const FillInBlankQuestion({
+  const StudentFillInBlankQuestion({
     super.key,
     required this.question,
     required this.studentAnswer,

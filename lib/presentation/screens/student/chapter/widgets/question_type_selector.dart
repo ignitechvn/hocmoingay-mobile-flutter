@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 
 // This is a placeholder widget for future use
-class QuestionTypeSelector extends StatelessWidget {
-  const QuestionTypeSelector({super.key});
+class StudentQuestionTypeSelector extends StatelessWidget {
+  const StudentQuestionTypeSelector({super.key});
 
   @override
   Widget build(BuildContext context) {

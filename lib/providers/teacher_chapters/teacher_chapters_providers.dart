@@ -6,6 +6,8 @@ import '../../data/repositories/teacher_chapters/teacher_chapters_repository_imp
 import '../../domain/repositories/teacher_chapters_repository.dart';
 import '../../domain/usecases/teacher_chapters/get_teacher_chapter_details_usecase.dart';
 import '../../domain/usecases/teacher_chapters/create_chapter_usecase.dart';
+import '../../domain/usecases/teacher_chapters/get_teacher_chapter_questions_usecase.dart';
+import '../../domain/usecases/teacher_chapters/get_teacher_chapters_usecase.dart';
 import '../api/api_providers.dart';
 
 // API Provider
@@ -34,6 +36,19 @@ final createChapterUseCaseProvider = Provider<CreateChapterUseCase>((ref) {
   return CreateChapterUseCase(repository);
 });
 
+final getTeacherChapterQuestionsUseCaseProvider =
+    Provider<GetTeacherChapterQuestionsUseCase>((ref) {
+      final repository = ref.watch(teacherChaptersRepositoryProvider);
+      return GetTeacherChapterQuestionsUseCase(repository);
+    });
+
+final getTeacherChaptersUseCaseProvider = Provider<GetTeacherChaptersUseCase>((
+  ref,
+) {
+  final repository = ref.watch(teacherChaptersRepositoryProvider);
+  return GetTeacherChaptersUseCase(repository);
+});
+
 // Data Provider
 final teacherChapterDetailsProvider =
     FutureProvider.family<ChapterDetailsTeacherResponseDto, String>((
@@ -42,4 +57,22 @@ final teacherChapterDetailsProvider =
     ) async {
       final useCase = ref.watch(getTeacherChapterDetailsUseCaseProvider);
       return await useCase(chapterId);
+    });
+
+final teacherChapterQuestionsProvider =
+    FutureProvider.family<TeacherChapterQuestionsResponseDto, String>((
+      ref,
+      chapterId,
+    ) async {
+      final useCase = ref.watch(getTeacherChapterQuestionsUseCaseProvider);
+      return await useCase(chapterId);
+    });
+
+final teacherChaptersProvider =
+    FutureProvider.family<TeacherChapterResponseListDto, String>((
+      ref,
+      classroomId,
+    ) async {
+      final useCase = ref.watch(getTeacherChaptersUseCaseProvider);
+      return await useCase(classroomId);
     });

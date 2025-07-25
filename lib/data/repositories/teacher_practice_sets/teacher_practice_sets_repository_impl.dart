@@ -16,12 +16,24 @@ class TeacherPracticeSetsRepositoryImpl
   }
 
   @override
-  Future<PracticeSetTeacherResponseDto> createPracticeSet(CreatePracticeSetDto dto) async {
+  Future<TeacherPracticeSetResponseListDto> getOpenOrClosedPracticeSets(
+    String classroomId,
+  ) async {
+    return await _api.getOpenOrClosedPracticeSets(classroomId);
+  }
+
+  @override
+  Future<PracticeSetTeacherResponseDto> createPracticeSet(
+    CreatePracticeSetDto dto,
+  ) async {
     return await _api.createPracticeSet(dto);
   }
 
   @override
-  Future<PracticeSetTeacherResponseDto> updatePracticeSet(String practiceSetId, UpdatePracticeSetDto dto) async {
+  Future<PracticeSetTeacherResponseDto> updatePracticeSet(
+    String practiceSetId,
+    UpdatePracticeSetDto dto,
+  ) async {
     return await _api.updatePracticeSet(practiceSetId, dto);
   }
 }

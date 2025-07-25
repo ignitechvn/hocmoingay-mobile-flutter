@@ -129,6 +129,36 @@ class TeacherPracticeSetResponseListDto {
     );
   }
 
+  // Factory method to handle the actual API response format
+  factory TeacherPracticeSetResponseListDto.fromList(List<dynamic> jsonList) {
+    final practiceSets =
+        jsonList
+            .map(
+              (item) => PracticeSetTeacherResponseDto.fromJson(
+                item as Map<String, dynamic>,
+              ),
+            )
+            .toList();
+
+    // Categorize practice sets by status
+    final scheduledPracticeSets =
+        practiceSets
+            .where((p) => p.status == EPracticeSetStatus.SCHEDULED)
+            .toList();
+    final openPracticeSets =
+        practiceSets.where((p) => p.status == EPracticeSetStatus.OPEN).toList();
+    final closedPracticeSets =
+        practiceSets
+            .where((p) => p.status == EPracticeSetStatus.CLOSED)
+            .toList();
+
+    return TeacherPracticeSetResponseListDto(
+      scheduledPracticeSets: scheduledPracticeSets,
+      openPracticeSets: openPracticeSets,
+      closedPracticeSets: closedPracticeSets,
+    );
+  }
+
   Map<String, dynamic> toJson() => {
     'scheduledPracticeSets':
         scheduledPracticeSets.map((e) => e.toJson()).toList(),

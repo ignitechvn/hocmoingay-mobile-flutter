@@ -9,16 +9,24 @@ import '../../../../core/theme/app_text_styles.dart';
 import '../../../../core/widgets/empty_state_widget.dart';
 import '../../../../data/dto/chapter_dto.dart';
 import '../../../../providers/teacher_chapters/teacher_chapters_providers.dart';
+import 'teacher_chapter_questions_screen.dart';
 
-class TeacherChapterDetailsScreen extends ConsumerWidget {
+class TeacherChapterDetailsScreen extends ConsumerStatefulWidget {
   final String chapterId;
 
   const TeacherChapterDetailsScreen({super.key, required this.chapterId});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<TeacherChapterDetailsScreen> createState() =>
+      _TeacherChapterDetailsScreenState();
+}
+
+class _TeacherChapterDetailsScreenState
+    extends ConsumerState<TeacherChapterDetailsScreen> {
+  @override
+  Widget build(BuildContext context) {
     final chapterDetailsAsync = ref.watch(
-      teacherChapterDetailsProvider(chapterId),
+      teacherChapterDetailsProvider(widget.chapterId),
     );
 
     return Scaffold(
@@ -91,7 +99,9 @@ class TeacherChapterDetailsScreen extends ConsumerWidget {
               child: EmptyStateWidgets.error(
                 message: 'Không thể tải chi tiết chủ đề',
                 onRetry: () {
-                  ref.invalidate(teacherChapterDetailsProvider(chapterId));
+                  ref.invalidate(
+                    teacherChapterDetailsProvider(widget.chapterId),
+                  );
                 },
               ),
             ),
@@ -217,19 +227,21 @@ class TeacherChapterDetailsScreen extends ConsumerWidget {
       crossAxisCount: 2,
       crossAxisSpacing: 12,
       mainAxisSpacing: 12,
-      childAspectRatio: 1.5,
+      childAspectRatio: 1.2, // Reduced aspect ratio to accommodate button
       children: [
         _buildStatCard(
           'Câu hỏi',
           '${chapter.questionCount}',
           Icons.quiz,
           AppColors.primary,
+          () => _navigateToQuestionsDetails(chapter.id),
         ),
         _buildStatCard(
           'Học sinh đã làm',
           '${chapter.studentProgressCount}',
           Icons.people,
           AppColors.success,
+          () => _navigateToStudentProgressDetails(chapter.id),
         ),
       ],
     );
@@ -240,6 +252,7 @@ class TeacherChapterDetailsScreen extends ConsumerWidget {
     String value,
     IconData icon,
     Color color,
+    VoidCallback? onDetailsTap,
   ) {
     return Card(
       elevation: 0,
@@ -264,6 +277,30 @@ class TeacherChapterDetailsScreen extends ConsumerWidget {
                 color: AppColors.textSecondary,
               ),
               textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 8),
+            // Chi tiết button
+            InkWell(
+              onTap: onDetailsTap,
+              borderRadius: BorderRadius.circular(8),
+              child: Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 12,
+                  vertical: 6,
+                ),
+                decoration: BoxDecoration(
+                  color: color.withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(8),
+                  border: Border.all(color: color.withOpacity(0.3), width: 1),
+                ),
+                child: Text(
+                  'Chi tiết',
+                  style: AppTextStyles.bodySmall.copyWith(
+                    color: color,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ),
             ),
           ],
         ),
@@ -379,5 +416,36 @@ class TeacherChapterDetailsScreen extends ConsumerWidget {
     } catch (e) {
       return 'N/A';
     }
+  }
+
+  // Navigation methods
+  void _navigateToQuestionsDetails(String chapterId) {
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder:
+            (context) => TeacherChapterQuestionsScreen(chapterId: chapterId),
+      ),
+    );
+  }
+
+  void _navigateToStudentProgressDetails(String chapterId) {
+    // TODO: Navigate to student progress details screen
+    // Navigator.of(context).push(
+    //   MaterialPageRoute(
+    //     builder: (context) => ChapterStudentProgressDetailsScreen(
+    //       chapterId: chapterId,
+    //     ),
+    //   ),
+    // );
+
+    // Temporary: Show toast message
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(
+          'Chuyển đến màn hình chi tiết tiến độ học sinh cho chủ đề $chapterId',
+        ),
+        duration: const Duration(seconds: 2),
+      ),
+    );
   }
 }

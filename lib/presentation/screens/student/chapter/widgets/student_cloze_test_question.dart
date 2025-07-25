@@ -5,12 +5,12 @@ import '../../../../../core/theme/app_dimensions.dart';
 import '../../../../../data/dto/question_dto.dart';
 import '../../../../../core/constants/question_constants.dart';
 
-class ClozeTestQuestion extends StatelessWidget {
+class StudentClozeTestQuestion extends StatelessWidget {
   final QuestionStudentDto question;
   final Map<String, String> studentAnswers;
   final Function(Map<String, String>) onAnswersChanged;
 
-  const ClozeTestQuestion({
+  const StudentClozeTestQuestion({
     super.key,
     required this.question,
     required this.studentAnswers,
@@ -127,23 +127,23 @@ class ClozeTestQuestion extends StatelessWidget {
                               borderRadius: BorderRadius.circular(
                                 AppDimensions.borderRadiusS,
                               ),
-                                                        child: Container(
-                            padding: const EdgeInsets.all(
-                              AppDimensions.paddingM,
-                            ),
-                            decoration: BoxDecoration(
-                              color: Colors.white,
-                              border: Border.all(
-                                color:
-                                    isSelected
-                                        ? AppColors.primary
-                                        : AppColors.grey300,
-                                width: 1,
-                              ),
-                              borderRadius: BorderRadius.circular(
-                                AppDimensions.borderRadiusS,
-                              ),
-                            ),
+                              child: Container(
+                                padding: const EdgeInsets.all(
+                                  AppDimensions.paddingM,
+                                ),
+                                decoration: BoxDecoration(
+                                  color: Colors.white,
+                                  border: Border.all(
+                                    color:
+                                        isSelected
+                                            ? AppColors.primary
+                                            : AppColors.grey300,
+                                    width: 1,
+                                  ),
+                                  borderRadius: BorderRadius.circular(
+                                    AppDimensions.borderRadiusS,
+                                  ),
+                                ),
                                 child: Row(
                                   children: [
                                     Container(

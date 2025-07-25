@@ -7,6 +7,7 @@ import '../common/notification_screen.dart';
 import '../common/profile_screen.dart';
 import '../../../providers/notification/notification_providers.dart';
 import 'dashboard/tabs/teacher_classes_tab.dart';
+import 'resources/teacher_resources_screen.dart';
 
 class TeacherDashboardScreen extends ConsumerStatefulWidget {
   const TeacherDashboardScreen({super.key});
@@ -22,7 +23,7 @@ class _TeacherDashboardScreenState
 
   final List<Widget> _tabs = [
     const TeacherClassesTab(),
-    const _TeacherResourcesTab(),
+    const TeacherResourcesScreen(),
     const CommonNotificationScreen(),
     const CommonProfileScreen(),
   ];
@@ -97,46 +98,6 @@ class _TeacherDashboardScreenState
           ),
           const BottomNavigationBarItem(icon: Icon(Icons.person), label: ''),
         ],
-      ),
-    );
-  }
-}
-
-
-
-// Teacher Resources Tab
-class _TeacherResourcesTab extends StatelessWidget {
-  const _TeacherResourcesTab();
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.white,
-      appBar: AppBar(
-        title: const Text('Kho tài liệu'),
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-        foregroundColor: AppColors.textPrimary,
-      ),
-      body: const Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(Icons.folder, size: 64, color: AppColors.textSecondary),
-            SizedBox(height: 16),
-            Text(
-              'Kho tài liệu cá nhân',
-              style: AppTextStyles.bodyLarge,
-              textAlign: TextAlign.center,
-            ),
-            SizedBox(height: 8),
-            Text(
-              'Tính năng đang được phát triển',
-              style: AppTextStyles.bodyMedium,
-              textAlign: TextAlign.center,
-            ),
-          ],
-        ),
       ),
     );
   }

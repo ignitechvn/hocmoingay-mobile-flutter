@@ -8,6 +8,13 @@ class TeacherChaptersRepositoryImpl implements TeacherChaptersRepository {
   TeacherChaptersRepositoryImpl(this._api);
 
   @override
+  Future<TeacherChapterResponseListDto> getTeacherChapters(
+    String classroomId,
+  ) async {
+    return await _api.getTeacherChapters(classroomId);
+  }
+
+  @override
   Future<ChapterDetailsTeacherResponseDto> getChapterDetails(
     String chapterId,
   ) async {
@@ -17,5 +24,12 @@ class TeacherChaptersRepositoryImpl implements TeacherChaptersRepository {
   @override
   Future<ChapterTeacherResponseDto> createChapter(CreateChapterDto dto) async {
     return await _api.createChapter(dto);
+  }
+
+  @override
+  Future<TeacherChapterQuestionsResponseDto> getChapterQuestions(
+    String chapterId,
+  ) async {
+    return await _api.getChapterQuestions(chapterId);
   }
 }

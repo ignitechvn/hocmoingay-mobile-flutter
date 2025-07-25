@@ -5,12 +5,12 @@ import '../../../../../core/theme/app_dimensions.dart';
 import '../../../../../data/dto/question_dto.dart';
 import '../../../../../core/constants/question_constants.dart';
 
-class MultipleChoiceQuestion extends StatelessWidget {
+class StudentMultipleChoiceQuestion extends StatelessWidget {
   final QuestionStudentDto question;
   final String? selectedAnswerId;
   final Function(String) onAnswerSelected;
 
-  const MultipleChoiceQuestion({
+  const StudentMultipleChoiceQuestion({
     super.key,
     required this.question,
     required this.selectedAnswerId,

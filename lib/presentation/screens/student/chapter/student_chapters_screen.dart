@@ -10,7 +10,7 @@ import '../../../../core/widgets/empty_state_widget.dart';
 import '../../../../data/dto/chapter_dto.dart';
 import '../../../../providers/chapter/chapter_providers.dart';
 import 'widgets/chapter_status_filter_bar.dart';
-import 'chapter_details_screen.dart';
+import 'student_chapter_details_screen.dart';
 
 class StudentChaptersScreen extends ConsumerStatefulWidget {
   const StudentChaptersScreen({super.key, required this.classroomId});
@@ -135,7 +135,8 @@ class _ChaptersScreenState extends ConsumerState<StudentChaptersScreen> {
       onTap: () {
         Navigator.of(context).push(
           MaterialPageRoute(
-            builder: (context) => ChapterDetailsScreen(chapterId: chapter.id),
+            builder:
+                (context) => StudentChapterDetailsScreen(chapterId: chapter.id),
           ),
         );
       },

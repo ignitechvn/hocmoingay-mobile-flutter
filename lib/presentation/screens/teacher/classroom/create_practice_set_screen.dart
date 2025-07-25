@@ -252,34 +252,59 @@ class _CreatePracticeSetScreenState
                         children: [
                           // Option 1: Assign to all
                           Expanded(
-                            child: RadioListTile<bool>(
-                              title: const Text('Giao cho cả lớp'),
-                              value: true,
-                              groupValue: _assignToAll,
-                              onChanged: (value) {
+                            child: GestureDetector(
+                              onTap: () {
                                 setState(() {
-                                  _assignToAll = value!;
-                                  if (_assignToAll) {
-                                    _selectedStudentIds.clear();
-                                  }
+                                  _assignToAll = true;
+                                  _selectedStudentIds.clear();
                                 });
                               },
-                              activeColor: AppColors.primary,
+                              child: Row(
+                                children: [
+                                  Radio<bool>(
+                                    value: true,
+                                    groupValue: _assignToAll,
+                                    onChanged: (value) {
+                                      setState(() {
+                                        _assignToAll = value!;
+                                        if (_assignToAll) {
+                                          _selectedStudentIds.clear();
+                                        }
+                                      });
+                                    },
+                                    activeColor: AppColors.primary,
+                                  ),
+                                  const SizedBox(width: 4),
+                                  const Text('Giao cho cả lớp'),
+                                ],
+                              ),
                             ),
                           ),
 
                           // Option 2: Assign to specific students
                           Expanded(
-                            child: RadioListTile<bool>(
-                              title: const Text('Giao cho học sinh cụ thể'),
-                              value: false,
-                              groupValue: _assignToAll,
-                              onChanged: (value) {
+                            child: GestureDetector(
+                              onTap: () {
                                 setState(() {
-                                  _assignToAll = value!;
+                                  _assignToAll = false;
                                 });
                               },
-                              activeColor: AppColors.primary,
+                              child: Row(
+                                children: [
+                                  Radio<bool>(
+                                    value: false,
+                                    groupValue: _assignToAll,
+                                    onChanged: (value) {
+                                      setState(() {
+                                        _assignToAll = value!;
+                                      });
+                                    },
+                                    activeColor: AppColors.primary,
+                                  ),
+                                  const SizedBox(width: 4),
+                                  const Text('Giao cho học sinh cụ thể'),
+                                ],
+                              ),
                             ),
                           ),
                         ],

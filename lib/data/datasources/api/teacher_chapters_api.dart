@@ -9,6 +9,34 @@ class TeacherChaptersApi {
 
   TeacherChaptersApi(this._apiService);
 
+  /// Get teacher chapters for classroom
+  Future<TeacherChapterResponseListDto> getTeacherChapters(
+    String classroomId,
+  ) async {
+    try {
+      print(
+        '🔍 TeacherChaptersApi: Calling GET /teacher-classrooms/$classroomId/chapters/open-or-closed',
+      );
+      final response = await _apiService.get(
+        '/teacher-classrooms/$classroomId/chapters/open-or-closed',
+      );
+      print(
+        '✅ TeacherChaptersApi: Get teacher chapters success response: ${response.data}',
+      );
+      return TeacherChapterResponseListDto.fromList(
+        response.data as List<dynamic>,
+      );
+    } on DioException catch (e) {
+      print('❌ TeacherChaptersApi: DioException: ${e.message}');
+      print('❌ TeacherChaptersApi: Status code: ${e.response?.statusCode}');
+      print('❌ TeacherChaptersApi: Response data: ${e.response?.data}');
+      throw _handleDioError(e);
+    } catch (e) {
+      print('❌ TeacherChaptersApi: General exception: $e');
+      throw Exception('Failed to get teacher chapters: $e');
+    }
+  }
+
   /// Get chapter details for teacher
   Future<ChapterDetailsTeacherResponseDto> getChapterDetails(
     String chapterId,
@@ -61,6 +89,30 @@ class TeacherChaptersApi {
     } catch (e) {
       print('❌ TeacherChaptersApi: General exception: $e');
       throw Exception('Failed to create chapter: $e');
+    }
+  }
+
+  /// Get chapter questions for teacher
+  Future<TeacherChapterQuestionsResponseDto> getChapterQuestions(
+    String chapterId,
+  ) async {
+    try {
+      print(
+        '🔍 TeacherChaptersApi: Calling GET /teacher-chapters/$chapterId/questions',
+      );
+      final response = await _apiService.get(
+        '/teacher-chapters/$chapterId/questions',
+      );
+      print('✅ TeacherChaptersApi: Success response: ${response.data}');
+      return TeacherChapterQuestionsResponseDto.fromJson(response.data);
+    } on DioException catch (e) {
+      print('❌ TeacherChaptersApi: DioException: ${e.message}');
+      print('❌ TeacherChaptersApi: Status code: ${e.response?.statusCode}');
+      print('❌ TeacherChaptersApi: Response data: ${e.response?.data}');
+      throw _handleDioError(e);
+    } catch (e) {
+      print('❌ TeacherChaptersApi: General exception: $e');
+      throw Exception('Failed to get chapter questions: $e');
     }
   }
 

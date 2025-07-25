@@ -12,7 +12,7 @@ import '../../../presentation/screens/student/dashboard/student_dashboard_screen
 import '../../../presentation/screens/common/notification_screen.dart';
 import '../../../presentation/screens/student/classroom/classroom_details_screen.dart';
 import '../../presentation/screens/student/chapter/student_chapters_screen.dart';
-import '../../../presentation/screens/student/chapter/chapter_details_screen.dart';
+import '../../presentation/screens/student/chapter/student_chapter_details_screen.dart';
 import '../../../presentation/screens/teacher/teacher_dashboard_screen.dart';
 import '../../../core/constants/app_constants.dart';
 
@@ -124,7 +124,7 @@ class AppRoutes {
           final extra = state.extra as Map<String, dynamic>?;
           final chapterId = extra?['chapterId'] as String?;
           if (chapterId != null) {
-            return ChapterDetailsScreen(chapterId: chapterId);
+            return StudentChapterDetailsScreen(chapterId: chapterId);
           }
           return const StudentDashboardScreen();
         },

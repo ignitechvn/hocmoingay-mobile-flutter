@@ -9,6 +9,34 @@ class TeacherPracticeSetsApi {
 
   TeacherPracticeSetsApi(this._apiService);
 
+  /// Get open or closed practice sets for teacher classroom
+  Future<TeacherPracticeSetResponseListDto> getOpenOrClosedPracticeSets(
+    String classroomId,
+  ) async {
+    try {
+      print(
+        '🔍 TeacherPracticeSetsApi: Calling GET /teacher-classrooms/$classroomId/practice-sets/open-or-closed',
+      );
+      final response = await _apiService.get(
+        '/teacher-classrooms/$classroomId/practice-sets/open-or-closed',
+      );
+      print(
+        '✅ TeacherPracticeSetsApi: Get open or closed practice sets success response: ${response.data}',
+      );
+      return TeacherPracticeSetResponseListDto.fromList(
+        response.data as List<dynamic>,
+      );
+    } on DioException catch (e) {
+      print('❌ TeacherPracticeSetsApi: DioException: ${e.message}');
+      print('❌ TeacherPracticeSetsApi: Status code: ${e.response?.statusCode}');
+      print('❌ TeacherPracticeSetsApi: Response data: ${e.response?.data}');
+      throw _handleDioError(e);
+    } catch (e) {
+      print('❌ TeacherPracticeSetsApi: General exception: $e');
+      throw Exception('Failed to get open or closed practice sets: $e');
+    }
+  }
+
   /// Get practice sets for teacher classroom
   Future<TeacherPracticeSetResponseListDto> getPracticeSets(
     String classroomId,

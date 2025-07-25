@@ -22,8 +22,10 @@ import '../widgets/chapter_status_filter_bar.dart';
 import '../widgets/practice_set_status_filter_bar.dart';
 import 'teacher_chapters_screen.dart';
 import 'teacher_practice_sets_screen.dart';
+import 'teacher_exams_screen.dart';
 import 'create_classroom_screen.dart';
 import 'student_management_screen.dart';
+import 'reports_screen.dart';
 
 class TeacherClassroomDetailsScreen extends ConsumerStatefulWidget {
   final String classroomId;
@@ -555,9 +557,12 @@ class _TeacherClassroomDetailsScreenState
                 Expanded(
                   child: AppButton(
                     onPressed: () {
-                      ToastUtils.showSuccess(
-                        context: context,
-                        message: 'Chức năng quản lý bài thi sẽ được thêm sau',
+                      Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder:
+                              (context) =>
+                                  TeacherExamsScreen(classroomId: classroom.id),
+                        ),
                       );
                     },
                     text: 'Quản lý bài thi',
@@ -567,9 +572,14 @@ class _TeacherClassroomDetailsScreenState
                 Expanded(
                   child: AppButton(
                     onPressed: () {
-                      ToastUtils.showSuccess(
-                        context: context,
-                        message: 'Chức năng xem báo cáo sẽ được thêm sau',
+                      Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder:
+                              (context) => ReportsScreen(
+                                classroomId: classroom.id,
+                                classroomName: classroom.name,
+                              ),
+                        ),
                       );
                     },
                     text: 'Xem báo cáo',

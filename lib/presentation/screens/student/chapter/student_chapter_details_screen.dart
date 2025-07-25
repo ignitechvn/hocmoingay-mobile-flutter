@@ -11,23 +11,23 @@ import '../../../../core/widgets/app_button.dart';
 import '../../../../data/dto/chapter_details_dto.dart';
 import '../../../../data/dto/question_dto.dart';
 import '../../../../providers/chapter/chapter_providers.dart';
-import 'widgets/cloze_test_question.dart';
-import 'widgets/fill_in_blank_question.dart';
-import 'widgets/multiple_choice_question.dart';
-import 'widgets/question_result_view.dart';
-import 'widgets/sentence_rewriting_question.dart';
+import 'widgets/student_cloze_test_question.dart';
+import 'widgets/student_fill_in_blank_question.dart';
+import 'widgets/student_multiple_choice_question.dart';
+import 'widgets/student_question_result_view.dart';
+import 'widgets/student_sentence_rewriting_question.dart';
 
-class ChapterDetailsScreen extends ConsumerStatefulWidget {
-
-  const ChapterDetailsScreen({required this.chapterId, super.key});
+class StudentChapterDetailsScreen extends ConsumerStatefulWidget {
+  const StudentChapterDetailsScreen({required this.chapterId, super.key});
   final String chapterId;
 
   @override
-  ConsumerState<ChapterDetailsScreen> createState() =>
-      _ChapterDetailsScreenState();
+  ConsumerState<StudentChapterDetailsScreen> createState() =>
+      _StudentChapterDetailsScreenState();
 }
 
-class _ChapterDetailsScreenState extends ConsumerState<ChapterDetailsScreen> {
+class _StudentChapterDetailsScreenState
+    extends ConsumerState<StudentChapterDetailsScreen> {
   Map<String, dynamic> studentAnswers = {};
   bool isSubmitting = false;
 
@@ -111,28 +111,30 @@ class _ChapterDetailsScreenState extends ConsumerState<ChapterDetailsScreen> {
     );
   }
 
-  Widget _buildHeader(ChapterDetailsStudentResponseDto chapterDetails) => const SizedBox.shrink();
+  Widget _buildHeader(ChapterDetailsStudentResponseDto chapterDetails) =>
+      const SizedBox.shrink();
 
-  Widget _buildQuestionsList(ChapterDetailsStudentResponseDto chapterDetails) => Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: <Widget>[
-        Text(
-          'Danh sách câu hỏi',
-          style: AppTextStyles.headlineSmall.copyWith(
-            color: AppColors.textPrimary,
+  Widget _buildQuestionsList(ChapterDetailsStudentResponseDto chapterDetails) =>
+      Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: <Widget>[
+          Text(
+            'Danh sách câu hỏi',
+            style: AppTextStyles.headlineSmall.copyWith(
+              color: AppColors.textPrimary,
+            ),
           ),
-        ),
-        const SizedBox(height: AppDimensions.paddingM),
-        ...chapterDetails.questions.asMap().entries.map((entry) {
-          final index = entry.key;
-          final question = entry.value;
-          return Padding(
-            padding: const EdgeInsets.only(bottom: AppDimensions.paddingL),
-            child: _buildQuestionItem(index, question, chapterDetails.status),
-          );
-        }),
-      ],
-    );
+          const SizedBox(height: AppDimensions.paddingM),
+          ...chapterDetails.questions.asMap().entries.map((entry) {
+            final index = entry.key;
+            final question = entry.value;
+            return Padding(
+              padding: const EdgeInsets.only(bottom: AppDimensions.paddingL),
+              child: _buildQuestionItem(index, question, chapterDetails.status),
+            );
+          }),
+        ],
+      );
 
   Widget _buildQuestionItem(
     int index,
@@ -183,7 +185,7 @@ class _ChapterDetailsScreenState extends ConsumerState<ChapterDetailsScreen> {
               question: question,
               studentAnswer: studentAnswers[question.id],
             )
-            : MultipleChoiceQuestion(
+            : StudentMultipleChoiceQuestion(
               question: question,
               onAnswerSelected: (String answerId) {
                 setState(() {
@@ -199,7 +201,7 @@ class _ChapterDetailsScreenState extends ConsumerState<ChapterDetailsScreen> {
               question: question,
               studentAnswer: studentAnswers[question.id],
             )
-            : FillInBlankQuestion(
+            : StudentFillInBlankQuestion(
               question: question,
               onAnswerChanged: (String answer) {
                 setState(() {
@@ -215,7 +217,7 @@ class _ChapterDetailsScreenState extends ConsumerState<ChapterDetailsScreen> {
               question: question,
               studentAnswer: studentAnswers[question.id],
             )
-            : ClozeTestQuestion(
+            : StudentClozeTestQuestion(
               question: question,
               onAnswersChanged: (Map<String, String> answers) {
                 setState(() {
@@ -231,7 +233,7 @@ class _ChapterDetailsScreenState extends ConsumerState<ChapterDetailsScreen> {
               question: question,
               studentAnswer: studentAnswers[question.id],
             )
-            : SentenceRewritingQuestion(
+            : StudentSentenceRewritingQuestion(
               question: question,
               onAnswerChanged: (String answer) {
                 setState(() {
@@ -240,8 +242,7 @@ class _ChapterDetailsScreenState extends ConsumerState<ChapterDetailsScreen> {
               },
               studentAnswer: studentAnswers[question.id] ?? '',
             );
-
-      }
+    }
   }
 
   Widget _buildQuestionTypeTag(EQuestionType questionType) {
@@ -279,35 +280,35 @@ class _ChapterDetailsScreenState extends ConsumerState<ChapterDetailsScreen> {
   }
 
   Widget _buildErrorState(dynamic error) => Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: <Widget>[
-          const Icon(Icons.error_outline, size: 64, color: AppColors.error),
-          const SizedBox(height: AppDimensions.paddingM),
-          Text(
-            'Không thể tải thông tin chủ đề',
-            style: AppTextStyles.headlineSmall.copyWith(
-              color: AppColors.textPrimary,
-            ),
+    child: Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: <Widget>[
+        const Icon(Icons.error_outline, size: 64, color: AppColors.error),
+        const SizedBox(height: AppDimensions.paddingM),
+        Text(
+          'Không thể tải thông tin chủ đề',
+          style: AppTextStyles.headlineSmall.copyWith(
+            color: AppColors.textPrimary,
           ),
-          const SizedBox(height: AppDimensions.paddingS),
-          Text(
-            error.toString(),
-            style: AppTextStyles.bodyMedium.copyWith(
-              color: AppColors.textSecondary,
-            ),
-            textAlign: TextAlign.center,
+        ),
+        const SizedBox(height: AppDimensions.paddingS),
+        Text(
+          error.toString(),
+          style: AppTextStyles.bodyMedium.copyWith(
+            color: AppColors.textSecondary,
           ),
-          const SizedBox(height: AppDimensions.paddingL),
-          AppButton(
-            text: 'Thử lại',
-            onPressed: () {
-              ref.invalidate(chapterDetailsProvider(widget.chapterId));
-            },
-          ),
-        ],
-      ),
-    );
+          textAlign: TextAlign.center,
+        ),
+        const SizedBox(height: AppDimensions.paddingL),
+        AppButton(
+          text: 'Thử lại',
+          onPressed: () {
+            ref.invalidate(chapterDetailsProvider(widget.chapterId));
+          },
+        ),
+      ],
+    ),
+  );
 
   Future<void> _handleSubmit() async {
     if (studentAnswers.isEmpty) {

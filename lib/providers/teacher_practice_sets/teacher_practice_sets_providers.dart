@@ -5,6 +5,7 @@ import '../../data/dto/practice_set_dto.dart';
 import '../../data/repositories/teacher_practice_sets/teacher_practice_sets_repository_impl.dart';
 import '../../domain/repositories/teacher_practice_sets_repository.dart';
 import '../../domain/usecases/teacher_practice_sets/get_teacher_practice_sets_usecase.dart';
+import '../../domain/usecases/teacher_practice_sets/get_open_or_closed_practice_sets_usecase.dart';
 import '../../domain/usecases/teacher_practice_sets/create_practice_set_usecase.dart';
 import '../../domain/usecases/teacher_practice_sets/update_practice_set_usecase.dart';
 import '../api/api_providers.dart';
@@ -29,6 +30,12 @@ final getTeacherPracticeSetsUseCaseProvider =
       return GetTeacherPracticeSetsUseCase(repository);
     });
 
+final getOpenOrClosedPracticeSetsUseCaseProvider =
+    Provider<GetOpenOrClosedPracticeSetsUseCase>((ref) {
+      final repository = ref.watch(teacherPracticeSetsRepositoryProvider);
+      return GetOpenOrClosedPracticeSetsUseCase(repository);
+    });
+
 final createPracticeSetUseCaseProvider = Provider<CreatePracticeSetUseCase>((
   ref,
 ) {
@@ -50,5 +57,14 @@ final teacherPracticeSetsProvider =
       classroomId,
     ) async {
       final useCase = ref.watch(getTeacherPracticeSetsUseCaseProvider);
+      return await useCase(classroomId);
+    });
+
+final teacherOpenOrClosedPracticeSetsProvider =
+    FutureProvider.family<TeacherPracticeSetResponseListDto, String>((
+      ref,
+      classroomId,
+    ) async {
+      final useCase = ref.watch(getOpenOrClosedPracticeSetsUseCaseProvider);
       return await useCase(classroomId);
     });
