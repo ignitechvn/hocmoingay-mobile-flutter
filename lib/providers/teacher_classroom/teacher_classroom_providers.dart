@@ -15,6 +15,9 @@ import '../../domain/usecases/teacher_classroom/approve_student_usecase.dart';
 import '../../domain/usecases/teacher_classroom/reject_student_usecase.dart';
 import '../../domain/usecases/teacher_classroom/get_teacher_chapters_usecase.dart';
 import '../../providers/api/api_providers.dart';
+import '../../data/dto/classroom_dto.dart';
+import '../../domain/entities/classroom.dart';
+import '../../domain/usecases/teacher_classroom/update_classroom_usecase.dart';
 
 // API Provider
 final teacherClassroomApiProvider = Provider<TeacherClassroomApi>((ref) {
@@ -40,6 +43,11 @@ final getTeacherClassroomsUseCaseProvider =
 final createClassroomUseCaseProvider = Provider<CreateClassroomUseCase>((ref) {
   final repository = ref.watch(teacherClassroomRepositoryProvider);
   return CreateClassroomUseCase(repository);
+});
+
+final updateClassroomUseCaseProvider = Provider<UpdateClassroomUseCase>((ref) {
+  final repository = ref.watch(teacherClassroomRepositoryProvider);
+  return UpdateClassroomUseCase(repository);
 });
 
 final getClassroomDetailsUseCaseProvider = Provider<GetClassroomDetailsUseCase>(
@@ -78,7 +86,9 @@ final rejectStudentUseCaseProvider = Provider<RejectStudentUseCase>((ref) {
   return RejectStudentUseCase(repository);
 });
 
-final getTeacherChaptersUseCaseProvider = Provider<GetTeacherChaptersUseCase>((ref) {
+final getTeacherChaptersUseCaseProvider = Provider<GetTeacherChaptersUseCase>((
+  ref,
+) {
   final repository = ref.watch(teacherClassroomRepositoryProvider);
   return GetTeacherChaptersUseCase(repository);
 });

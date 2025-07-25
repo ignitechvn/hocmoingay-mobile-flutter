@@ -1,22 +1,29 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:intl/intl.dart';
 
+import '../../../../core/constants/app_constants.dart';
 import '../../../../core/constants/classroom_constants.dart';
-import '../../../../core/constants/grade_constants.dart';
 import '../../../../core/constants/classroom_status_constants.dart';
+import '../../../../core/constants/grade_constants.dart';
 import '../../../../core/constants/subject_constants.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_text_styles.dart';
 import '../../../../core/utils/toast_utils.dart';
 import '../../../../core/widgets/app_button.dart';
-import '../../../../core/widgets/empty_state_widget.dart';
+import '../../../../data/dto/classroom_dto.dart';
 import '../../../../data/dto/teacher_classroom_dto.dart';
 import '../../../../providers/teacher_classroom/teacher_classroom_providers.dart';
-import '../../../../domain/entities/classroom.dart';
-import 'edit_classroom_screen.dart';
-import 'student_management_screen.dart';
+import '../../../../providers/teacher_chapters/teacher_chapters_providers.dart';
+import '../../../../providers/teacher_practice_sets/teacher_practice_sets_providers.dart';
+import '../../../../core/widgets/empty_state_widget.dart';
+import '../widgets/chapter_status_filter_bar.dart';
+import '../widgets/practice_set_status_filter_bar.dart';
 import 'teacher_chapters_screen.dart';
+import 'teacher_practice_sets_screen.dart';
+import 'create_classroom_screen.dart';
+import 'student_management_screen.dart';
 
 class TeacherClassroomDetailsScreen extends ConsumerStatefulWidget {
   final String classroomId;
@@ -63,7 +70,7 @@ class _TeacherClassroomDetailsScreenState
                     MaterialPageRoute(
                       builder:
                           (context) =>
-                              EditClassroomScreen(classroom: classroom),
+                              CreateClassroomScreen(classroom: classroom),
                     ),
                   );
                 });
@@ -528,9 +535,13 @@ class _TeacherClassroomDetailsScreenState
                 Expanded(
                   child: AppButton(
                     onPressed: () {
-                      ToastUtils.showSuccess(
-                        context: context,
-                        message: 'Chức năng quản lý bài tập sẽ được thêm sau',
+                      Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder:
+                              (context) => TeacherPracticeSetsScreen(
+                                classroomId: classroom.id,
+                              ),
+                        ),
                       );
                     },
                     text: 'Quản lý bài tập',

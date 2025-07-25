@@ -15,5 +15,9 @@ abstract class TeacherClassroomRepository {
   );
   Future<String> approveStudent(String classroomId, String studentId);
   Future<String> rejectStudent(String classroomId, String studentId);
+  Future<ClassroomTeacherResponseDto> updateClassroom(
+    String classroomId,
+    UpdateClassroomDto dto,
+  );
   Future<TeacherChapterResponseListDto> getChapters(String classroomId);
 }

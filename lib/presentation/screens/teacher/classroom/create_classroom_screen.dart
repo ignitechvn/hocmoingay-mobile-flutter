@@ -14,11 +14,16 @@ import '../../../../core/widgets/app_button.dart';
 import '../../../../core/widgets/app_text_field.dart';
 import '../../../../domain/entities/classroom.dart';
 import '../../../../data/dto/teacher_classroom_dto.dart';
+import '../../../../data/dto/classroom_dto.dart';
 import '../../../../providers/teacher_classroom/teacher_classroom_providers.dart';
+import '../../../../domain/usecases/teacher_classroom/update_classroom_usecase.dart';
 import 'schedule_setup_screen.dart';
 
 class CreateClassroomScreen extends ConsumerStatefulWidget {
-  const CreateClassroomScreen({super.key});
+  final ClassroomDetailsTeacherResponseDto?
+  classroom; // null = create, != null = edit
+
+  const CreateClassroomScreen({super.key, this.classroom});
 
   @override
   ConsumerState<CreateClassroomScreen> createState() =>
@@ -36,6 +41,115 @@ class _CreateClassroomScreenState extends ConsumerState<CreateClassroomScreen> {
   DateTime _endDate = DateTime.now().add(const Duration(days: 30));
   List<Schedule> _schedule = [];
 
+  bool get isEditMode => widget.classroom != null;
+
+  @override
+  void initState() {
+    super.initState();
+    if (isEditMode) {
+      _initializeEditData();
+    }
+  }
+
+  void _initializeEditData() {
+    final classroom = widget.classroom!;
+
+    // Pre-populate form with existing classroom data
+    _nameController.text = classroom.name;
+    _selectedSubject = ESubjectCode.fromString(classroom.code);
+    _selectedGrade = EGradeLevel.fromString(classroom.grade);
+
+    if (classroom.startDate != null) {
+      try {
+        _startDate = _parseDate(classroom.startDate!);
+      } catch (e) {
+        _startDate = DateTime.now();
+      }
+    }
+
+    if (classroom.endDate != null) {
+      try {
+        _endDate = _parseDate(classroom.endDate!);
+      } catch (e) {
+        _endDate = DateTime.now().add(const Duration(days: 30));
+      }
+    }
+
+    // Convert schedule from DTO to entity
+    if (classroom.schedule != null) {
+      _schedule =
+          classroom.schedule!
+              .map(
+                (s) => Schedule(
+                  dayOfWeek: s.dayOfWeek,
+                  startTime: s.startTime,
+                  endTime: s.endTime,
+                ),
+              )
+              .toList();
+    }
+  }
+
+  // Parse date from backend format
+  DateTime _parseDate(String dateString) {
+    try {
+      // Try ISO format first
+      return DateTime.parse(dateString);
+    } catch (e) {
+      // Handle backend format: "Tue Jul 22 2025 17:00:00 GMT+0000 (Coordinated Universal Time)"
+      try {
+        // Extract the date part and convert to ISO format
+        final parts = dateString.split(' ');
+        if (parts.length >= 6) {
+          final day = parts[2];
+          final month = _getMonthNumber(parts[1]);
+          final year = parts[3];
+          final time = parts[4];
+
+          // Create ISO format: "2025-07-22T17:00:00"
+          final isoDate = '$year-$month-$day $time';
+          return DateTime.parse(isoDate);
+        }
+      } catch (e2) {
+        print('❌ Failed to parse date: $dateString - $e2');
+      }
+
+      // Fallback to current date
+      return DateTime.now();
+    }
+  }
+
+  String _getMonthNumber(String monthName) {
+    switch (monthName) {
+      case 'Jan':
+        return '01';
+      case 'Feb':
+        return '02';
+      case 'Mar':
+        return '03';
+      case 'Apr':
+        return '04';
+      case 'May':
+        return '05';
+      case 'Jun':
+        return '06';
+      case 'Jul':
+        return '07';
+      case 'Aug':
+        return '08';
+      case 'Sep':
+        return '09';
+      case 'Oct':
+        return '10';
+      case 'Nov':
+        return '11';
+      case 'Dec':
+        return '12';
+      default:
+        return '01';
+    }
+  }
+
   @override
   void dispose() {
     _nameController.dispose();
@@ -49,7 +163,7 @@ class _CreateClassroomScreenState extends ConsumerState<CreateClassroomScreen> {
       backgroundColor: AppColors.background,
       appBar: AppBar(
         title: Text(
-          'Thêm lớp học',
+          isEditMode ? 'Chỉnh sửa lớp học' : 'Thêm lớp học',
           style: AppTextStyles.headlineSmall.copyWith(
             color: AppColors.textPrimary,
             fontWeight: FontWeight.bold,
@@ -189,32 +303,34 @@ class _CreateClassroomScreenState extends ConsumerState<CreateClassroomScreen> {
               ),
               const SizedBox(height: 24),
 
-              // Số buổi học dự kiến
-              Text(
-                'Số buổi học dự kiến',
-                style: AppTextStyles.titleMedium.copyWith(
-                  color: AppColors.textPrimary,
-                  fontWeight: FontWeight.w600,
+              // Số buổi học dự kiến (chỉ hiển thị khi tạo mới)
+              if (!isEditMode) ...[
+                Text(
+                  'Số buổi học dự kiến',
+                  style: AppTextStyles.titleMedium.copyWith(
+                    color: AppColors.textPrimary,
+                    fontWeight: FontWeight.w600,
+                  ),
                 ),
-              ),
-              const SizedBox(height: 8),
-              AppTextField(
-                controller: _expectedSessionsController,
-                label: '',
-                hint: 'Nhập số buổi học',
-                keyboardType: TextInputType.number,
-                validator: (value) {
-                  if (value == null || value.trim().isEmpty) {
-                    return 'Vui lòng nhập số buổi học';
-                  }
-                  final number = int.tryParse(value);
-                  if (number == null || number <= 0) {
-                    return 'Số buổi học phải là số nguyên dương';
-                  }
-                  return null;
-                },
-              ),
-              const SizedBox(height: 24),
+                const SizedBox(height: 8),
+                AppTextField(
+                  controller: _expectedSessionsController,
+                  label: '',
+                  hint: 'Nhập số buổi học',
+                  keyboardType: TextInputType.number,
+                  validator: (value) {
+                    if (value == null || value.trim().isEmpty) {
+                      return 'Vui lòng nhập số buổi học';
+                    }
+                    final number = int.tryParse(value);
+                    if (number == null || number <= 0) {
+                      return 'Số buổi học phải là số nguyên dương';
+                    }
+                    return null;
+                  },
+                ),
+                const SizedBox(height: 24),
+              ],
 
               // Ngày bắt đầu
               Text(
@@ -387,12 +503,12 @@ class _CreateClassroomScreenState extends ConsumerState<CreateClassroomScreen> {
 
               const SizedBox(height: 32),
 
-              // Nút tạo lớp học
+              // Nút tạo/cập nhật lớp học
               SizedBox(
                 width: double.infinity,
                 child: AppButton(
-                  text: 'Tạo lớp học',
-                  onPressed: _createClassroom,
+                  text: isEditMode ? 'Cập nhật lớp học' : 'Tạo lớp học',
+                  onPressed: isEditMode ? _updateClassroom : _createClassroom,
                 ),
               ),
             ],
@@ -527,6 +643,89 @@ class _CreateClassroomScreenState extends ConsumerState<CreateClassroomScreen> {
         );
 
         print('❌ Failed to create classroom: $e');
+      }
+    }
+  }
+
+  Future<void> _updateClassroom() async {
+    if (_formKey.currentState!.validate()) {
+      // Validate dates
+      if (_endDate.isBefore(_startDate)) {
+        ToastUtils.showFail(
+          context: context,
+          message: 'Ngày kết thúc phải sau ngày bắt đầu',
+        );
+        return;
+      }
+
+      // Validate schedule
+      if (_schedule.isEmpty) {
+        ToastUtils.showWarning(
+          context: context,
+          message: 'Vui lòng thiết lập lịch học',
+        );
+        return;
+      }
+
+      try {
+        // Show loading
+        showDialog(
+          context: context,
+          barrierDismissible: false,
+          builder:
+              (context) => const Center(child: CircularProgressIndicator()),
+        );
+
+        // Create update DTO
+        final updateClassroomDto = UpdateClassroomDto(
+          name: _nameController.text.trim(),
+          startDate: _startDate.toIso8601String(),
+          endDate: _endDate.toIso8601String(),
+          schedule:
+              _schedule
+                  .map(
+                    (s) => ScheduleItemDto(
+                      dayOfWeek: s.dayOfWeek,
+                      startTime: s.startTime,
+                      endTime: s.endTime,
+                    ),
+                  )
+                  .toList(),
+        );
+
+        // Call API
+        final useCase = ref.read(updateClassroomUseCaseProvider);
+        final result = await useCase(
+          UpdateClassroomParams(
+            classroomId: widget.classroom!.id,
+            dto: updateClassroomDto,
+          ),
+        );
+
+        // Hide loading
+        Navigator.of(context).pop();
+
+        // Show success
+        ToastUtils.showSuccess(
+          context: context,
+          message: 'Cập nhật lớp học thành công!',
+        );
+
+        print('✅ Updated classroom: ${result.name}');
+
+        // Navigate back
+        Navigator.of(context).pop();
+      } catch (e) {
+        // Hide loading
+        Navigator.of(context).pop();
+
+        // Show error
+        ToastUtils.showFail(
+          context: context,
+          message: 'Cập nhật lớp học thất bại: ${e.toString()}',
+        );
+
+        print('❌ Failed to update classroom: $e');
       }
     }
   }

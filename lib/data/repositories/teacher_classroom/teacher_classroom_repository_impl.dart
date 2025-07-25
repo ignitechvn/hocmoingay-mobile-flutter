@@ -41,6 +41,14 @@ class TeacherClassroomRepositoryImpl implements TeacherClassroomRepository {
   }
 
   @override
+  Future<ClassroomTeacherResponseDto> updateClassroom(
+    String classroomId,
+    UpdateClassroomDto dto,
+  ) async {
+    return await _api.updateClassroom(classroomId, dto);
+  }
+
+  @override
   Future<List<PendingStudentResponseDto>> getPendingStudents(
     String classroomId,
   ) async {

@@ -75,6 +75,28 @@ class CreateClassroomDto {
   };
 }
 
+// Update Classroom DTO
+class UpdateClassroomDto {
+  final String? name;
+  final String? startDate;
+  final String? endDate;
+  final List<ScheduleItemDto>? schedule;
+
+  const UpdateClassroomDto({
+    this.name,
+    this.startDate,
+    this.endDate,
+    this.schedule,
+  });
+
+  Map<String, dynamic> toJson() => {
+    if (name != null) 'name': name,
+    if (startDate != null) 'startDate': startDate,
+    if (endDate != null) 'endDate': endDate,
+    if (schedule != null) 'schedule': schedule!.map((e) => e.toJson()).toList(),
+  };
+}
+
 // Classroom Details Teacher Response DTO
 class ClassroomDetailsTeacherResponseDto {
   final String id;

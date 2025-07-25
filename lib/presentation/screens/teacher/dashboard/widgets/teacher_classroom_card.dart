@@ -9,7 +9,10 @@ import '../../../../../core/theme/app_colors.dart';
 import '../../../../../core/theme/app_text_styles.dart';
 import '../../../../../core/utils/toast_utils.dart';
 import '../../../../../domain/entities/classroom.dart';
+import '../../../../../data/dto/classroom_dto.dart';
+import '../../../../../data/dto/teacher_classroom_dto.dart';
 import '../../classroom/teacher_classroom_details_screen.dart';
+import '../../classroom/create_classroom_screen.dart';
 
 class TeacherClassroomCard extends StatelessWidget {
   final ClassroomTeacher classroom;
@@ -278,9 +281,14 @@ class TeacherClassroomCard extends StatelessWidget {
   void _handleMenuAction(BuildContext context, String action) {
     switch (action) {
       case 'edit-info':
-        ToastUtils.showSuccess(
-          context: context,
-          message: 'Chức năng chỉnh sửa thông tin sẽ được thêm sau',
+        // Navigate to CreateClassroomScreen in edit mode
+        Navigator.of(context).push(
+          MaterialPageRoute(
+            builder:
+                (context) => CreateClassroomScreen(
+                  classroom: _convertToClassroomDetailsDto(),
+                ),
+          ),
         );
         break;
       case 'edit-status':
@@ -296,5 +304,52 @@ class TeacherClassroomCard extends StatelessWidget {
         );
         break;
     }
+  }
+
+  // Convert ClassroomTeacher to ClassroomDetailsTeacherResponseDto for edit mode
+  ClassroomDetailsTeacherResponseDto _convertToClassroomDetailsDto() {
+    return ClassroomDetailsTeacherResponseDto(
+      id: classroom.id,
+      name: classroom.name,
+      code: classroom.code.value,
+      joinCode: classroom.joinCode,
+      grade: classroom.grade.value,
+      status: classroom.status.value,
+      lessonSessionCount: classroom.lessonSessionCount,
+      lessonLearnedCount: classroom.lessonLearnedCount,
+      startDate: classroom.startDate.toIso8601String(),
+      endDate: classroom.endDate.toIso8601String(),
+      totalStudents: classroom.totalStudents,
+      schedule:
+          classroom.schedule
+              .map(
+                (s) => ScheduleResponseDto(
+                  dayOfWeek: s.dayOfWeek,
+                  startTime: s.startTime,
+                  endTime: s.endTime,
+                ),
+              )
+              .toList(),
+      lessonSessions:
+          classroom.lessonSessions
+              .map(
+                (ls) => LessonSessionResponseDto(
+                  id: ls.id,
+                  date: ls.date.toIso8601String(),
+                  startTime: ls.startTime,
+                  endTime: ls.endTime,
+                  status: ls.status,
+                  note: ls.note,
+                  originalSessionId: ls.originalSessionId,
+                ),
+              )
+              .toList(),
+      teacher: null, // Will be filled by API
+      studentsCount: classroom.totalStudents,
+      pendingStudentCount: 0, // Will be filled by API
+      chaptersCount: 0, // Will be filled by API
+      practiceSetsCount: 0, // Will be filled by API
+      examsCount: 0, // Will be filled by API
+    );
   }
 }
