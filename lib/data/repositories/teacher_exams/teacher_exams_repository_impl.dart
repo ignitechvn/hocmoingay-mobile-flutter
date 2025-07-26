@@ -29,4 +29,22 @@ class TeacherExamsRepositoryImpl implements TeacherExamsRepository {
   ) async {
     return await _api.updateExam(examId, dto);
   }
+
+  @override
+  Future<DeleteExamResponseDto> deleteExam(String examId) async {
+    return await _api.deleteExam(examId);
+  }
+
+  @override
+  Future<ExamTeacherResponseDto> updateExamStatus(
+    String examId,
+    UpdateExamStatusDto dto,
+  ) async {
+    return await _api.updateExamStatus(examId, dto);
+  }
+
+  @override
+  Future<ExamDetailsTeacherResponseDto> getExamDetails(String examId) async {
+    return await _api.getExamDetails(examId);
+  }
 }

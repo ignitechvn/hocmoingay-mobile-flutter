@@ -7,7 +7,7 @@ import '../../../../core/theme/app_dimensions.dart';
 import '../../../../core/theme/app_text_styles.dart';
 import '../../../../core/utils/toast_utils.dart';
 import '../../../../core/widgets/app_button.dart';
-import '../../../../core/widgets/app_text_field.dart';
+
 import '../../../../data/dto/exam_dto.dart';
 import '../../../../data/dto/teacher_classroom_dto.dart';
 import '../../../../providers/teacher_exams/teacher_exams_providers.dart';
@@ -92,10 +92,40 @@ class _CreateExamScreenState extends ConsumerState<CreateExamScreen> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               // Title
-              AppTextField(
+              Text(
+                'Tên bài thi *',
+                style: AppTextStyles.bodyMedium.copyWith(
+                  color: AppColors.textPrimary,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+              const SizedBox(height: 8),
+              TextFormField(
                 controller: _titleController,
-                label: 'Tên bài thi',
-                hint: 'Nhập tên bài thi',
+                decoration: InputDecoration(
+                  hintText: 'Nhập tên bài thi',
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: const BorderSide(color: AppColors.grey300),
+                  ),
+                  enabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: const BorderSide(color: AppColors.grey300),
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: const BorderSide(color: AppColors.primary),
+                  ),
+                  errorBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: const BorderSide(color: AppColors.error),
+                  ),
+                  contentPadding: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 16,
+                  ),
+                ),
+                style: AppTextStyles.bodyMedium,
                 validator: (value) {
                   if (value == null || value.trim().isEmpty) {
                     return 'Vui lòng nhập tên bài thi';
@@ -106,20 +136,80 @@ class _CreateExamScreenState extends ConsumerState<CreateExamScreen> {
               const SizedBox(height: 24),
 
               // Description
-              AppTextField(
+              Text(
+                'Mô tả',
+                style: AppTextStyles.bodyMedium.copyWith(
+                  color: AppColors.textPrimary,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+              const SizedBox(height: 8),
+              TextFormField(
                 controller: _descriptionController,
-                label: 'Mô tả',
-                hint: 'Nhập mô tả bài thi (tùy chọn)',
                 maxLines: 3,
+                decoration: InputDecoration(
+                  hintText: 'Nhập mô tả bài thi (tùy chọn)',
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: const BorderSide(color: AppColors.grey300),
+                  ),
+                  enabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: const BorderSide(color: AppColors.grey300),
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: const BorderSide(color: AppColors.primary),
+                  ),
+                  errorBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: const BorderSide(color: AppColors.error),
+                  ),
+                  contentPadding: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 16,
+                  ),
+                ),
+                style: AppTextStyles.bodyMedium,
               ),
               const SizedBox(height: 24),
 
               // Duration
-              AppTextField(
+              Text(
+                'Thời lượng làm bài (phút) *',
+                style: AppTextStyles.bodyMedium.copyWith(
+                  color: AppColors.textPrimary,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+              const SizedBox(height: 8),
+              TextFormField(
                 controller: _durationController,
-                label: 'Thời lượng làm bài (phút)',
-                hint: 'Nhập thời lượng (ví dụ: 90)',
                 keyboardType: TextInputType.number,
+                decoration: InputDecoration(
+                  hintText: 'Nhập thời lượng (ví dụ: 90)',
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: const BorderSide(color: AppColors.grey300),
+                  ),
+                  enabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: const BorderSide(color: AppColors.grey300),
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: const BorderSide(color: AppColors.primary),
+                  ),
+                  errorBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: const BorderSide(color: AppColors.error),
+                  ),
+                  contentPadding: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 16,
+                  ),
+                ),
+                style: AppTextStyles.bodyMedium,
                 validator: (value) {
                   if (value == null || value.trim().isEmpty) {
                     return 'Vui lòng nhập thời lượng';

@@ -8,10 +8,15 @@ import '../../../../core/theme/app_dimensions.dart';
 import '../../../../core/theme/app_text_styles.dart';
 import '../../../../core/utils/toast_utils.dart';
 import '../../../../core/widgets/empty_state_widget.dart';
+import '../../../../core/widgets/confirm_dialog.dart';
+import '../../../../core/widgets/update_exam_status_dialog.dart';
 import '../../../../data/dto/exam_dto.dart';
 import '../../../../providers/teacher_exams/teacher_exams_providers.dart';
+import '../../../../domain/usecases/teacher_exams/delete_exam_usecase.dart';
+import '../../../../domain/usecases/teacher_exams/update_exam_status_usecase.dart';
 import '../widgets/exam_status_filter_bar.dart';
 import 'create_exam_screen.dart';
+import 'teacher_exam_details_screen.dart';
 
 class TeacherExamsScreen extends ConsumerStatefulWidget {
   const TeacherExamsScreen({super.key, required this.classroomId});
@@ -133,10 +138,7 @@ class _TeacherExamsScreenState extends ConsumerState<TeacherExamsScreen> {
       return Center(
         child: EmptyStateWidget(
           message: 'Chưa có bài thi nào',
-          showAction: true,
-          actionText: 'Làm mới',
-          onActionPressed:
-              () => ref.refresh(teacherExamsProvider(widget.classroomId)),
+          showAction: false,
         ),
       );
     }
@@ -159,10 +161,10 @@ class _TeacherExamsScreenState extends ConsumerState<TeacherExamsScreen> {
   Widget _buildExamCard(ExamTeacherResponseDto exam) {
     return GestureDetector(
       onTap: () {
-        // TODO: Navigate to exam details screen
-        ToastUtils.showSuccess(
-          context: context,
-          message: 'Chức năng xem chi tiết bài thi sẽ được thêm sau',
+        Navigator.of(context).push(
+          MaterialPageRoute(
+            builder: (context) => TeacherExamDetailsScreen(examId: exam.id),
+          ),
         );
       },
       child: Container(
@@ -195,33 +197,18 @@ class _TeacherExamsScreenState extends ConsumerState<TeacherExamsScreen> {
                       (context) => [
                         const PopupMenuItem(
                           value: 'update_info',
-                          child: Row(
-                            children: [
-                              Icon(Icons.edit, size: 16),
-                              SizedBox(width: 8),
-                              Text('Cập nhật thông tin'),
-                            ],
-                          ),
+                          child: Text('Cập nhật thông tin'),
                         ),
                         if (exam.status != EExamStatus.CLOSED)
                           const PopupMenuItem(
                             value: 'update_status',
-                            child: Row(
-                              children: [
-                                Icon(Icons.update, size: 16),
-                                SizedBox(width: 8),
-                                Text('Cập nhật trạng thái'),
-                              ],
-                            ),
+                            child: Text('Cập nhật trạng thái'),
                           ),
                         const PopupMenuItem(
                           value: 'delete',
-                          child: Row(
-                            children: [
-                              Icon(Icons.delete, size: 16, color: Colors.red),
-                              SizedBox(width: 8),
-                              Text('Xóa', style: TextStyle(color: Colors.red)),
-                            ],
+                          child: Text(
+                            'Xóa',
+                            style: TextStyle(color: Colors.red),
                           ),
                         ),
                       ],
@@ -345,16 +332,10 @@ class _TeacherExamsScreenState extends ConsumerState<TeacherExamsScreen> {
         }
         break;
       case 'update_status':
-        ToastUtils.showSuccess(
-          context: context,
-          message: 'Chức năng cập nhật trạng thái sẽ được thêm sau',
-        );
+        _showUpdateStatusDialog(exam);
         break;
       case 'delete':
-        ToastUtils.showSuccess(
-          context: context,
-          message: 'Chức năng xóa bài thi sẽ được thêm sau',
-        );
+        _showDeleteConfirmation(exam);
         break;
     }
   }
@@ -377,5 +358,159 @@ class _TeacherExamsScreenState extends ConsumerState<TeacherExamsScreen> {
     } catch (e) {
       return 'N/A';
     }
+  }
+
+  Future<void> _showUpdateStatusDialog(ExamTeacherResponseDto exam) async {
+    final newStatus = await UpdateExamStatusHelper.showUpdateStatusDialog(
+      context,
+      examTitle: exam.title,
+      currentStatus: exam.status,
+    );
+
+    if (newStatus != null && newStatus != exam.status) {
+      try {
+        // Show loading
+        showDialog(
+          context: context,
+          barrierDismissible: false,
+          builder:
+              (context) => const Center(child: CircularProgressIndicator()),
+        );
+
+        // Call update status API
+        final updateStatusDto = UpdateExamStatusDto(status: newStatus);
+        final useCase = ref.read(updateExamStatusUseCaseProvider);
+        await useCase(
+          UpdateExamStatusParams(examId: exam.id, dto: updateStatusDto),
+        );
+
+        // Hide loading
+        Navigator.of(context).pop();
+
+        // Show success message
+        ToastUtils.showSuccess(
+          context: context,
+          message: 'Cập nhật trạng thái bài thi thành công!',
+        );
+
+        // Refresh exams list
+        ref.refresh(teacherExamsProvider(widget.classroomId));
+      } catch (e) {
+        // Hide loading
+        Navigator.of(context).pop();
+
+        // Show error message
+        ToastUtils.showFail(
+          context: context,
+          message: 'Cập nhật trạng thái thất bại: ${e.toString()}',
+        );
+      }
+    }
+  }
+
+  Future<void> _showDeleteConfirmation(ExamTeacherResponseDto exam) async {
+    final shouldDelete = await ConfirmDialogHelper.showCustomConfirmation(
+      context,
+      title: 'Xác nhận xóa',
+      content: DeleteExamContent(examTitle: exam.title),
+      confirmText: 'Xóa',
+      cancelText: 'Hủy',
+      confirmColor: AppColors.error,
+    );
+
+    if (shouldDelete) {
+      try {
+        // Show loading
+        showDialog(
+          context: context,
+          barrierDismissible: false,
+          builder:
+              (context) => const Center(child: CircularProgressIndicator()),
+        );
+
+        // Call delete API
+        final useCase = ref.read(deleteExamUseCaseProvider);
+        await useCase(exam.id);
+
+        // Hide loading
+        Navigator.of(context).pop();
+
+        // Show success message
+        ToastUtils.showSuccess(
+          context: context,
+          message: 'Xóa bài thi thành công',
+        );
+
+        // Refresh exams list
+        ref.refresh(teacherExamsProvider(widget.classroomId));
+      } catch (e) {
+        // Hide loading
+        Navigator.of(context).pop();
+
+        // Show error message
+        ToastUtils.showFail(
+          context: context,
+          message: 'Xóa bài thi thất bại: ${e.toString()}',
+        );
+      }
+    }
+  }
+}
+
+// Content widget for deleting exam confirmation
+class DeleteExamContent extends StatelessWidget {
+  final String examTitle;
+
+  const DeleteExamContent({super.key, required this.examTitle});
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        RichText(
+          text: TextSpan(
+            style: AppTextStyles.bodyMedium.copyWith(
+              color: AppColors.textPrimary,
+            ),
+            children: [
+              const TextSpan(text: 'Bạn có chắc chắn muốn xoá bài thi '),
+              TextSpan(
+                text: '"$examTitle"',
+                style: AppTextStyles.bodyMedium.copyWith(
+                  color: AppColors.textPrimary,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              const TextSpan(text: ' không?'),
+            ],
+          ),
+        ),
+        const SizedBox(height: 16),
+        RichText(
+          text: TextSpan(
+            style: AppTextStyles.bodyMedium.copyWith(
+              color: AppColors.textPrimary,
+            ),
+            children: [
+              const TextSpan(text: 'Hành động này sẽ '),
+              const TextSpan(
+                text: 'xóa toàn bộ câu hỏi',
+                style: TextStyle(fontWeight: FontWeight.bold),
+              ),
+              const TextSpan(text: ' và '),
+              const TextSpan(
+                text: 'kết quả học tập liên quan',
+                style: TextStyle(fontWeight: FontWeight.bold),
+              ),
+              const TextSpan(
+                text: ' đến bài thi này. Thao tác không thể hoàn tác.',
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
   }
 }

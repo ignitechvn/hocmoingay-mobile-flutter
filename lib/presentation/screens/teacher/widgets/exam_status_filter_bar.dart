@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-
+import '../../../../core/constants/exam_constants.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_text_styles.dart';
 
@@ -16,9 +16,9 @@ class ExamStatusFilterBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final statusOptions = [
-      {'label': 'Đã lên lịch', 'count': 0},
-      {'label': 'Đang mở', 'count': 0},
-      {'label': 'Đã đóng', 'count': 0},
+      {'label': 'Đã lên lịch', 'status': EExamStatus.SCHEDULED},
+      {'label': 'Đang mở', 'status': EExamStatus.OPEN},
+      {'label': 'Đã đóng', 'status': EExamStatus.CLOSED},
     ];
 
     return Container(
@@ -29,6 +29,8 @@ class ExamStatusFilterBar extends StatelessWidget {
               final index = entry.key;
               final status = entry.value;
               final isSelected = index == selectedIndex;
+              final statusEnum = status['status'] as EExamStatus;
+              final statusColor = _getStatusColor(statusEnum);
 
               return Expanded(
                 child: Padding(
@@ -43,13 +45,10 @@ class ExamStatusFilterBar extends StatelessWidget {
                         horizontal: 16,
                       ),
                       decoration: BoxDecoration(
-                        color: isSelected ? AppColors.primary : Colors.white,
+                        color: isSelected ? statusColor : Colors.white,
                         borderRadius: BorderRadius.circular(24),
                         border: Border.all(
-                          color:
-                              isSelected
-                                  ? AppColors.primary
-                                  : AppColors.grey300,
+                          color: isSelected ? statusColor : AppColors.grey300,
                           width: 1,
                         ),
                       ),
@@ -67,8 +66,19 @@ class ExamStatusFilterBar extends StatelessWidget {
                   ),
                 ),
               );
-            }).toList(),
+            }).toList(        ),
       ),
     );
+  }
+
+  Color _getStatusColor(EExamStatus status) {
+    switch (status) {
+      case EExamStatus.SCHEDULED:
+        return const Color(0xFF2196F3); // Blue
+      case EExamStatus.OPEN:
+        return const Color(0xFF4CAF50); // Green
+      case EExamStatus.CLOSED:
+        return const Color(0xFFF44336); // Red
+    }
   }
 }

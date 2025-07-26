@@ -8,6 +8,9 @@ import '../../../domain/usecases/teacher_exams/get_teacher_exams_usecase.dart';
 import '../../../domain/usecases/teacher_exams/get_closed_exams_usecase.dart';
 import '../../../domain/usecases/teacher_exams/create_exam_usecase.dart';
 import '../../../domain/usecases/teacher_exams/update_exam_usecase.dart';
+import '../../../domain/usecases/teacher_exams/update_exam_status_usecase.dart';
+import '../../../domain/usecases/teacher_exams/get_exam_details_usecase.dart';
+import '../../../domain/usecases/teacher_exams/delete_exam_usecase.dart';
 import '../api/api_providers.dart';
 
 // API Provider
@@ -43,6 +46,23 @@ final updateExamUseCaseProvider = Provider<UpdateExamUseCase>((ref) {
   return UpdateExamUseCase(repository);
 });
 
+final deleteExamUseCaseProvider = Provider<DeleteExamUseCase>((ref) {
+  final repository = ref.watch(teacherExamsRepositoryProvider);
+  return DeleteExamUseCase(repository);
+});
+
+final updateExamStatusUseCaseProvider = Provider<UpdateExamStatusUseCase>((
+  ref,
+) {
+  final repository = ref.watch(teacherExamsRepositoryProvider);
+  return UpdateExamStatusUseCase(repository);
+});
+
+final getExamDetailsUseCaseProvider = Provider<GetExamDetailsUseCase>((ref) {
+  final repository = ref.watch(teacherExamsRepositoryProvider);
+  return GetExamDetailsUseCase(repository);
+});
+
 // Data Provider
 final teacherExamsProvider =
     FutureProvider.family<TeacherExamResponseListDto, String>((
@@ -60,4 +80,13 @@ final teacherClosedExamsProvider =
     ) async {
       final useCase = ref.watch(getClosedExamsUseCaseProvider);
       return await useCase(classroomId);
+    });
+
+final examDetailsProvider =
+    FutureProvider.family<ExamDetailsTeacherResponseDto, String>((
+      ref,
+      examId,
+    ) async {
+      final useCase = ref.watch(getExamDetailsUseCaseProvider);
+      return await useCase(examId);
     });

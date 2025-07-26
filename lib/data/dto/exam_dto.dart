@@ -159,6 +159,78 @@ class ExamTeacherResponseDto extends ExamResponseDto {
   }
 }
 
+// Delete Exam DTO (for API response)
+class DeleteExamResponseDto {
+  final String message;
+
+  const DeleteExamResponseDto({required this.message});
+
+  factory DeleteExamResponseDto.fromJson(Map<String, dynamic> json) {
+    return DeleteExamResponseDto(
+      message: json['message'] as String? ?? 'Exam deleted successfully',
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {'message': message};
+  }
+}
+
+// Update Exam Status DTO
+class UpdateExamStatusDto {
+  final EExamStatus status;
+
+  const UpdateExamStatusDto({required this.status});
+
+  Map<String, dynamic> toJson() => {'status': status.value};
+
+  factory UpdateExamStatusDto.fromJson(Map<String, dynamic> json) =>
+      UpdateExamStatusDto(
+        status: EExamStatus.fromString(json['status'] as String),
+      );
+}
+
+// Exam Details Teacher Response DTO
+class ExamDetailsTeacherResponseDto extends ExamTeacherResponseDto {
+  final int studentProgressCount;
+
+  const ExamDetailsTeacherResponseDto({
+    required super.id,
+    required super.title,
+    super.description,
+    super.startTime,
+    required super.duration,
+    required super.status,
+    required super.classroomId,
+    required super.questionCount,
+    required super.assignToAll,
+    super.assignedStudentCount,
+    required this.studentProgressCount,
+  });
+
+  factory ExamDetailsTeacherResponseDto.fromJson(Map<String, dynamic> json) {
+    return ExamDetailsTeacherResponseDto(
+      id: json['id'] as String,
+      title: json['title'] as String,
+      description: json['description'] as String?,
+      startTime: json['startTime'] as String?,
+      duration: json['duration'] as int,
+      status: EExamStatus.fromString(json['status'] as String),
+      classroomId: json['classroomId'] as String,
+      questionCount: json['questionCount'] as int,
+      assignToAll: json['assignToAll'] as bool? ?? false,
+      assignedStudentCount: json['assignedStudentCount'] as int?,
+      studentProgressCount: json['studentProgressCount'] as int,
+    );
+  }
+
+  @override
+  Map<String, dynamic> toJson() => {
+    ...super.toJson(),
+    'studentProgressCount': studentProgressCount,
+  };
+}
+
 // Teacher Exam Response List DTO
 class TeacherExamResponseListDto {
   final List<ExamTeacherResponseDto> scheduledExams;

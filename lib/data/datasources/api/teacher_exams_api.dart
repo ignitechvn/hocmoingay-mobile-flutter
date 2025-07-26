@@ -18,7 +18,9 @@ class TeacherExamsApi {
       final response = await _apiService.get(
         '/teacher-classrooms/$classroomId/exams/closed',
       );
-      print('✅ TeacherExamsApi: Get closed exams success response: ${response.data}');
+      print(
+        '✅ TeacherExamsApi: Get closed exams success response: ${response.data}',
+      );
       return TeacherExamResponseListDto.fromList(
         response.data as List<dynamic>,
       );
@@ -99,6 +101,73 @@ class TeacherExamsApi {
     } catch (e) {
       print('❌ TeacherExamsApi: General exception: $e');
       throw Exception('Failed to update exam: $e');
+    }
+  }
+
+  /// Delete exam for teacher
+  Future<DeleteExamResponseDto> deleteExam(String examId) async {
+    try {
+      print('🔍 TeacherExamsApi: Calling DELETE /teacher-exams/$examId');
+      final response = await _apiService.delete('/teacher-exams/$examId');
+      print(
+        '✅ TeacherExamsApi: Delete exam success response: ${response.data}',
+      );
+      return DeleteExamResponseDto.fromJson(response.data);
+    } on DioException catch (e) {
+      print('❌ TeacherExamsApi: DioException: ${e.message}');
+      print('❌ TeacherExamsApi: Status code: ${e.response?.statusCode}');
+      print('❌ TeacherExamsApi: Response data: ${e.response?.data}');
+      throw _handleDioError(e);
+    } catch (e) {
+      print('❌ TeacherExamsApi: General exception: $e');
+      throw Exception('Failed to delete exam: $e');
+    }
+  }
+
+  /// Update exam status for teacher
+  Future<ExamTeacherResponseDto> updateExamStatus(
+    String examId,
+    UpdateExamStatusDto dto,
+  ) async {
+    try {
+      print('🔍 TeacherExamsApi: Calling PATCH /teacher-exams/$examId/status');
+      print('📝 TeacherExamsApi: Request data: ${dto.toJson()}');
+      final response = await _apiService.patch(
+        '/teacher-exams/$examId/status',
+        data: dto.toJson(),
+      );
+      print(
+        '✅ TeacherExamsApi: Update exam status success response: ${response.data}',
+      );
+      return ExamTeacherResponseDto.fromJson(response.data);
+    } on DioException catch (e) {
+      print('❌ TeacherExamsApi: DioException: ${e.message}');
+      print('❌ TeacherExamsApi: Status code: ${e.response?.statusCode}');
+      print('❌ TeacherExamsApi: Response data: ${e.response?.data}');
+      throw _handleDioError(e);
+    } catch (e) {
+      print('❌ TeacherExamsApi: General exception: $e');
+      throw Exception('Failed to update exam status: $e');
+    }
+  }
+
+  /// Get exam details for teacher
+  Future<ExamDetailsTeacherResponseDto> getExamDetails(String examId) async {
+    try {
+      print('🔍 TeacherExamsApi: Calling GET /teacher-exams/$examId/details');
+      final response = await _apiService.get(
+        '/teacher-exams/$examId/details',
+      );
+      print('✅ TeacherExamsApi: Get exam details success response: ${response.data}');
+      return ExamDetailsTeacherResponseDto.fromJson(response.data);
+    } on DioException catch (e) {
+      print('❌ TeacherExamsApi: DioException: ${e.message}');
+      print('❌ TeacherExamsApi: Status code: ${e.response?.statusCode}');
+      print('❌ TeacherExamsApi: Response data: ${e.response?.data}');
+      throw _handleDioError(e);
+    } catch (e) {
+      print('❌ TeacherExamsApi: General exception: $e');
+      throw Exception('Failed to get exam details: $e');
     }
   }
 

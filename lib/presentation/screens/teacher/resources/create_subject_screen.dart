@@ -80,11 +80,24 @@ class _CreateSubjectScreenState extends ConsumerState<CreateSubjectScreen> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               // Subject Code Dropdown
+              Text(
+                'Môn học *',
+                style: AppTextStyles.bodyMedium.copyWith(
+                  color: AppColors.textPrimary,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+              const SizedBox(height: 8),
               DropdownButtonFormField<String>(
                 value: _selectedSubjectCode,
+                style: AppTextStyles.bodyMedium.copyWith(
+                  color: AppColors.textPrimary,
+                ),
                 decoration: InputDecoration(
-                  labelText: 'Môn học',
-                  labelStyle: AppTextStyles.inputLabel,
+                  hintText: 'Chọn môn học',
+                  hintStyle: AppTextStyles.bodyMedium.copyWith(
+                    color: AppColors.textSecondary,
+                  ),
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12),
                     borderSide: const BorderSide(color: AppColors.grey300),
@@ -97,12 +110,15 @@ class _CreateSubjectScreenState extends ConsumerState<CreateSubjectScreen> {
                     borderRadius: BorderRadius.circular(12),
                     borderSide: const BorderSide(color: AppColors.primary),
                   ),
+                  errorBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: const BorderSide(color: AppColors.error),
+                  ),
                   contentPadding: const EdgeInsets.symmetric(
                     horizontal: 16,
-                    vertical: 12,
+                    vertical: 16,
                   ),
                 ),
-                hint: const Text('Chọn môn học'),
                 items:
                     _subjectCodes.entries.map((entry) {
                       return DropdownMenuItem<String>(
@@ -125,11 +141,24 @@ class _CreateSubjectScreenState extends ConsumerState<CreateSubjectScreen> {
               const SizedBox(height: 24),
 
               // Grade Level Dropdown
+              Text(
+                'Khối lớp *',
+                style: AppTextStyles.bodyMedium.copyWith(
+                  color: AppColors.textPrimary,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+              const SizedBox(height: 8),
               DropdownButtonFormField<String>(
                 value: _selectedGradeLevel,
+                style: AppTextStyles.bodyMedium.copyWith(
+                  color: AppColors.textPrimary,
+                ),
                 decoration: InputDecoration(
-                  labelText: 'Khối lớp',
-                  labelStyle: AppTextStyles.inputLabel,
+                  hintText: 'Chọn khối lớp',
+                  hintStyle: AppTextStyles.bodyMedium.copyWith(
+                    color: AppColors.textSecondary,
+                  ),
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12),
                     borderSide: const BorderSide(color: AppColors.grey300),
@@ -142,12 +171,15 @@ class _CreateSubjectScreenState extends ConsumerState<CreateSubjectScreen> {
                     borderRadius: BorderRadius.circular(12),
                     borderSide: const BorderSide(color: AppColors.primary),
                   ),
+                  errorBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: const BorderSide(color: AppColors.error),
+                  ),
                   contentPadding: const EdgeInsets.symmetric(
                     horizontal: 16,
-                    vertical: 12,
+                    vertical: 16,
                   ),
                 ),
-                hint: const Text('Chọn khối lớp'),
                 items:
                     _gradeLevels.entries.map((entry) {
                       return DropdownMenuItem<String>(
@@ -170,10 +202,40 @@ class _CreateSubjectScreenState extends ConsumerState<CreateSubjectScreen> {
               const SizedBox(height: 24),
 
               // Subject Name
-              AppTextField(
+              Text(
+                'Tên môn học *',
+                style: AppTextStyles.bodyMedium.copyWith(
+                  color: AppColors.textPrimary,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+              const SizedBox(height: 8),
+              TextFormField(
                 controller: _nameController,
-                label: 'Tên môn học',
-                hint: 'Nhập tên môn học',
+                decoration: InputDecoration(
+                  hintText: 'Nhập tên môn học',
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: const BorderSide(color: AppColors.grey300),
+                  ),
+                  enabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: const BorderSide(color: AppColors.grey300),
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: const BorderSide(color: AppColors.primary),
+                  ),
+                  errorBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: const BorderSide(color: AppColors.error),
+                  ),
+                  contentPadding: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 16,
+                  ),
+                ),
+                style: AppTextStyles.bodyMedium,
                 validator: (value) {
                   if (value == null || value.trim().isEmpty) {
                     return 'Vui lòng nhập tên môn học';
@@ -184,11 +246,41 @@ class _CreateSubjectScreenState extends ConsumerState<CreateSubjectScreen> {
               const SizedBox(height: 24),
 
               // Description
-              AppTextField(
+              Text(
+                'Mô tả',
+                style: AppTextStyles.bodyMedium.copyWith(
+                  color: AppColors.textPrimary,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+              const SizedBox(height: 8),
+              TextFormField(
                 controller: _descriptionController,
-                label: 'Mô tả',
-                hint: 'Nhập mô tả môn học (không bắt buộc)',
                 maxLines: 3,
+                decoration: InputDecoration(
+                  hintText: 'Nhập mô tả môn học (không bắt buộc)',
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: const BorderSide(color: AppColors.grey300),
+                  ),
+                  enabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: const BorderSide(color: AppColors.grey300),
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: const BorderSide(color: AppColors.primary),
+                  ),
+                  errorBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: const BorderSide(color: AppColors.error),
+                  ),
+                  contentPadding: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 16,
+                  ),
+                ),
+                style: AppTextStyles.bodyMedium,
               ),
               const SizedBox(height: 32),
 

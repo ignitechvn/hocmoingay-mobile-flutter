@@ -5,4 +5,7 @@ abstract class TeacherExamsRepository {
   Future<TeacherExamResponseListDto> getClosedExams(String classroomId);
   Future<ExamTeacherResponseDto> createExam(CreateExamDto dto);
   Future<ExamTeacherResponseDto> updateExam(String examId, UpdateExamDto dto);
+  Future<DeleteExamResponseDto> deleteExam(String examId);
+  Future<ExamTeacherResponseDto> updateExamStatus(String examId, UpdateExamStatusDto dto);
+  Future<ExamDetailsTeacherResponseDto> getExamDetails(String examId);
 }
