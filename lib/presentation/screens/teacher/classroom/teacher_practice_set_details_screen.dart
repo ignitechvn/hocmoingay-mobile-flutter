@@ -2,39 +2,41 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 
-import '../../../../core/constants/chapter_constants.dart';
+import '../../../../core/constants/practice_set_constants.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_dimensions.dart';
 import '../../../../core/theme/app_text_styles.dart';
 import '../../../../core/widgets/empty_state_widget.dart';
-import '../../../../data/dto/chapter_dto.dart';
-import '../../../../providers/teacher_chapters/teacher_chapters_providers.dart';
-import 'teacher_chapter_questions_screen.dart';
-import 'create_chapter_screen.dart';
+import '../../../../data/dto/practice_set_dto.dart';
+import '../../../../providers/teacher_practice_sets/teacher_practice_sets_providers.dart';
+import 'create_practice_set_screen.dart';
 
-class TeacherChapterDetailsScreen extends ConsumerStatefulWidget {
-  final String chapterId;
+class TeacherPracticeSetDetailsScreen extends ConsumerStatefulWidget {
+  final String practiceSetId;
 
-  const TeacherChapterDetailsScreen({super.key, required this.chapterId});
+  const TeacherPracticeSetDetailsScreen({
+    super.key,
+    required this.practiceSetId,
+  });
 
   @override
-  ConsumerState<TeacherChapterDetailsScreen> createState() =>
-      _TeacherChapterDetailsScreenState();
+  ConsumerState<TeacherPracticeSetDetailsScreen> createState() =>
+      _TeacherPracticeSetDetailsScreenState();
 }
 
-class _TeacherChapterDetailsScreenState
-    extends ConsumerState<TeacherChapterDetailsScreen> {
+class _TeacherPracticeSetDetailsScreenState
+    extends ConsumerState<TeacherPracticeSetDetailsScreen> {
   @override
   Widget build(BuildContext context) {
-    final chapterDetailsAsync = ref.watch(
-      teacherChapterDetailsProvider(widget.chapterId),
+    final practiceSetDetailsAsync = ref.watch(
+      practiceSetDetailsProvider(widget.practiceSetId),
     );
 
     return Scaffold(
       backgroundColor: AppColors.background,
       appBar: AppBar(
         title: const Text(
-          'Chi tiết chủ đề',
+          'Chi tiết bài tập',
           style: AppTextStyles.headlineMedium,
         ),
         backgroundColor: AppColors.background,
@@ -49,7 +51,7 @@ class _TeacherChapterDetailsScreenState
             margin: const EdgeInsets.only(right: 8),
             child: InkWell(
               onTap: () {
-                _navigateToEditChapter();
+                _navigateToEditPracticeSet();
               },
               borderRadius: BorderRadius.circular(20),
               child: Container(
@@ -92,16 +94,17 @@ class _TeacherChapterDetailsScreenState
           ),
         ],
       ),
-      body: chapterDetailsAsync.when(
-        data: (chapterDetails) => _buildContent(context, chapterDetails),
+      body: practiceSetDetailsAsync.when(
+        data:
+            (practiceSetDetails) => _buildContent(context, practiceSetDetails),
         loading: () => const Center(child: CircularProgressIndicator()),
         error:
             (error, stackTrace) => Center(
               child: EmptyStateWidgets.error(
-                message: 'Không thể tải chi tiết chủ đề',
+                message: 'Không thể tải chi tiết bài tập',
                 onRetry: () {
                   ref.invalidate(
-                    teacherChapterDetailsProvider(widget.chapterId),
+                    practiceSetDetailsProvider(widget.practiceSetId),
                   );
                 },
               ),
@@ -112,7 +115,7 @@ class _TeacherChapterDetailsScreenState
 
   Widget _buildContent(
     BuildContext context,
-    ChapterDetailsTeacherResponseDto chapter,
+    PracticeSetDetailsTeacherResponseDto practiceSet,
   ) {
     return SingleChildScrollView(
       padding: const EdgeInsets.all(AppDimensions.defaultPadding),
@@ -120,15 +123,15 @@ class _TeacherChapterDetailsScreenState
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           // Header Card
-          _buildHeaderCard(context, chapter),
+          _buildHeaderCard(context, practiceSet),
           const SizedBox(height: 16),
 
           // Statistics Cards
-          _buildStatisticsCards(chapter),
+          _buildStatisticsCards(practiceSet),
           const SizedBox(height: 16),
 
-          // Theory Pages Section
-          _buildTheoryPagesSection(chapter),
+          // Assignment Section
+          _buildAssignmentSection(practiceSet),
         ],
       ),
     );
@@ -136,7 +139,7 @@ class _TeacherChapterDetailsScreenState
 
   Widget _buildHeaderCard(
     BuildContext context,
-    ChapterDetailsTeacherResponseDto chapter,
+    PracticeSetDetailsTeacherResponseDto practiceSet,
   ) {
     return Card(
       elevation: 0,
@@ -152,7 +155,7 @@ class _TeacherChapterDetailsScreenState
               children: [
                 Expanded(
                   child: Text(
-                    chapter.title,
+                    practiceSet.title,
                     style: AppTextStyles.headlineSmall.copyWith(
                       color: AppColors.textPrimary,
                       fontWeight: FontWeight.bold,
@@ -165,11 +168,11 @@ class _TeacherChapterDetailsScreenState
                     vertical: 4,
                   ),
                   decoration: BoxDecoration(
-                    color: _getStatusColor(chapter.status),
+                    color: _getStatusColor(practiceSet.status),
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: Text(
-                    _getStatusText(chapter.status),
+                    _getStatusText(practiceSet.status),
                     style: AppTextStyles.bodySmall.copyWith(
                       color: Colors.white,
                       fontWeight: FontWeight.w600,
@@ -181,9 +184,10 @@ class _TeacherChapterDetailsScreenState
             const SizedBox(height: 12),
 
             // Description
-            if (chapter.description != null && chapter.description!.isNotEmpty)
+            if (practiceSet.description != null &&
+                practiceSet.description!.isNotEmpty)
               Text(
-                chapter.description!,
+                practiceSet.description!,
                 style: AppTextStyles.bodyMedium.copyWith(
                   color: AppColors.textSecondary,
                 ),
@@ -201,7 +205,7 @@ class _TeacherChapterDetailsScreenState
                   ),
                 ),
                 Text(
-                  '${_formatDate(chapter.startDate ?? '')} - ${_formatDate(chapter.deadline ?? '')}',
+                  '${_formatDate(practiceSet.startDate ?? '')} - ${_formatDate(practiceSet.deadline ?? '')}',
                   style: AppTextStyles.bodyMedium.copyWith(
                     color: AppColors.textPrimary,
                     fontWeight: FontWeight.w600,
@@ -215,7 +219,9 @@ class _TeacherChapterDetailsScreenState
     );
   }
 
-  Widget _buildStatisticsCards(ChapterDetailsTeacherResponseDto chapter) {
+  Widget _buildStatisticsCards(
+    PracticeSetDetailsTeacherResponseDto practiceSet,
+  ) {
     return GridView.count(
       shrinkWrap: true,
       physics: const NeverScrollableScrollPhysics(),
@@ -226,17 +232,17 @@ class _TeacherChapterDetailsScreenState
       children: [
         _buildStatCard(
           'Câu hỏi',
-          '${chapter.questionCount}',
+          '${practiceSet.questionCount}',
           Icons.quiz,
           AppColors.primary,
-          () => _navigateToQuestionsDetails(chapter.id),
+          () => _navigateToQuestionsDetails(practiceSet.id),
         ),
         _buildStatCard(
           'Học sinh đã làm',
-          '${chapter.studentProgressCount}',
+          '${practiceSet.studentProgressCount}',
           Icons.people,
           AppColors.success,
-          () => _navigateToStudentProgressDetails(chapter.id),
+          () => _navigateToStudentProgressDetails(practiceSet.id),
         ),
       ],
     );
@@ -303,16 +309,9 @@ class _TeacherChapterDetailsScreenState
     );
   }
 
-  Widget _buildTheoryPagesSection(ChapterDetailsTeacherResponseDto chapter) {
-    if (chapter.theoryPages.isEmpty) {
-      return Card(
-        elevation: 0,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-        color: Colors.white,
-        child: EmptyStateWidgets.noData(message: 'Chưa có trang lý thuyết'),
-      );
-    }
-
+  Widget _buildAssignmentSection(
+    PracticeSetDetailsTeacherResponseDto practiceSet,
+  ) {
     return Card(
       elevation: 0,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
@@ -323,88 +322,62 @@ class _TeacherChapterDetailsScreenState
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              'Trang lý thuyết',
+              'Phân phối bài tập',
               style: AppTextStyles.titleMedium.copyWith(
                 color: AppColors.textPrimary,
                 fontWeight: FontWeight.bold,
               ),
             ),
             const SizedBox(height: 12),
-            ...chapter.theoryPages.map((page) => _buildTheoryPageItem(page, 0)),
+            Row(
+              children: [
+                Icon(
+                  practiceSet.assignToAll ? Icons.group : Icons.person,
+                  color: AppColors.primary,
+                  size: 20,
+                ),
+                const SizedBox(width: 8),
+                Text(
+                  practiceSet.assignToAll
+                      ? 'Giao cho cả lớp'
+                      : 'Giao cho ${practiceSet.assignedStudentCount ?? 0} học sinh cụ thể',
+                  style: AppTextStyles.bodyMedium.copyWith(
+                    color: AppColors.textPrimary,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ],
+            ),
           ],
         ),
       ),
     );
   }
 
-  Widget _buildTheoryPageItem(ChapterTheoryPageListItemDto page, int level) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Container(
-          margin: EdgeInsets.only(left: level * 16.0),
-          padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
-          decoration: BoxDecoration(
-            color: AppColors.grey100,
-            borderRadius: BorderRadius.circular(8),
-          ),
-          child: Row(
-            children: [
-              Icon(
-                page.children?.isNotEmpty == true
-                    ? Icons.folder
-                    : Icons.description,
-                size: 16,
-                color: AppColors.textSecondary,
-              ),
-              const SizedBox(width: 8),
-              Expanded(
-                child: Text(
-                  page.title,
-                  style: AppTextStyles.bodyMedium.copyWith(
-                    color: AppColors.textPrimary,
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ),
-        if (page.children?.isNotEmpty == true)
-          ...page.children!.map(
-            (child) => _buildTheoryPageItem(child, level + 1),
-          ),
-      ],
-    );
-  }
-
-  Color _getStatusColor(EChapterStatus status) {
+  Color _getStatusColor(EPracticeSetStatus status) {
     switch (status) {
-      case EChapterStatus.SCHEDULED:
+      case EPracticeSetStatus.SCHEDULED:
         return const Color(0xFF2196F3); // Blue
-      case EChapterStatus.OPEN:
+      case EPracticeSetStatus.OPEN:
         return const Color(0xFF4CAF50); // Green
-      case EChapterStatus.CLOSED:
+      case EPracticeSetStatus.CLOSED:
         return const Color(0xFFF44336); // Red
-      case EChapterStatus.CANCELED:
-        return const Color(0xFF9E9E9E); // Grey
     }
   }
 
-  String _getStatusText(EChapterStatus status) {
+  String _getStatusText(EPracticeSetStatus status) {
     switch (status) {
-      case EChapterStatus.SCHEDULED:
+      case EPracticeSetStatus.SCHEDULED:
         return 'Đã lên lịch';
-      case EChapterStatus.OPEN:
+      case EPracticeSetStatus.OPEN:
         return 'Đang mở';
-      case EChapterStatus.CLOSED:
+      case EPracticeSetStatus.CLOSED:
         return 'Đã đóng';
-      case EChapterStatus.CANCELED:
-        return 'Đã hủy';
     }
   }
 
-  String _formatDate(String dateString) {
-    if (dateString.isEmpty) return 'Chưa có';
+  String _formatDate(String? dateString) {
+    if (dateString == null || dateString.isEmpty) return 'Chưa có';
     try {
       final date = DateTime.parse(dateString);
       return DateFormat('dd/MM/yyyy').format(date);
@@ -414,26 +387,28 @@ class _TeacherChapterDetailsScreenState
   }
 
   // Navigation methods
-  void _navigateToEditChapter() async {
-    final chapterDetailsAsync = ref.read(
-      teacherChapterDetailsProvider(widget.chapterId),
+  void _navigateToEditPracticeSet() async {
+    final practiceSetDetailsAsync = ref.read(
+      practiceSetDetailsProvider(widget.practiceSetId),
     );
 
-    chapterDetailsAsync.whenData((chapterDetails) {
+    practiceSetDetailsAsync.whenData((practiceSetDetails) {
       Navigator.of(context).push(
         MaterialPageRoute(
           builder:
-              (context) => CreateChapterScreen(
-                classroomId: chapterDetails.classroomId,
-                chapterToEdit: ChapterTeacherResponseDto(
-                  id: chapterDetails.id,
-                  title: chapterDetails.title,
-                  description: chapterDetails.description,
-                  deadline: chapterDetails.deadline,
-                  startDate: chapterDetails.startDate,
-                  status: chapterDetails.status,
-                  classroomId: chapterDetails.classroomId,
-                  questionCount: chapterDetails.questionCount,
+              (context) => CreatePracticeSetScreen(
+                classroomId: practiceSetDetails.classroomId,
+                practiceSet: PracticeSetTeacherResponseDto(
+                  id: practiceSetDetails.id,
+                  title: practiceSetDetails.title,
+                  description: practiceSetDetails.description,
+                  deadline: practiceSetDetails.deadline,
+                  startDate: practiceSetDetails.startDate,
+                  status: practiceSetDetails.status,
+                  classroomId: practiceSetDetails.classroomId,
+                  questionCount: practiceSetDetails.questionCount,
+                  assignToAll: practiceSetDetails.assignToAll,
+                  assignedStudentCount: practiceSetDetails.assignedStudentCount,
                 ),
               ),
         ),
@@ -441,30 +416,24 @@ class _TeacherChapterDetailsScreenState
     });
   }
 
-  void _navigateToQuestionsDetails(String chapterId) {
-    Navigator.of(context).push(
-      MaterialPageRoute(
-        builder:
-            (context) => TeacherChapterQuestionsScreen(chapterId: chapterId),
+  void _navigateToQuestionsDetails(String practiceSetId) {
+    // TODO: Navigate to practice set questions screen
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(
+          'Chuyển đến màn hình quản lý câu hỏi cho bài tập $practiceSetId',
+        ),
+        duration: const Duration(seconds: 2),
       ),
     );
   }
 
-  void _navigateToStudentProgressDetails(String chapterId) {
+  void _navigateToStudentProgressDetails(String practiceSetId) {
     // TODO: Navigate to student progress details screen
-    // Navigator.of(context).push(
-    //   MaterialPageRoute(
-    //     builder: (context) => ChapterStudentProgressDetailsScreen(
-    //       chapterId: chapterId,
-    //     ),
-    //   ),
-    // );
-
-    // Temporary: Show toast message
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(
-          'Chuyển đến màn hình chi tiết tiến độ học sinh cho chủ đề $chapterId',
+          'Chuyển đến màn hình chi tiết tiến độ học sinh cho bài tập $practiceSetId',
         ),
         duration: const Duration(seconds: 2),
       ),

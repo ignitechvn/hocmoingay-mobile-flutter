@@ -92,6 +92,36 @@ class TeacherChaptersApi {
     }
   }
 
+  /// Update chapter for teacher
+  Future<ChapterTeacherResponseDto> updateChapter(
+    String chapterId,
+    UpdateChapterDto dto,
+  ) async {
+    try {
+      print(
+        '🔍 TeacherChaptersApi: Calling PATCH /teacher-chapters/$chapterId with data: ${dto.toJson()}',
+      );
+      final response = await _apiService.patch(
+        '/teacher-chapters/$chapterId',
+        data: dto.toJson(),
+      );
+      print(
+        '✅ TeacherChaptersApi: Update chapter success response: ${response.data}',
+      );
+      return ChapterTeacherResponseDto.fromJson(
+        response.data as Map<String, dynamic>,
+      );
+    } on DioException catch (e) {
+      print('❌ TeacherChaptersApi: DioException: ${e.message}');
+      print('❌ TeacherChaptersApi: Status code: ${e.response?.statusCode}');
+      print('❌ TeacherChaptersApi: Response data: ${e.response?.data}');
+      throw _handleDioError(e);
+    } catch (e) {
+      print('❌ TeacherChaptersApi: General exception: $e');
+      throw Exception('Failed to update chapter: $e');
+    }
+  }
+
   /// Get chapter questions for teacher
   Future<TeacherChapterQuestionsResponseDto> getChapterQuestions(
     String chapterId,
@@ -113,6 +143,48 @@ class TeacherChaptersApi {
     } catch (e) {
       print('❌ TeacherChaptersApi: General exception: $e');
       throw Exception('Failed to get chapter questions: $e');
+    }
+  }
+
+  /// Delete chapter for teacher
+  Future<void> deleteChapter(String chapterId) async {
+    try {
+      print('🔍 TeacherChaptersApi: Calling DELETE /teacher-chapters/$chapterId');
+      await _apiService.delete('/teacher-chapters/$chapterId');
+      print('✅ TeacherChaptersApi: Delete chapter success');
+    } on DioException catch (e) {
+      print('❌ TeacherChaptersApi: DioException: ${e.message}');
+      print('❌ TeacherChaptersApi: Status code: ${e.response?.statusCode}');
+      print('❌ TeacherChaptersApi: Response data: ${e.response?.data}');
+      throw _handleDioError(e);
+    } catch (e) {
+      print('❌ TeacherChaptersApi: General exception: $e');
+      throw Exception('Failed to delete chapter: $e');
+    }
+  }
+
+  /// Update chapter status for teacher
+  Future<ChapterTeacherResponseDto> updateStatus(
+    String chapterId,
+    UpdateChapterStatusDto dto,
+  ) async {
+    try {
+      print('🔍 TeacherChaptersApi: Calling PATCH /teacher-chapters/$chapterId/status');
+      print('📝 TeacherChaptersApi: Request data: ${dto.toJson()}');
+      final response = await _apiService.patch(
+        '/teacher-chapters/$chapterId/status',
+        data: dto.toJson(),
+      );
+      print('✅ TeacherChaptersApi: Update status success response: ${response.data}');
+      return ChapterTeacherResponseDto.fromJson(response.data as Map<String, dynamic>);
+    } on DioException catch (e) {
+      print('❌ TeacherChaptersApi: DioException: ${e.message}');
+      print('❌ TeacherChaptersApi: Status code: ${e.response?.statusCode}');
+      print('❌ TeacherChaptersApi: Response data: ${e.response?.data}');
+      throw _handleDioError(e);
+    } catch (e) {
+      print('❌ TeacherChaptersApi: General exception: $e');
+      throw Exception('Failed to update chapter status: $e');
     }
   }
 

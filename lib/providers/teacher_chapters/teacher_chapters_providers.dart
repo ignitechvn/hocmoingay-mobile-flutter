@@ -8,6 +8,9 @@ import '../../domain/usecases/teacher_chapters/get_teacher_chapter_details_useca
 import '../../domain/usecases/teacher_chapters/create_chapter_usecase.dart';
 import '../../domain/usecases/teacher_chapters/get_teacher_chapter_questions_usecase.dart';
 import '../../domain/usecases/teacher_chapters/get_teacher_chapters_usecase.dart';
+import '../../domain/usecases/teacher_chapters/delete_chapter_usecase.dart';
+import '../../domain/usecases/teacher_chapters/update_chapter_usecase.dart';
+import '../../domain/usecases/teacher_chapters/update_chapter_status_usecase.dart';
 import '../api/api_providers.dart';
 
 // API Provider
@@ -48,6 +51,23 @@ final getTeacherChaptersUseCaseProvider = Provider<GetTeacherChaptersUseCase>((
   final repository = ref.watch(teacherChaptersRepositoryProvider);
   return GetTeacherChaptersUseCase(repository);
 });
+
+final deleteChapterUseCaseProvider = Provider<DeleteChapterUseCase>((ref) {
+  final repository = ref.watch(teacherChaptersRepositoryProvider);
+  return DeleteChapterUseCase(repository);
+});
+
+final updateChapterUseCaseProvider = Provider<UpdateChapterUseCase>((ref) {
+  final repository = ref.watch(teacherChaptersRepositoryProvider);
+  return UpdateChapterUseCase(repository);
+});
+
+final updateChapterStatusUseCaseProvider = Provider<UpdateChapterStatusUseCase>(
+  (ref) {
+    final repository = ref.watch(teacherChaptersRepositoryProvider);
+    return UpdateChapterStatusUseCase(repository);
+  },
+);
 
 // Data Provider
 final teacherChapterDetailsProvider =

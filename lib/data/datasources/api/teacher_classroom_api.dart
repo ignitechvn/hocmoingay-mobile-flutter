@@ -104,6 +104,33 @@ class TeacherClassroomApi {
     }
   }
 
+  /// Update classroom status for teacher
+  Future<ClassroomTeacherResponseDto> updateClassroomStatus(
+    String classroomId,
+    UpdateClassroomStatusDto dto,
+  ) async {
+    try {
+      print(
+        '🔍 TeacherClassroomApi: Calling PATCH /teacher-classrooms/$classroomId/status',
+      );
+      print('📝 TeacherClassroomApi: Request data: ${dto.toJson()}');
+      final response = await _apiService.patch(
+        '/teacher-classrooms/$classroomId/status',
+        data: dto.toJson(),
+      );
+      print('✅ TeacherClassroomApi: Success response: ${response.data}');
+      return ClassroomTeacherResponseDto.fromJson(response.data);
+    } on DioException catch (e) {
+      print('❌ TeacherClassroomApi: DioException: ${e.message}');
+      print('❌ TeacherClassroomApi: Status code: ${e.response?.statusCode}');
+      print('❌ TeacherClassroomApi: Response data: ${e.response?.data}');
+      throw _handleDioError(e);
+    } catch (e) {
+      print('❌ TeacherClassroomApi: General exception: $e');
+      throw Exception('Failed to update classroom status: $e');
+    }
+  }
+
   /// Get approved students for teacher classroom
   Future<List<StudentResponseDto>> getApprovedStudents(
     String classroomId,

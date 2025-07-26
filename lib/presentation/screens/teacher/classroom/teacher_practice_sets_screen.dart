@@ -8,10 +8,14 @@ import '../../../../core/theme/app_dimensions.dart';
 import '../../../../core/theme/app_text_styles.dart';
 import '../../../../core/utils/toast_utils.dart';
 import '../../../../core/widgets/empty_state_widget.dart';
+import '../../../../core/widgets/confirm_dialog.dart';
+import '../../../../core/widgets/update_practice_set_status_dialog.dart';
 import '../../../../data/dto/practice_set_dto.dart';
 import '../../../../providers/teacher_practice_sets/teacher_practice_sets_providers.dart';
+import '../../../../domain/usecases/teacher_practice_sets/update_practice_set_status_usecase.dart';
 import '../widgets/practice_set_status_filter_bar.dart';
 import 'create_practice_set_screen.dart';
+import 'teacher_practice_set_details_screen.dart';
 
 class TeacherPracticeSetsScreen extends ConsumerStatefulWidget {
   const TeacherPracticeSetsScreen({super.key, required this.classroomId});
@@ -141,11 +145,7 @@ class _TeacherPracticeSetsScreenState
       return Center(
         child: EmptyStateWidget(
           message: 'Chưa có bài tập nào',
-          showAction: true,
-          actionText: 'Làm mới',
-          onActionPressed:
-              () =>
-                  ref.refresh(teacherPracticeSetsProvider(widget.classroomId)),
+          showAction: false,
         ),
       );
     }
@@ -168,10 +168,13 @@ class _TeacherPracticeSetsScreenState
   Widget _buildPracticeSetCard(PracticeSetTeacherResponseDto practiceSet) {
     return GestureDetector(
       onTap: () {
-        // TODO: Navigate to practice set details screen
-        ToastUtils.showSuccess(
-          context: context,
-          message: 'Chức năng xem chi tiết bài tập sẽ được thêm sau',
+        Navigator.of(context).push(
+          MaterialPageRoute(
+            builder:
+                (context) => TeacherPracticeSetDetailsScreen(
+                  practiceSetId: practiceSet.id,
+                ),
+          ),
         );
       },
       child: Container(
@@ -204,33 +207,18 @@ class _TeacherPracticeSetsScreenState
                       (context) => [
                         const PopupMenuItem(
                           value: 'update_info',
-                          child: Row(
-                            children: [
-                              Icon(Icons.edit, size: 16),
-                              SizedBox(width: 8),
-                              Text('Cập nhật thông tin'),
-                            ],
-                          ),
+                          child: Text('Cập nhật thông tin'),
                         ),
                         if (practiceSet.status != EPracticeSetStatus.CLOSED)
                           const PopupMenuItem(
                             value: 'update_status',
-                            child: Row(
-                              children: [
-                                Icon(Icons.update, size: 16),
-                                SizedBox(width: 8),
-                                Text('Cập nhật trạng thái'),
-                              ],
-                            ),
+                            child: Text('Cập nhật trạng thái'),
                           ),
                         const PopupMenuItem(
                           value: 'delete',
-                          child: Row(
-                            children: [
-                              Icon(Icons.delete, size: 16, color: Colors.red),
-                              SizedBox(width: 8),
-                              Text('Xóa', style: TextStyle(color: Colors.red)),
-                            ],
+                          child: Text(
+                            'Xóa',
+                            style: TextStyle(color: Colors.red),
                           ),
                         ),
                       ],
@@ -342,34 +330,13 @@ class _TeacherPracticeSetsScreenState
   ) async {
     switch (action) {
       case 'update_info':
-        final result = await Navigator.of(context).push(
-          MaterialPageRoute(
-            builder:
-                (context) => CreatePracticeSetScreen(
-                  classroomId: widget.classroomId,
-                  practiceSet: practiceSet,
-                ),
-          ),
-        );
-
-        // Refresh data if practice set was updated successfully
-        if (result == true) {
-          ref.refresh(teacherPracticeSetsProvider(widget.classroomId));
-        }
+        _navigateToEditPracticeSet(practiceSet);
         break;
       case 'update_status':
-        // TODO: Show status update dialog
-        ToastUtils.showSuccess(
-          context: context,
-          message: 'Chức năng cập nhật trạng thái sẽ được thêm sau',
-        );
+        _showUpdateStatusDialog(practiceSet);
         break;
       case 'delete':
-        // TODO: Show confirmation dialog and delete practice set
-        ToastUtils.showSuccess(
-          context: context,
-          message: 'Chức năng xóa bài tập sẽ được thêm sau',
-        );
+        _showDeleteConfirmation(practiceSet);
         break;
     }
   }
@@ -393,5 +360,155 @@ class _TeacherPracticeSetsScreenState
     } catch (e) {
       return 'N/A';
     }
+  }
+
+  void _navigateToEditPracticeSet(
+    PracticeSetTeacherResponseDto practiceSet,
+  ) async {
+    final result = await Navigator.of(context).push(
+      MaterialPageRoute(
+        builder:
+            (context) => CreatePracticeSetScreen(
+              classroomId: widget.classroomId,
+              practiceSet: practiceSet,
+            ),
+      ),
+    );
+
+    // Refresh data if practice set was updated successfully
+    if (result == true) {
+      ref.refresh(teacherPracticeSetsProvider(widget.classroomId));
+    }
+  }
+
+  Future<void> _showUpdateStatusDialog(
+    PracticeSetTeacherResponseDto practiceSet,
+  ) async {
+    final newStatus =
+        await UpdatePracticeSetStatusHelper.showUpdateStatusDialog(
+          context,
+          practiceSetTitle: practiceSet.title,
+          currentStatus: practiceSet.status,
+        );
+
+    if (newStatus != null && newStatus != practiceSet.status) {
+      try {
+        // Show loading
+        showDialog(
+          context: context,
+          barrierDismissible: false,
+          builder:
+              (context) => const Center(child: CircularProgressIndicator()),
+        );
+
+        // Call API
+        final updateStatusDto = UpdatePracticeSetStatusDto(status: newStatus);
+        final useCase = ref.read(updatePracticeSetStatusUseCaseProvider);
+        await useCase(
+          UpdatePracticeSetStatusParams(
+            practiceSetId: practiceSet.id,
+            dto: updateStatusDto,
+          ),
+        );
+
+        // Hide loading
+        Navigator.of(context).pop();
+
+        // Show success message
+        ToastUtils.showSuccess(
+          context: context,
+          message: 'Cập nhật trạng thái bài tập thành công!',
+        );
+
+        // Refresh practice sets list
+        ref.refresh(teacherPracticeSetsProvider(widget.classroomId));
+      } catch (e) {
+        // Hide loading
+        Navigator.of(context).pop();
+
+        // Show error message
+        ToastUtils.showFail(
+          context: context,
+          message: 'Cập nhật trạng thái thất bại: ${e.toString()}',
+        );
+      }
+    }
+  }
+
+  Future<void> _showDeleteConfirmation(
+    PracticeSetTeacherResponseDto practiceSet,
+  ) async {
+    final shouldDelete = await ConfirmDialogHelper.showCustomConfirmation(
+      context,
+      title: 'Xác nhận xóa',
+      content: DeletePracticeSetContent(practiceSetTitle: practiceSet.title),
+      confirmText: 'Xóa',
+      cancelText: 'Hủy',
+      confirmColor: AppColors.error,
+    );
+
+    if (shouldDelete) {
+      // TODO: Call delete API
+      ToastUtils.showSuccess(
+        context: context,
+        message: 'Chức năng xóa bài tập sẽ được thêm sau',
+      );
+    }
+  }
+}
+
+// Content widget for deleting practice set confirmation
+class DeletePracticeSetContent extends StatelessWidget {
+  final String practiceSetTitle;
+
+  const DeletePracticeSetContent({super.key, required this.practiceSetTitle});
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        RichText(
+          text: TextSpan(
+            style: AppTextStyles.bodyMedium.copyWith(
+              color: AppColors.textPrimary,
+            ),
+            children: [
+              const TextSpan(text: 'Bạn có chắc chắn muốn xoá bài tập '),
+              TextSpan(
+                text: '"$practiceSetTitle"',
+                style: AppTextStyles.bodyMedium.copyWith(
+                  color: AppColors.textPrimary,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              const TextSpan(text: '?'),
+            ],
+          ),
+        ),
+        const SizedBox(height: 16),
+        RichText(
+          text: TextSpan(
+            style: AppTextStyles.bodyMedium.copyWith(
+              color: AppColors.textPrimary,
+            ),
+            children: [
+              const TextSpan(text: 'Hành động này sẽ '),
+              const TextSpan(
+                text: 'xóa toàn bộ câu hỏi',
+                style: TextStyle(fontWeight: FontWeight.bold),
+              ),
+              const TextSpan(text: ' và '),
+              const TextSpan(
+                text: 'kết quả học tập liên quan',
+                style: TextStyle(fontWeight: FontWeight.bold),
+              ),
+              const TextSpan(text: '.'),
+            ],
+          ),
+        ),
+      ],
+    );
   }
 }

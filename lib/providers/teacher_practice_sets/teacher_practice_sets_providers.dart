@@ -8,6 +8,8 @@ import '../../domain/usecases/teacher_practice_sets/get_teacher_practice_sets_us
 import '../../domain/usecases/teacher_practice_sets/get_open_or_closed_practice_sets_usecase.dart';
 import '../../domain/usecases/teacher_practice_sets/create_practice_set_usecase.dart';
 import '../../domain/usecases/teacher_practice_sets/update_practice_set_usecase.dart';
+import '../../domain/usecases/teacher_practice_sets/update_practice_set_status_usecase.dart';
+import '../../domain/usecases/teacher_practice_sets/get_practice_set_details_usecase.dart';
 import '../api/api_providers.dart';
 
 // API Provider
@@ -50,6 +52,19 @@ final updatePracticeSetUseCaseProvider = Provider<UpdatePracticeSetUseCase>((
   return UpdatePracticeSetUseCase(repository);
 });
 
+final updatePracticeSetStatusUseCaseProvider =
+    Provider<UpdatePracticeSetStatusUseCase>((ref) {
+      final repository = ref.watch(teacherPracticeSetsRepositoryProvider);
+      return UpdatePracticeSetStatusUseCase(repository);
+    });
+
+final getPracticeSetDetailsUseCaseProvider = Provider<GetPracticeSetDetailsUseCase>((
+  ref,
+) {
+  final repository = ref.watch(teacherPracticeSetsRepositoryProvider);
+  return GetPracticeSetDetailsUseCase(repository);
+});
+
 // Data Provider
 final teacherPracticeSetsProvider =
     FutureProvider.family<TeacherPracticeSetResponseListDto, String>((
@@ -67,4 +82,13 @@ final teacherOpenOrClosedPracticeSetsProvider =
     ) async {
       final useCase = ref.watch(getOpenOrClosedPracticeSetsUseCaseProvider);
       return await useCase(classroomId);
+    });
+
+final practiceSetDetailsProvider =
+    FutureProvider.family<PracticeSetDetailsTeacherResponseDto, String>((
+      ref,
+      practiceSetId,
+    ) async {
+      final useCase = ref.watch(getPracticeSetDetailsUseCaseProvider);
+      return await useCase(practiceSetId);
     });

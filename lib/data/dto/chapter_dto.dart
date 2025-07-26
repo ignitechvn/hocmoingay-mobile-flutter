@@ -317,6 +317,28 @@ class CreateChapterDto {
   };
 }
 
+// Update Chapter DTO
+class UpdateChapterDto {
+  final String? title;
+  final String? description;
+  final String? deadline;
+  final String? startDate;
+
+  const UpdateChapterDto({
+    this.title,
+    this.description,
+    this.deadline,
+    this.startDate,
+  });
+
+  Map<String, dynamic> toJson() => {
+    if (title != null) 'title': title,
+    if (description != null) 'description': description,
+    if (deadline != null) 'deadline': deadline,
+    if (startDate != null) 'startDate': startDate,
+  };
+}
+
 // Teacher Chapter Questions Response DTO
 class TeacherChapterQuestionsResponseDto {
   final String id;
@@ -385,4 +407,18 @@ class QuestionTeacherDto extends QuestionResponseDto {
       examId: base.examId,
     );
   }
+}
+
+// Update Chapter Status DTO
+class UpdateChapterStatusDto {
+  final EChapterStatus status;
+
+  const UpdateChapterStatusDto({required this.status});
+
+  Map<String, dynamic> toJson() => {'status': status.value};
+
+  factory UpdateChapterStatusDto.fromJson(Map<String, dynamic> json) =>
+      UpdateChapterStatusDto(
+        status: EChapterStatus.fromString(json['status'] as String),
+      );
 }

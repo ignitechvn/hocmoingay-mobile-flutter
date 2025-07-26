@@ -18,6 +18,7 @@ import '../../providers/api/api_providers.dart';
 import '../../data/dto/classroom_dto.dart';
 import '../../domain/entities/classroom.dart';
 import '../../domain/usecases/teacher_classroom/update_classroom_usecase.dart';
+import '../../domain/usecases/teacher_classroom/update_classroom_status_usecase.dart';
 
 // API Provider
 final teacherClassroomApiProvider = Provider<TeacherClassroomApi>((ref) {
@@ -48,6 +49,11 @@ final createClassroomUseCaseProvider = Provider<CreateClassroomUseCase>((ref) {
 final updateClassroomUseCaseProvider = Provider<UpdateClassroomUseCase>((ref) {
   final repository = ref.watch(teacherClassroomRepositoryProvider);
   return UpdateClassroomUseCase(repository);
+});
+
+final updateClassroomStatusUseCaseProvider = Provider<UpdateClassroomStatusUseCase>((ref) {
+  final repository = ref.watch(teacherClassroomRepositoryProvider);
+  return UpdateClassroomStatusUseCase(repository);
 });
 
 final getClassroomDetailsUseCaseProvider = Provider<GetClassroomDetailsUseCase>(

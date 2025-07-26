@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_text_styles.dart';
 import '../../../../core/widgets/empty_state_widget.dart';
+import '../../../../core/widgets/confirm_dialog.dart';
 import '../../../../data/dto/teacher_classroom_dto.dart';
 import '../../../../providers/teacher_classroom/teacher_classroom_providers.dart';
 import '../../../../core/utils/toast_utils.dart';
@@ -11,11 +12,13 @@ import '../../../../core/utils/toast_utils.dart';
 class StudentManagementScreen extends ConsumerStatefulWidget {
   final String classroomId;
   final String classroomName;
+  final int initialTabIndex;
 
   const StudentManagementScreen({
     super.key,
     required this.classroomId,
     required this.classroomName,
+    this.initialTabIndex = 0,
   });
 
   @override
@@ -33,7 +36,11 @@ class _StudentManagementScreenState
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 2, vsync: this);
+    _tabController = TabController(
+      length: 2,
+      vsync: this,
+      initialIndex: widget.initialTabIndex,
+    );
   }
 
   @override
@@ -306,19 +313,9 @@ class _StudentManagementScreenState
                     (context) => [
                       const PopupMenuItem<String>(
                         value: 'remove',
-                        child: Row(
-                          children: [
-                            Icon(
-                              Icons.person_remove,
-                              color: AppColors.error,
-                              size: 20,
-                            ),
-                            SizedBox(width: 8),
-                            Text(
-                              'Xóa khỏi lớp',
-                              style: TextStyle(color: AppColors.error),
-                            ),
-                          ],
+                        child: Text(
+                          'Xóa khỏi lớp',
+                          style: TextStyle(color: AppColors.error),
                         ),
                       ),
                     ],
@@ -383,109 +380,167 @@ class _StudentManagementScreenState
   }
 
   void _approveStudent(String studentId) async {
-    try {
-      // Show loading
-      showDialog(
-        context: context,
-        barrierDismissible: false,
-        builder: (context) => const Center(child: CircularProgressIndicator()),
-      );
+    // Find student info for confirmation dialog
+    final pendingStudentsAsync = ref.read(
+      pendingStudentsProvider(widget.classroomId),
+    );
+    final student = pendingStudentsAsync.value?.firstWhere(
+      (student) => student.id == studentId,
+    );
 
-      // Call API
-      final useCase = ref.read(approveStudentUseCaseProvider);
-      await useCase({
-        'classroomId': widget.classroomId,
-        'studentId': studentId,
-      });
-
-      // Hide loading
-      Navigator.of(context).pop();
-
-      // Show success message
-      ToastUtils.showSuccess(
-        context: context,
-        message: 'Đã phê duyệt học sinh thành công',
-      );
-
-      // Refresh both tabs data
-      ref.refresh(approvedStudentsProvider(widget.classroomId));
-      ref.refresh(pendingStudentsProvider(widget.classroomId));
-    } catch (e) {
-      // Hide loading
-      Navigator.of(context).pop();
-
-      // Show error message
+    if (student == null) {
       ToastUtils.showFail(
         context: context,
-        message: 'Phê duyệt học sinh thất bại: ${e.toString()}',
+        message: 'Không tìm thấy thông tin học sinh',
       );
+      return;
+    }
+
+    // Show confirmation dialog using ConfirmDialog
+    final shouldApprove = await ConfirmDialogHelper.showCustomConfirmation(
+      context,
+      title: 'Xác nhận phê duyệt',
+      content: ApproveStudentContent(studentName: student.fullName),
+      confirmText: 'Phê duyệt',
+      cancelText: 'Hủy',
+      confirmColor: AppColors.success,
+    );
+
+    if (shouldApprove) {
+      try {
+        // Show loading
+        showDialog(
+          context: context,
+          barrierDismissible: false,
+          builder:
+              (context) => const Center(child: CircularProgressIndicator()),
+        );
+
+        // Call API
+        final useCase = ref.read(approveStudentUseCaseProvider);
+        await useCase({
+          'classroomId': widget.classroomId,
+          'studentId': studentId,
+        });
+
+        // Hide loading
+        Navigator.of(context).pop();
+
+        // Show success message
+        ToastUtils.showSuccess(
+          context: context,
+          message: 'Đã phê duyệt học sinh thành công',
+        );
+
+        // Refresh both tabs data
+        ref.refresh(approvedStudentsProvider(widget.classroomId));
+        ref.refresh(pendingStudentsProvider(widget.classroomId));
+      } catch (e) {
+        // Hide loading
+        Navigator.of(context).pop();
+
+        // Show error message
+        ToastUtils.showFail(
+          context: context,
+          message: 'Phê duyệt học sinh thất bại: ${e.toString()}',
+        );
+      }
     }
   }
 
   void _rejectStudent(String studentId) async {
-    try {
-      // Show loading
-      showDialog(
-        context: context,
-        barrierDismissible: false,
-        builder: (context) => const Center(child: CircularProgressIndicator()),
-      );
+    // Find student info for confirmation dialog
+    final pendingStudentsAsync = ref.read(
+      pendingStudentsProvider(widget.classroomId),
+    );
+    final student = pendingStudentsAsync.value?.firstWhere(
+      (student) => student.id == studentId,
+    );
 
-      // Call API
-      final useCase = ref.read(rejectStudentUseCaseProvider);
-      await useCase({
-        'classroomId': widget.classroomId,
-        'studentId': studentId,
-      });
-
-      // Hide loading
-      Navigator.of(context).pop();
-
-      // Show success message
-      ToastUtils.showSuccess(
-        context: context,
-        message: 'Đã từ chối học sinh thành công',
-      );
-
-      // Refresh pending students data
-      ref.refresh(pendingStudentsProvider(widget.classroomId));
-    } catch (e) {
-      // Hide loading
-      Navigator.of(context).pop();
-
-      // Show error message
+    if (student == null) {
       ToastUtils.showFail(
         context: context,
-        message: 'Từ chối học sinh thất bại: ${e.toString()}',
+        message: 'Không tìm thấy thông tin học sinh',
       );
+      return;
+    }
+
+    // Show confirmation dialog using ConfirmDialog
+    final shouldReject = await ConfirmDialogHelper.showCustomConfirmation(
+      context,
+      title: 'Xác nhận từ chối',
+      content: RejectStudentContent(studentName: student.fullName),
+      confirmText: 'Từ chối',
+      cancelText: 'Hủy',
+      confirmColor: AppColors.error,
+    );
+
+    if (shouldReject) {
+      try {
+        // Show loading
+        showDialog(
+          context: context,
+          barrierDismissible: false,
+          builder:
+              (context) => const Center(child: CircularProgressIndicator()),
+        );
+
+        // Call API
+        final useCase = ref.read(rejectStudentUseCaseProvider);
+        await useCase({
+          'classroomId': widget.classroomId,
+          'studentId': studentId,
+        });
+
+        // Hide loading
+        Navigator.of(context).pop();
+
+        // Show success message
+        ToastUtils.showSuccess(
+          context: context,
+          message: 'Đã từ chối học sinh thành công',
+        );
+
+        // Refresh pending students data
+        ref.refresh(pendingStudentsProvider(widget.classroomId));
+      } catch (e) {
+        // Hide loading
+        Navigator.of(context).pop();
+
+        // Show error message
+        ToastUtils.showFail(
+          context: context,
+          message: 'Từ chối học sinh thất bại: ${e.toString()}',
+        );
+      }
     }
   }
 
   void _removeStudent(String studentId) async {
-    // Show confirmation dialog
-    final shouldRemove = await showDialog<bool>(
-      context: context,
-      builder:
-          (context) => AlertDialog(
-            title: const Text('Xác nhận'),
-            content: const Text(
-              'Bạn có chắc chắn muốn xóa học sinh này khỏi lớp?',
-            ),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.of(context).pop(false),
-                child: const Text('Hủy'),
-              ),
-              TextButton(
-                onPressed: () => Navigator.of(context).pop(true),
-                style: TextButton.styleFrom(foregroundColor: AppColors.error),
-                child: const Text('Xóa'),
-              ),
-            ],
-          ),
+    // Find student info for confirmation dialog
+    final approvedStudentsAsync = ref.read(
+      approvedStudentsProvider(widget.classroomId),
+    );
+    final student = approvedStudentsAsync.value?.firstWhere(
+      (student) => student.id == studentId,
     );
 
-    if (shouldRemove == true) {
+    if (student == null) {
+      ToastUtils.showFail(
+        context: context,
+        message: 'Không tìm thấy thông tin học sinh',
+      );
+      return;
+    }
+
+    // Show confirmation dialog using ConfirmDialog
+    final shouldRemove = await ConfirmDialogHelper.showDeleteConfirmation(
+      context,
+      itemName: student.fullName,
+      customContent: RemoveStudentContent(studentName: student.fullName),
+    );
+
+    if (shouldRemove) {
       try {
         // Show loading
         showDialog(
@@ -521,5 +576,308 @@ class _StudentManagementScreenState
         );
       }
     }
+  }
+}
+
+// Content widget for approving student confirmation
+class ApproveStudentContent extends StatelessWidget {
+  final String studentName;
+
+  const ApproveStudentContent({super.key, required this.studentName});
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        RichText(
+          text: TextSpan(
+            style: AppTextStyles.bodyMedium.copyWith(
+              color: AppColors.textPrimary,
+            ),
+            children: [
+              const TextSpan(text: 'Bạn sắp '),
+              const TextSpan(
+                text: 'đồng ý',
+                style: TextStyle(fontWeight: FontWeight.bold),
+              ),
+              const TextSpan(text: ' cho học sinh '),
+              TextSpan(
+                text: studentName,
+                style: AppTextStyles.bodyMedium.copyWith(
+                  color: AppColors.textPrimary,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              const TextSpan(text: ' tham gia lớp học này.'),
+            ],
+          ),
+        ),
+        const SizedBox(height: 16),
+        Text(
+          'Sau khi đồng ý:',
+          style: AppTextStyles.bodyMedium.copyWith(
+            color: AppColors.textPrimary,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        const SizedBox(height: 8),
+        Padding(
+          padding: const EdgeInsets.only(left: 8),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              _buildBulletPoint(
+                'Học sinh sẽ chính thức trở thành thành viên của lớp học.',
+              ),
+              _buildBulletPoint(
+                'Học sinh sẽ có quyền truy cập vào nội dung học tập, lịch học và các hoạt động của lớp.',
+              ),
+              _buildBulletPoint(
+                'Thông báo sẽ được gửi tới học sinh để xác nhận việc tham gia.',
+              ),
+            ],
+          ),
+        ),
+        const SizedBox(height: 16),
+        Text(
+          'Bạn có chắc chắn muốn thực hiện hành động này không?',
+          style: AppTextStyles.bodyMedium.copyWith(
+            color: AppColors.textPrimary,
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildBulletPoint(String text) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 4),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Container(
+            margin: const EdgeInsets.only(top: 6, right: 8),
+            width: 4,
+            height: 4,
+            decoration: const BoxDecoration(
+              color: AppColors.textSecondary,
+              shape: BoxShape.circle,
+            ),
+          ),
+          Expanded(
+            child: Text(
+              text,
+              style: AppTextStyles.bodyMedium.copyWith(
+                color: AppColors.textSecondary,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+// Content widget for rejecting student confirmation
+class RejectStudentContent extends StatelessWidget {
+  final String studentName;
+
+  const RejectStudentContent({super.key, required this.studentName});
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        RichText(
+          text: TextSpan(
+            style: AppTextStyles.bodyMedium.copyWith(
+              color: AppColors.textPrimary,
+            ),
+            children: [
+              const TextSpan(text: 'Bạn sắp '),
+              const TextSpan(
+                text: 'từ chối',
+                style: TextStyle(fontWeight: FontWeight.bold),
+              ),
+              const TextSpan(text: ' học sinh '),
+              TextSpan(
+                text: studentName,
+                style: AppTextStyles.bodyMedium.copyWith(
+                  color: AppColors.textPrimary,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              const TextSpan(text: ' tham gia lớp học này.'),
+            ],
+          ),
+        ),
+        const SizedBox(height: 16),
+        Text(
+          'Sau khi từ chối:',
+          style: AppTextStyles.bodyMedium.copyWith(
+            color: AppColors.textPrimary,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        const SizedBox(height: 8),
+        Padding(
+          padding: const EdgeInsets.only(left: 8),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              _buildBulletPoint(
+                'Học sinh sẽ không thể truy cập nội dung hoặc tham gia các buổi học của lớp.',
+              ),
+              _buildBulletPoint('Lời mời tham gia lớp học sẽ bị hủy bỏ.'),
+              _buildBulletPoint(
+                'Nếu muốn thêm học sinh lại, bạn sẽ cần gửi lời mời mới.',
+              ),
+            ],
+          ),
+        ),
+        const SizedBox(height: 16),
+        Text(
+          'Bạn có chắc chắn muốn tiếp tục hành động này không?',
+          style: AppTextStyles.bodyMedium.copyWith(
+            color: AppColors.textPrimary,
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildBulletPoint(String text) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 4),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Container(
+            margin: const EdgeInsets.only(top: 6, right: 8),
+            width: 4,
+            height: 4,
+            decoration: const BoxDecoration(
+              color: AppColors.textSecondary,
+              shape: BoxShape.circle,
+            ),
+          ),
+          Expanded(
+            child: Text(
+              text,
+              style: AppTextStyles.bodyMedium.copyWith(
+                color: AppColors.textSecondary,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+// Content widget for removing student confirmation
+class RemoveStudentContent extends StatelessWidget {
+  final String studentName;
+
+  const RemoveStudentContent({super.key, required this.studentName});
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        RichText(
+          text: TextSpan(
+            style: AppTextStyles.bodyMedium.copyWith(
+              color: AppColors.textPrimary,
+            ),
+            children: [
+              const TextSpan(text: 'Bạn có chắc chắn muốn xoá học sinh '),
+              TextSpan(
+                text: studentName,
+                style: AppTextStyles.bodyMedium.copyWith(
+                  color: AppColors.textPrimary,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              const TextSpan(text: ' khỏi lớp học này không?'),
+            ],
+          ),
+        ),
+        const SizedBox(height: 16),
+        Text(
+          'Hành động này sẽ:',
+          style: AppTextStyles.bodyMedium.copyWith(
+            color: AppColors.textPrimary,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        const SizedBox(height: 8),
+        Padding(
+          padding: const EdgeInsets.only(left: 8),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              _buildBulletPoint('Xoá học sinh khỏi danh sách lớp.'),
+              _buildBulletPoint(
+                'Không thể truy cập nội dung và bài tập trong lớp nữa.',
+              ),
+              _buildBulletPoint(
+                'Không ảnh hưởng đến dữ liệu của các lớp khác (nếu có).',
+              ),
+            ],
+          ),
+        ),
+        const SizedBox(height: 16),
+        Container(
+          padding: const EdgeInsets.all(12),
+          decoration: BoxDecoration(
+            color: AppColors.warning.withOpacity(0.1),
+            borderRadius: BorderRadius.circular(8),
+            border: Border.all(color: AppColors.warning.withOpacity(0.3)),
+          ),
+          child: Text(
+            'Hành động này không thể hoàn tác. Vui lòng xác nhận!',
+            style: AppTextStyles.bodyMedium.copyWith(
+              color: AppColors.warning,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildBulletPoint(String text) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 4),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Container(
+            margin: const EdgeInsets.only(top: 6, right: 8),
+            width: 4,
+            height: 4,
+            decoration: const BoxDecoration(
+              color: AppColors.textSecondary,
+              shape: BoxShape.circle,
+            ),
+          ),
+          Expanded(
+            child: Text(
+              text,
+              style: AppTextStyles.bodyMedium.copyWith(
+                color: AppColors.textSecondary,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
   }
 }

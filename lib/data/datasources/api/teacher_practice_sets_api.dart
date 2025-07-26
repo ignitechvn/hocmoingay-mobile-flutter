@@ -124,6 +124,64 @@ class TeacherPracticeSetsApi {
     }
   }
 
+  /// Update practice set status
+  Future<PracticeSetTeacherResponseDto> updatePracticeSetStatus(
+    String practiceSetId,
+    UpdatePracticeSetStatusDto dto,
+  ) async {
+    try {
+      print(
+        '🔍 TeacherPracticeSetsApi: Calling PATCH /teacher-practice-sets/$practiceSetId/status with data: ${dto.toJson()}',
+      );
+      final response = await _apiService.patch(
+        '/teacher-practice-sets/$practiceSetId/status',
+        data: dto.toJson(),
+      );
+      print(
+        '✅ TeacherPracticeSetsApi: Update practice set status success response: ${response.data}',
+      );
+      return PracticeSetTeacherResponseDto.fromJson(
+        response.data as Map<String, dynamic>,
+      );
+    } on DioException catch (e) {
+      print('❌ TeacherPracticeSetsApi: DioException: ${e.message}');
+      print('❌ TeacherPracticeSetsApi: Status code: ${e.response?.statusCode}');
+      print('❌ TeacherPracticeSetsApi: Response data: ${e.response?.data}');
+      throw _handleDioError(e);
+    } catch (e) {
+      print('❌ TeacherPracticeSetsApi: General exception: $e');
+      throw Exception('Failed to update practice set status: $e');
+    }
+  }
+
+  /// Get practice set details for teacher
+  Future<PracticeSetDetailsTeacherResponseDto> getPracticeSetDetails(
+    String practiceSetId,
+  ) async {
+    try {
+      print(
+        '🔍 TeacherPracticeSetsApi: Calling GET /teacher-practice-sets/$practiceSetId/details',
+      );
+      final response = await _apiService.get(
+        '/teacher-practice-sets/$practiceSetId/details',
+      );
+      print(
+        '✅ TeacherPracticeSetsApi: Get practice set details success response: ${response.data}',
+      );
+      return PracticeSetDetailsTeacherResponseDto.fromJson(
+        response.data as Map<String, dynamic>,
+      );
+    } on DioException catch (e) {
+      print('❌ TeacherPracticeSetsApi: DioException: ${e.message}');
+      print('❌ TeacherPracticeSetsApi: Status code: ${e.response?.statusCode}');
+      print('❌ TeacherPracticeSetsApi: Response data: ${e.response?.data}');
+      throw _handleDioError(e);
+    } catch (e) {
+      print('❌ TeacherPracticeSetsApi: General exception: $e');
+      throw Exception('Failed to get practice set details: $e');
+    }
+  }
+
   // Error handling
   Exception _handleDioError(DioException e) {
     final errorResponse = ApiErrorHandler.parseErrorResponse(e);

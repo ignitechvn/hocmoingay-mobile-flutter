@@ -72,7 +72,7 @@ class PracticeSetTeacherResponseDto extends PracticeSetResponseDto {
       status: EPracticeSetStatus.fromString(json['status'] as String),
       classroomId: json['classroomId'] as String,
       questionCount: json['questionCount'] as int,
-      assignToAll: json['assignToAll'] as bool,
+      assignToAll: json['assignToAll'] as bool? ?? false,
       assignedStudentCount: json['assignedStudentCount'] as int?,
     );
   }
@@ -223,5 +223,64 @@ class UpdatePracticeSetDto {
     if (deadline != null) 'deadline': deadline,
     if (assignToAll != null) 'assignToAll': assignToAll,
     if (studentIds != null) 'studentIds': studentIds,
+  };
+}
+
+// Update Practice Set Status DTO
+class UpdatePracticeSetStatusDto {
+  final EPracticeSetStatus status;
+
+  const UpdatePracticeSetStatusDto({
+    required this.status,
+  });
+
+  Map<String, dynamic> toJson() => {
+    'status': status.value,
+  };
+
+  factory UpdatePracticeSetStatusDto.fromJson(Map<String, dynamic> json) =>
+      UpdatePracticeSetStatusDto(
+        status: EPracticeSetStatus.fromString(json['status'] as String),
+      );
+}
+
+// Practice Set Details Teacher Response DTO
+class PracticeSetDetailsTeacherResponseDto extends PracticeSetTeacherResponseDto {
+  final int studentProgressCount;
+
+  const PracticeSetDetailsTeacherResponseDto({
+    required super.id,
+    required super.title,
+    super.description,
+    super.deadline,
+    super.startDate,
+    required super.status,
+    required super.classroomId,
+    required super.questionCount,
+    required super.assignToAll,
+    super.assignedStudentCount,
+    required this.studentProgressCount,
+  });
+
+  factory PracticeSetDetailsTeacherResponseDto.fromJson(Map<String, dynamic> json) {
+    return PracticeSetDetailsTeacherResponseDto(
+      id: json['id'] as String,
+      title: json['title'] as String,
+      description: json['description'] as String?,
+      deadline: json['deadline'] as String?,
+      startDate: json['startDate'] as String?,
+      status: EPracticeSetStatus.fromString(json['status'] as String),
+      classroomId: json['classroomId'] as String,
+      questionCount: json['questionCount'] as int,
+      assignToAll: json['assignToAll'] as bool? ?? false, // Handle null case
+      assignedStudentCount: json['assignedStudentCount'] as int?,
+      studentProgressCount: json['studentProgressCount'] as int,
+    );
+  }
+
+  @override
+  Map<String, dynamic> toJson() => {
+    ...super.toJson(),
+    'studentProgressCount': studentProgressCount,
   };
 }

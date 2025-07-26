@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../../core/constants/classroom_constants.dart';
 import '../../../../../core/constants/app_constants.dart';
@@ -8,20 +9,24 @@ import '../../../../../core/constants/grade_constants.dart';
 import '../../../../../core/theme/app_colors.dart';
 import '../../../../../core/theme/app_text_styles.dart';
 import '../../../../../core/utils/toast_utils.dart';
+import '../../../../../core/widgets/confirm_dialog.dart';
+import '../../../../../core/widgets/update_classroom_status_dialog.dart';
 import '../../../../../domain/entities/classroom.dart';
 import '../../../../../data/dto/classroom_dto.dart';
+import '../../../../../providers/teacher_classroom/teacher_classroom_providers.dart';
+import '../../../../../domain/usecases/teacher_classroom/update_classroom_status_usecase.dart';
 import '../../../../../data/dto/teacher_classroom_dto.dart';
 import '../../classroom/teacher_classroom_details_screen.dart';
 import '../../classroom/create_classroom_screen.dart';
 
-class TeacherClassroomCard extends StatelessWidget {
+class TeacherClassroomCard extends ConsumerWidget {
   final ClassroomTeacher classroom;
   final VoidCallback? onTap;
 
   const TeacherClassroomCard({super.key, required this.classroom, this.onTap});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final isClassActive =
         classroom.status != EClassroomStatus.ENROLLING &&
         classroom.status != EClassroomStatus.CANCELED;
@@ -44,38 +49,13 @@ class TeacherClassroomCard extends StatelessWidget {
       color: Color(int.parse(backgroundColor.replaceAll('#', '0xFF'))),
       child: InkWell(
         onTap: () {
-          if (classroom.status == EClassroomStatus.ENROLLING) {
-            ToastUtils.showWarning(
+          if (classroom.status == EClassroomStatus.CANCELED) {
+            ToastUtils.showFail(
               context: context,
-              message: 'Lớp học này đang trong quá trình tuyển sinh.',
+              message: 'Lớp học này đã bị hủy.',
             );
             return;
           }
-
-          if (!isClassActive) {
-            if (classroom.status == EClassroomStatus.CANCELED) {
-              ToastUtils.showFail(
-                context: context,
-                message: 'Lớp học này đã bị hủy.',
-              );
-            } else {
-              ToastUtils.showWarning(
-                context: context,
-                message:
-                    'Lớp học hiện tại đang trong quá trình tuyển sinh và xếp lịch.',
-              );
-            }
-            return;
-          }
-
-          // Navigate to details screen
-          Navigator.of(context).push(
-            MaterialPageRoute(
-              builder:
-                  (_) =>
-                      TeacherClassroomDetailsScreen(classroomId: classroom.id),
-            ),
-          );
 
           onTap?.call();
         },
@@ -105,47 +85,25 @@ class TeacherClassroomCard extends StatelessWidget {
                           color: AppColors.textSecondary,
                         ),
                         onSelected:
-                            (value) => _handleMenuAction(context, value),
+                            (value) => _handleMenuAction(context, ref, value),
                         itemBuilder:
                             (context) => [
                               if (classroom.status !=
                                   EClassroomStatus.FINISHED) ...[
                                 const PopupMenuItem(
                                   value: 'edit-info',
-                                  child: Row(
-                                    children: [
-                                      Icon(Icons.edit, size: 16),
-                                      SizedBox(width: 8),
-                                      Text('Chỉnh sửa thông tin'),
-                                    ],
-                                  ),
+                                  child: Text('Chỉnh sửa thông tin'),
                                 ),
                                 const PopupMenuItem(
                                   value: 'edit-status',
-                                  child: Row(
-                                    children: [
-                                      Icon(Icons.update, size: 16),
-                                      SizedBox(width: 8),
-                                      Text('Cập nhật trạng thái'),
-                                    ],
-                                  ),
+                                  child: Text('Cập nhật trạng thái'),
                                 ),
                               ],
                               const PopupMenuItem(
                                 value: 'delete',
-                                child: Row(
-                                  children: [
-                                    Icon(
-                                      Icons.delete,
-                                      size: 16,
-                                      color: Colors.red,
-                                    ),
-                                    SizedBox(width: 8),
-                                    Text(
-                                      'Xóa',
-                                      style: TextStyle(color: Colors.red),
-                                    ),
-                                  ],
+                                child: Text(
+                                  'Xóa',
+                                  style: TextStyle(color: Colors.red),
                                 ),
                               ),
                             ],
@@ -278,7 +236,7 @@ class TeacherClassroomCard extends StatelessWidget {
     );
   }
 
-  void _handleMenuAction(BuildContext context, String action) {
+  void _handleMenuAction(BuildContext context, WidgetRef ref, String action) {
     switch (action) {
       case 'edit-info':
         // Navigate to CreateClassroomScreen in edit mode
@@ -292,17 +250,89 @@ class TeacherClassroomCard extends StatelessWidget {
         );
         break;
       case 'edit-status':
-        ToastUtils.showSuccess(
-          context: context,
-          message: 'Chức năng cập nhật trạng thái sẽ được thêm sau',
-        );
+        _showUpdateStatusDialog(context, ref);
         break;
       case 'delete':
+        _showDeleteConfirmation(context);
+        break;
+    }
+  }
+
+  Future<void> _showDeleteConfirmation(BuildContext context) async {
+    final confirmed = await ConfirmDialogHelper.showDeleteConfirmation(
+      context,
+      itemName: classroom.name,
+      customContent: DeleteClassroomContent(className: classroom.name),
+    );
+
+    if (confirmed) {
+      // TODO: Implement delete classroom functionality
+      ToastUtils.showSuccess(
+        context: context,
+        message: 'Chức năng xóa lớp học sẽ được thêm sau',
+      );
+    }
+  }
+
+  Future<void> _showUpdateStatusDialog(
+    BuildContext context,
+    WidgetRef ref,
+  ) async {
+    final newStatus = await UpdateClassroomStatusHelper.showUpdateStatusDialog(
+      context,
+      className: classroom.name,
+      currentStatus: classroom.status,
+    );
+
+    if (newStatus != null && newStatus != classroom.status) {
+      try {
+        // Show loading
+        showDialog(
+          context: context,
+          barrierDismissible: false,
+          builder:
+              (context) => const Center(child: CircularProgressIndicator()),
+        );
+
+        // Create DTO
+        final updateStatusDto = UpdateClassroomStatusDto(status: newStatus);
+
+        // Call API
+        final useCase = ref.read(updateClassroomStatusUseCaseProvider);
+        final result = await useCase(
+          UpdateClassroomStatusParams(
+            classroomId: classroom.id,
+            dto: updateStatusDto,
+          ),
+        );
+
+        // Hide loading
+        Navigator.of(context).pop();
+
+        // Show success
         ToastUtils.showSuccess(
           context: context,
-          message: 'Chức năng xóa lớp học sẽ được thêm sau',
+          message: 'Cập nhật trạng thái lớp học thành công!',
         );
-        break;
+
+        print(
+          '✅ Updated classroom status: ${result.name} - ${result.status.value}',
+        );
+
+        // Refresh the classrooms list
+        ref.invalidate(teacherClassroomsProvider);
+      } catch (e) {
+        // Hide loading
+        Navigator.of(context).pop();
+
+        // Show error
+        ToastUtils.showFail(
+          context: context,
+          message: 'Cập nhật trạng thái thất bại: ${e.toString()}',
+        );
+
+        print('❌ Failed to update classroom status: $e');
+      }
     }
   }
 

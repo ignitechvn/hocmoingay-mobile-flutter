@@ -7,8 +7,15 @@ import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_dimensions.dart';
 import '../../../../core/theme/app_text_styles.dart';
 import '../../../../core/widgets/empty_state_widget.dart';
+import '../../../../core/widgets/confirm_dialog.dart';
+import '../../../../core/widgets/update_chapter_status_dialog.dart';
+import '../../../../core/utils/toast_utils.dart';
 import '../../../../data/dto/chapter_dto.dart';
 import '../../../../providers/teacher_classroom/teacher_classroom_providers.dart';
+import '../../../../providers/teacher_chapters/teacher_chapters_providers.dart'
+    as chapter_providers;
+import '../../../../domain/usecases/teacher_chapters/delete_chapter_usecase.dart';
+import '../../../../domain/usecases/teacher_chapters/update_chapter_status_usecase.dart';
 import '../widgets/chapter_status_filter_bar.dart';
 import 'teacher_chapter_details_screen.dart';
 import 'create_chapter_screen.dart';
@@ -140,10 +147,7 @@ class _TeacherChaptersScreenState extends ConsumerState<TeacherChaptersScreen> {
       return Center(
         child: EmptyStateWidget(
           message: 'Chưa có chủ đề nào',
-          showAction: true,
-          actionText: 'Làm mới',
-          onActionPressed:
-              () => ref.refresh(teacherChaptersProvider(widget.classroomId)),
+          showAction: false,
         ),
       );
     }
@@ -203,32 +207,17 @@ class _TeacherChaptersScreenState extends ConsumerState<TeacherChaptersScreen> {
                       (context) => [
                         const PopupMenuItem(
                           value: 'update_info',
-                          child: Row(
-                            children: [
-                              Icon(Icons.edit, size: 16),
-                              SizedBox(width: 8),
-                              Text('Cập nhật thông tin'),
-                            ],
-                          ),
+                          child: Text('Cập nhật thông tin'),
                         ),
                         const PopupMenuItem(
                           value: 'update_status',
-                          child: Row(
-                            children: [
-                              Icon(Icons.update, size: 16),
-                              SizedBox(width: 8),
-                              Text('Cập nhật trạng thái'),
-                            ],
-                          ),
+                          child: Text('Cập nhật trạng thái'),
                         ),
                         const PopupMenuItem(
                           value: 'delete',
-                          child: Row(
-                            children: [
-                              Icon(Icons.delete, size: 16, color: Colors.red),
-                              SizedBox(width: 8),
-                              Text('Xóa', style: TextStyle(color: Colors.red)),
-                            ],
+                          child: Text(
+                            'Xóa',
+                            style: TextStyle(color: Colors.red),
                           ),
                         ),
                       ],
@@ -281,14 +270,138 @@ class _TeacherChaptersScreenState extends ConsumerState<TeacherChaptersScreen> {
   void _handleChapterAction(String action, ChapterTeacherResponseDto chapter) {
     switch (action) {
       case 'update_info':
-        // TODO: Navigate to update chapter info screen
+        _navigateToEditChapter(chapter);
         break;
       case 'update_status':
-        // TODO: Show status update dialog
+        _showUpdateStatusDialog(chapter);
         break;
       case 'delete':
-        // TODO: Show confirmation dialog and delete chapter
+        _showDeleteConfirmation(chapter);
         break;
+    }
+  }
+
+  void _navigateToEditChapter(ChapterTeacherResponseDto chapter) async {
+    final result = await Navigator.of(context).push(
+      MaterialPageRoute(
+        builder:
+            (context) => CreateChapterScreen(
+              classroomId: widget.classroomId,
+              chapterToEdit: chapter,
+            ),
+      ),
+    );
+
+    // Refresh data if chapter was updated successfully
+    if (result == true) {
+      ref.refresh(teacherChaptersProvider(widget.classroomId));
+    }
+  }
+
+  Future<void> _showUpdateStatusDialog(
+    ChapterTeacherResponseDto chapter,
+  ) async {
+    final newStatus = await UpdateChapterStatusHelper.showUpdateStatusDialog(
+      context,
+      chapterTitle: chapter.title,
+      currentStatus: chapter.status,
+    );
+
+    if (newStatus != null && newStatus != chapter.status) {
+      try {
+        // Show loading
+        showDialog(
+          context: context,
+          barrierDismissible: false,
+          builder:
+              (context) => const Center(child: CircularProgressIndicator()),
+        );
+
+        // Call API
+        final updateStatusDto = UpdateChapterStatusDto(status: newStatus);
+        final useCase = ref.read(
+          chapter_providers.updateChapterStatusUseCaseProvider,
+        );
+        await useCase(
+          UpdateChapterStatusParams(
+            chapterId: chapter.id,
+            dto: updateStatusDto,
+          ),
+        );
+
+        // Hide loading
+        Navigator.of(context).pop();
+
+        // Show success message
+        ToastUtils.showSuccess(
+          context: context,
+          message: 'Cập nhật trạng thái chủ đề thành công!',
+        );
+
+        // Refresh chapters list
+        ref.refresh(teacherChaptersProvider(widget.classroomId));
+      } catch (e) {
+        // Hide loading
+        Navigator.of(context).pop();
+
+        // Show error message
+        ToastUtils.showFail(
+          context: context,
+          message: 'Cập nhật trạng thái thất bại: ${e.toString()}',
+        );
+      }
+    }
+  }
+
+  Future<void> _showDeleteConfirmation(
+    ChapterTeacherResponseDto chapter,
+  ) async {
+    final shouldDelete = await ConfirmDialogHelper.showCustomConfirmation(
+      context,
+      title: 'Xác nhận xóa',
+      content: DeleteChapterContent(chapterTitle: chapter.title),
+      confirmText: 'Xóa',
+      cancelText: 'Hủy',
+      confirmColor: AppColors.error,
+    );
+
+    if (shouldDelete) {
+      try {
+        // Show loading
+        showDialog(
+          context: context,
+          barrierDismissible: false,
+          builder:
+              (context) => const Center(child: CircularProgressIndicator()),
+        );
+
+        // Call API
+        final useCase = ref.read(
+          chapter_providers.deleteChapterUseCaseProvider,
+        );
+        await useCase(DeleteChapterParams(chapterId: chapter.id));
+
+        // Hide loading
+        Navigator.of(context).pop();
+
+        // Show success message
+        ToastUtils.showSuccess(
+          context: context,
+          message: 'Xóa chủ đề thành công',
+        );
+
+        // Refresh chapters list
+        ref.refresh(teacherChaptersProvider(widget.classroomId));
+      } catch (e) {
+        // Hide loading
+        Navigator.of(context).pop();
+
+        // Show error message
+        ToastUtils.showFail(
+          context: context,
+          message: 'Xóa chủ đề thất bại: ${e.toString()}',
+        );
+      }
     }
   }
 
@@ -335,9 +448,67 @@ class _TeacherChaptersScreenState extends ConsumerState<TeacherChaptersScreen> {
     if (dateString.isEmpty) return 'Chưa có';
     try {
       final date = DateTime.parse(dateString);
-      return DateFormat('dd/MM/yyyy HH:mm').format(date);
+      return DateFormat('dd/MM/yyyy').format(date);
     } catch (e) {
       return 'N/A';
     }
+  }
+}
+
+// Content widget for deleting chapter confirmation
+class DeleteChapterContent extends StatelessWidget {
+  final String chapterTitle;
+
+  const DeleteChapterContent({super.key, required this.chapterTitle});
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        RichText(
+          text: TextSpan(
+            style: AppTextStyles.bodyMedium.copyWith(
+              color: AppColors.textPrimary,
+            ),
+            children: [
+              const TextSpan(text: 'Bạn có chắc chắn muốn xoá chương học '),
+              TextSpan(
+                text: '"$chapterTitle"',
+                style: AppTextStyles.bodyMedium.copyWith(
+                  color: AppColors.textPrimary,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              const TextSpan(text: ' không?'),
+            ],
+          ),
+        ),
+        const SizedBox(height: 16),
+        RichText(
+          text: TextSpan(
+            style: AppTextStyles.bodyMedium.copyWith(
+              color: AppColors.textPrimary,
+            ),
+            children: [
+              const TextSpan(text: 'Hành động này sẽ '),
+              const TextSpan(
+                text: 'xóa toàn bộ câu hỏi',
+                style: TextStyle(fontWeight: FontWeight.bold),
+              ),
+              const TextSpan(text: ' và '),
+              const TextSpan(
+                text: 'kết quả học tập liên quan',
+                style: TextStyle(fontWeight: FontWeight.bold),
+              ),
+              const TextSpan(
+                text: ' đến chương học này. Thao tác không thể hoàn tác.',
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
   }
 }

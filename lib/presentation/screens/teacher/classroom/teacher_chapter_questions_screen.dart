@@ -58,6 +58,87 @@ class _TeacherChapterQuestionsScreenState
           icon: const Icon(Icons.arrow_back),
           onPressed: () => Navigator.of(context).pop(),
         ),
+        actions: [
+          // Add button with popup menu
+          Container(
+            margin: const EdgeInsets.only(right: 16),
+            child: PopupMenuButton<String>(
+              icon: Container(
+                width: 40,
+                height: 40,
+                decoration: BoxDecoration(
+                  color: AppColors.primary.withOpacity(0.1),
+                  shape: BoxShape.circle,
+                ),
+                child: const Icon(
+                  Icons.add,
+                  color: AppColors.primary,
+                  size: 20,
+                ),
+              ),
+              onSelected: (value) => _handleAddQuestionAction(value),
+              itemBuilder:
+                  (context) => [
+                    const PopupMenuItem<String>(
+                      value: 'bank',
+                      child: Row(
+                        children: [
+                          Icon(
+                            Icons.library_books,
+                            color: AppColors.primary,
+                            size: 18,
+                          ),
+                          SizedBox(width: 8),
+                          Text('Thêm từ ngân hàng câu hỏi'),
+                        ],
+                      ),
+                    ),
+                    const PopupMenuItem<String>(
+                      value: 'ai',
+                      child: Row(
+                        children: [
+                          Icon(
+                            Icons.auto_awesome,
+                            color: AppColors.primary,
+                            size: 18,
+                          ),
+                          SizedBox(width: 8),
+                          Text('Tạo câu hỏi bằng AI'),
+                        ],
+                      ),
+                    ),
+                    const PopupMenuItem<String>(
+                      value: 'manual',
+                      child: Row(
+                        children: [
+                          Icon(
+                            Icons.edit_note,
+                            color: AppColors.primary,
+                            size: 18,
+                          ),
+                          SizedBox(width: 8),
+                          Text('Nhập câu hỏi thủ công'),
+                        ],
+                      ),
+                    ),
+                    const PopupMenuItem<String>(
+                      value: 'file',
+                      child: Row(
+                        children: [
+                          Icon(
+                            Icons.file_upload,
+                            color: AppColors.primary,
+                            size: 18,
+                          ),
+                          SizedBox(width: 8),
+                          Text('Nhập từ file .docx'),
+                        ],
+                      ),
+                    ),
+                  ],
+            ),
+          ),
+        ],
       ),
       body: questionsAsync.when(
         data: (questionsData) => _buildContent(context, questionsData),
@@ -315,6 +396,63 @@ class _TeacherChapterQuestionsScreenState
       SnackBar(
         content: Text('Chỉnh sửa câu hỏi ${question.questionNumber}'),
         duration: const Duration(seconds: 2),
+      ),
+    );
+  }
+
+  void _handleAddQuestionAction(String action) {
+    switch (action) {
+      case 'bank':
+        _addFromQuestionBank();
+        break;
+      case 'ai':
+        _createWithAI();
+        break;
+      case 'manual':
+        _addManually();
+        break;
+      case 'file':
+        _importFromFile();
+        break;
+    }
+  }
+
+  void _addFromQuestionBank() {
+    // TODO: Navigate to question bank screen
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text('Chuyển đến ngân hàng câu hỏi'),
+        duration: Duration(seconds: 2),
+      ),
+    );
+  }
+
+  void _createWithAI() {
+    // TODO: Navigate to AI question creation screen
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text('Chuyển đến tạo câu hỏi bằng AI'),
+        duration: Duration(seconds: 2),
+      ),
+    );
+  }
+
+  void _addManually() {
+    // TODO: Navigate to manual question creation screen
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text('Chuyển đến nhập câu hỏi thủ công'),
+        duration: Duration(seconds: 2),
+      ),
+    );
+  }
+
+  void _importFromFile() {
+    // TODO: Navigate to file import screen
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text('Chuyển đến nhập từ file .docx'),
+        duration: Duration(seconds: 2),
       ),
     );
   }

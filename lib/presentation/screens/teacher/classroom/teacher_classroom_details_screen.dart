@@ -258,12 +258,6 @@ class _TeacherClassroomDetailsScreenState
             // Join Code
             Row(
               children: [
-                const Icon(
-                  Icons.link,
-                  size: 16,
-                  color: AppColors.textSecondary,
-                ),
-                const SizedBox(width: 8),
                 Text(
                   'Mã tham gia: ',
                   style: AppTextStyles.bodyMedium.copyWith(
@@ -306,12 +300,6 @@ class _TeacherClassroomDetailsScreenState
             // Date Range
             Row(
               children: [
-                const Icon(
-                  Icons.calendar_today,
-                  size: 16,
-                  color: AppColors.textSecondary,
-                ),
-                const SizedBox(width: 8),
                 Text(
                   'Thời gian: ',
                   style: AppTextStyles.bodyMedium.copyWith(
@@ -406,6 +394,29 @@ class _TeacherClassroomDetailsScreenState
               ),
               textAlign: TextAlign.center,
             ),
+            const SizedBox(height: 8),
+            SizedBox(
+              width: double.infinity,
+              child: ElevatedButton(
+                onPressed: () => _handleStatCardAction(title),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: color.withOpacity(0.1),
+                  foregroundColor: color,
+                  elevation: 0,
+                  padding: const EdgeInsets.symmetric(vertical: 8),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                ),
+                child: Text(
+                  'Chi tiết',
+                  style: AppTextStyles.bodySmall.copyWith(
+                    color: color,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ),
+            ),
           ],
         ),
       ),
@@ -493,106 +504,85 @@ class _TeacherClassroomDetailsScreenState
               ),
             ),
             const SizedBox(height: 12),
-            Row(
-              children: [
-                Expanded(
-                  child: AppButton(
-                    onPressed: () {
-                      Navigator.of(context).push(
-                        MaterialPageRoute(
-                          builder:
-                              (context) => StudentManagementScreen(
-                                classroomId: classroom.id,
-                                classroomName: classroom.name,
-                              ),
-                        ),
-                      );
-                    },
-                    text: 'Quản lý học sinh',
-                  ),
-                ),
-                const SizedBox(width: 12),
-                const Expanded(child: SizedBox()), // Empty space for alignment
-              ],
+            SizedBox(
+              width: double.infinity,
+              child: AppButton(
+                onPressed: () {
+                  Navigator.of(context).push(
+                    MaterialPageRoute(
+                      builder:
+                          (context) => ReportsScreen(
+                            classroomId: classroom.id,
+                            classroomName: classroom.name,
+                          ),
+                    ),
+                  );
+                },
+                text: 'Xem báo cáo',
+              ),
             ),
-            const SizedBox(height: 12),
-            Row(
-              children: [
-                Expanded(
-                  child: AppButton(
-                    onPressed: () {
-                      Navigator.of(context).push(
-                        MaterialPageRoute(
-                          builder:
-                              (context) => TeacherChaptersScreen(
-                                classroomId: classroom.id,
-                              ),
-                        ),
-                      );
-                    },
-                    text: 'Quản lý chủ đề',
-                  ),
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: AppButton(
-                    onPressed: () {
-                      Navigator.of(context).push(
-                        MaterialPageRoute(
-                          builder:
-                              (context) => TeacherPracticeSetsScreen(
-                                classroomId: classroom.id,
-                              ),
-                        ),
-                      );
-                    },
-                    text: 'Quản lý bài tập',
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 12),
-            Row(
-              children: [
-                Expanded(
-                  child: AppButton(
-                    onPressed: () {
-                      Navigator.of(context).push(
-                        MaterialPageRoute(
-                          builder:
-                              (context) =>
-                                  TeacherExamsScreen(classroomId: classroom.id),
-                        ),
-                      );
-                    },
-                    text: 'Quản lý bài thi',
-                  ),
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: AppButton(
-                    onPressed: () {
-                      Navigator.of(context).push(
-                        MaterialPageRoute(
-                          builder:
-                              (context) => ReportsScreen(
-                                classroomId: classroom.id,
-                                classroomName: classroom.name,
-                              ),
-                        ),
-                      );
-                    },
-                    text: 'Xem báo cáo',
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 12),
-            // Removed settings button - moved to AppBar
           ],
         ),
       ),
     );
+  }
+
+  void _handleStatCardAction(String title) {
+    final classroomDetailsAsync = ref.read(
+      teacherClassroomDetailsProvider(widget.classroomId),
+    );
+
+    classroomDetailsAsync.whenData((classroom) {
+      switch (title) {
+        case 'Học sinh':
+          Navigator.of(context).push(
+            MaterialPageRoute(
+              builder: (context) => StudentManagementScreen(
+                classroomId: classroom.id,
+                classroomName: classroom.name,
+                initialTabIndex: 0, // Tab "Đã phê duyệt"
+              ),
+            ),
+          );
+          break;
+        case 'Chủ đề':
+          Navigator.of(context).push(
+            MaterialPageRoute(
+              builder:
+                  (context) => TeacherChaptersScreen(classroomId: classroom.id),
+            ),
+          );
+          break;
+        case 'Bài tập':
+          Navigator.of(context).push(
+            MaterialPageRoute(
+              builder:
+                  (context) =>
+                      TeacherPracticeSetsScreen(classroomId: classroom.id),
+            ),
+          );
+          break;
+        case 'Bài kiểm tra':
+          Navigator.of(context).push(
+            MaterialPageRoute(
+              builder:
+                  (context) => TeacherExamsScreen(classroomId: classroom.id),
+            ),
+          );
+          break;
+        case 'Chờ xác nhận':
+          Navigator.of(context).push(
+            MaterialPageRoute(
+              builder: (context) => StudentManagementScreen(
+                classroomId: classroom.id,
+                classroomName: classroom.name,
+                initialTabIndex: 1, // Tab "Chờ phê duyệt"
+              ),
+            ),
+          );
+          break;
+      }
+    });
   }
 
   Color _getStatusColor(String status) {

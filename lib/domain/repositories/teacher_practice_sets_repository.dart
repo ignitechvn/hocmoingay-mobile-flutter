@@ -12,4 +12,11 @@ abstract class TeacherPracticeSetsRepository {
     String practiceSetId,
     UpdatePracticeSetDto dto,
   );
+  Future<PracticeSetTeacherResponseDto> updatePracticeSetStatus(
+    String practiceSetId,
+    UpdatePracticeSetStatusDto dto,
+  );
+  Future<PracticeSetDetailsTeacherResponseDto> getPracticeSetDetails(
+    String practiceSetId,
+  );
 }

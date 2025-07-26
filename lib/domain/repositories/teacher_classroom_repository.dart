@@ -19,5 +19,9 @@ abstract class TeacherClassroomRepository {
     String classroomId,
     UpdateClassroomDto dto,
   );
+  Future<ClassroomTeacherResponseDto> updateClassroomStatus(
+    String classroomId,
+    UpdateClassroomStatusDto dto,
+  );
   Future<TeacherChapterResponseListDto> getChapters(String classroomId);
 }

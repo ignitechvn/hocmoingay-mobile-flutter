@@ -102,10 +102,47 @@ class _CreatePracticeSetScreenState
                 ),
               ),
               const SizedBox(height: 8),
-              AppTextField(
+              TextFormField(
                 controller: _titleController,
-                label: '',
-                hint: 'Nhập tên bài tập',
+                decoration: InputDecoration(
+                  hintText: 'Nhập tên bài tập',
+                  hintStyle: AppTextStyles.bodyMedium.copyWith(
+                    color: AppColors.textSecondary,
+                  ),
+                  filled: true,
+                  fillColor: Colors.white,
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(8),
+                    borderSide: const BorderSide(color: AppColors.grey300),
+                  ),
+                  enabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(8),
+                    borderSide: const BorderSide(color: AppColors.grey300),
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(8),
+                    borderSide: const BorderSide(
+                      color: AppColors.primary,
+                      width: 2,
+                    ),
+                  ),
+                  errorBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(8),
+                    borderSide: const BorderSide(color: AppColors.error),
+                  ),
+                  focusedErrorBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(8),
+                    borderSide: const BorderSide(
+                      color: AppColors.error,
+                      width: 2,
+                    ),
+                  ),
+                  contentPadding: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 12,
+                  ),
+                ),
+                style: AppTextStyles.bodyMedium,
                 validator: (value) {
                   if (value == null || value.trim().isEmpty) {
                     return 'Vui lòng nhập tên bài tập';
@@ -124,11 +161,37 @@ class _CreatePracticeSetScreenState
                 ),
               ),
               const SizedBox(height: 8),
-              AppTextField(
+              TextFormField(
                 controller: _descriptionController,
-                label: '',
-                hint: 'Nhập mô tả (không bắt buộc)',
                 maxLines: 3,
+                decoration: InputDecoration(
+                  hintText: 'Nhập mô tả (không bắt buộc)',
+                  hintStyle: AppTextStyles.bodyMedium.copyWith(
+                    color: AppColors.textSecondary,
+                  ),
+                  filled: true,
+                  fillColor: Colors.white,
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(8),
+                    borderSide: const BorderSide(color: AppColors.grey300),
+                  ),
+                  enabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(8),
+                    borderSide: const BorderSide(color: AppColors.grey300),
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(8),
+                    borderSide: const BorderSide(
+                      color: AppColors.primary,
+                      width: 2,
+                    ),
+                  ),
+                  contentPadding: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 12,
+                  ),
+                ),
+                style: AppTextStyles.bodyMedium,
               ),
               const SizedBox(height: 16),
 
@@ -155,8 +218,8 @@ class _CreatePracticeSetScreenState
                     border: Border.all(color: AppColors.grey300),
                   ),
                   child: Row(
-                    children: [
-                      Icon(
+                    children: <Widget>[
+                      const Icon(
                         Icons.calendar_today,
                         color: AppColors.textSecondary,
                         size: 20,
@@ -202,8 +265,8 @@ class _CreatePracticeSetScreenState
                     border: Border.all(color: AppColors.grey300),
                   ),
                   child: Row(
-                    children: [
-                      Icon(
+                    children: <Widget>[
+                      const Icon(
                         Icons.calendar_today,
                         color: AppColors.textSecondary,
                         size: 20,
@@ -363,10 +426,9 @@ class _CreatePracticeSetScreenState
     );
   }
 
-  Widget _buildStudentSelection(List<StudentResponseDto> students) {
-    return Column(
+  Widget _buildStudentSelection(List<StudentResponseDto> students) => Column(
       crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
+      children: <Widget>[
         Text(
           'Chọn học sinh:',
           style: AppTextStyles.bodyMedium.copyWith(
@@ -380,7 +442,7 @@ class _CreatePracticeSetScreenState
           child: ListView.builder(
             shrinkWrap: true,
             itemCount: students.length,
-            itemBuilder: (context, index) {
+            itemBuilder: (BuildContext context, int index) {
               final student = students[index];
               final isSelected = _selectedStudentIds.contains(student.id);
 
@@ -414,7 +476,6 @@ class _CreatePracticeSetScreenState
         ),
       ],
     );
-  }
 
   Future<void> _selectStartDate(BuildContext context) async {
     final picked = await showDatePicker(

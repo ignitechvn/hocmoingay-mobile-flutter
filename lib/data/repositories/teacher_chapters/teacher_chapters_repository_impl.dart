@@ -27,9 +27,30 @@ class TeacherChaptersRepositoryImpl implements TeacherChaptersRepository {
   }
 
   @override
+  Future<ChapterTeacherResponseDto> updateChapter(
+    String chapterId,
+    UpdateChapterDto dto,
+  ) async {
+    return await _api.updateChapter(chapterId, dto);
+  }
+
+  @override
   Future<TeacherChapterQuestionsResponseDto> getChapterQuestions(
     String chapterId,
   ) async {
     return await _api.getChapterQuestions(chapterId);
+  }
+
+  @override
+  Future<void> deleteChapter(String chapterId) async {
+    return await _api.deleteChapter(chapterId);
+  }
+
+  @override
+  Future<ChapterTeacherResponseDto> updateStatus(
+    String chapterId,
+    UpdateChapterStatusDto dto,
+  ) async {
+    return await _api.updateStatus(chapterId, dto);
   }
 }

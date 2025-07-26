@@ -1,13 +1,14 @@
 import 'package:flutter/material.dart';
-import '../../../../core/constants/practice_set_constants.dart';
-import '../../../../core/theme/app_colors.dart';
-import '../../../../core/theme/app_text_styles.dart';
 
-class PracticeSetStatusFilterBar extends StatelessWidget {
+import '../../../../../core/constants/app_constants.dart';
+import '../../../../../core/constants/classroom_constants.dart';
+import '../../../../../core/theme/app_text_styles.dart';
+
+class TeacherStatusFilterBar extends StatelessWidget {
   final int selectedIndex;
   final Function(int) onStatusChanged;
 
-  const PracticeSetStatusFilterBar({
+  const TeacherStatusFilterBar({
     super.key,
     required this.selectedIndex,
     required this.onStatusChanged,
@@ -16,9 +17,9 @@ class PracticeSetStatusFilterBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final statusOptions = [
-      {'label': 'Đã lên lịch', 'status': EPracticeSetStatus.SCHEDULED},
-      {'label': 'Đang mở', 'status': EPracticeSetStatus.OPEN},
-      {'label': 'Đã đóng', 'status': EPracticeSetStatus.CLOSED},
+      {'label': 'Đang tuyển sinh', 'status': ClassroomStatus.enrolling},
+      {'label': 'Đang diễn ra', 'status': ClassroomStatus.ongoing},
+      {'label': 'Đã kết thúc', 'status': ClassroomStatus.finished},
     ];
 
     return Container(
@@ -29,8 +30,14 @@ class PracticeSetStatusFilterBar extends StatelessWidget {
               final index = entry.key;
               final status = entry.value;
               final isSelected = index == selectedIndex;
-              final statusEnum = status['status'] as EPracticeSetStatus;
-              final statusColor = _getStatusColor(statusEnum);
+              final statusEnum = status['status'] as ClassroomStatus;
+
+              // Get the darker color for this status
+              final statusColor =
+                  ClassroomStatusFilterBarColor.colors[statusEnum] ?? "#2196F3";
+              final color = Color(
+                int.parse(statusColor.replaceAll('#', '0xFF')),
+              );
 
               return Expanded(
                 child: Padding(
@@ -45,10 +52,10 @@ class PracticeSetStatusFilterBar extends StatelessWidget {
                         horizontal: 16,
                       ),
                       decoration: BoxDecoration(
-                        color: isSelected ? statusColor : Colors.white,
+                        color: isSelected ? color : Colors.white,
                         borderRadius: BorderRadius.circular(24),
                         border: Border.all(
-                          color: isSelected ? statusColor : AppColors.grey300,
+                          color: isSelected ? color : Colors.grey.shade300,
                           width: 1,
                         ),
                       ),
@@ -56,8 +63,9 @@ class PracticeSetStatusFilterBar extends StatelessWidget {
                         status['label'] as String,
                         textAlign: TextAlign.center,
                         style: AppTextStyles.bodyMedium.copyWith(
-                          color: isSelected ? Colors.white : AppColors.textPrimary,
-                          fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
+                          color: isSelected ? Colors.white : Colors.black87,
+                          fontWeight:
+                              isSelected ? FontWeight.w600 : FontWeight.normal,
                         ),
                       ),
                     ),
@@ -67,16 +75,5 @@ class PracticeSetStatusFilterBar extends StatelessWidget {
             }).toList(),
       ),
     );
-  }
-
-  Color _getStatusColor(EPracticeSetStatus status) {
-    switch (status) {
-      case EPracticeSetStatus.SCHEDULED:
-        return const Color(0xFF2196F3); // Blue
-      case EPracticeSetStatus.OPEN:
-        return const Color(0xFF4CAF50); // Green
-      case EPracticeSetStatus.CLOSED:
-        return const Color(0xFFF44336); // Red
-    }
   }
 }

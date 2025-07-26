@@ -10,10 +10,11 @@ import '../../../../../core/widgets/empty_state_widget.dart';
 import '../../../../../data/dto/classroom_dto.dart';
 import '../../../../../domain/entities/classroom.dart';
 import '../../../../../providers/teacher_classroom/teacher_classroom_providers.dart';
-import '../../../student/dashboard/widgets/status_filter_bar.dart';
+import '../widgets/teacher_status_filter_bar.dart';
 import '../../schedule/teacher_schedule_screen.dart';
 import '../widgets/teacher_classroom_card.dart';
 import '../../classroom/create_classroom_screen.dart';
+import '../../classroom/teacher_classroom_details_screen.dart';
 
 class TeacherClassesTab extends ConsumerStatefulWidget {
   const TeacherClassesTab({super.key});
@@ -31,7 +32,7 @@ class _TeacherClassesTabState extends ConsumerState<TeacherClassesTab> {
     final classroomsAsync = ref.watch(teacherClassroomsProvider);
 
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: AppColors.background,
       appBar: AppBar(
         title: Text(
           'Danh sách lớp học',
@@ -40,7 +41,7 @@ class _TeacherClassesTabState extends ConsumerState<TeacherClassesTab> {
             fontWeight: FontWeight.bold,
           ),
         ),
-        backgroundColor: Colors.transparent,
+        backgroundColor: AppColors.background,
         elevation: 0,
         actions: [
           // Create class button
@@ -102,7 +103,7 @@ class _TeacherClassesTabState extends ConsumerState<TeacherClassesTab> {
       body: Column(
         children: [
           // Status Filter Bar
-          StatusFilterBar(
+          TeacherStatusFilterBar(
             selectedIndex: _selectedStatusIndex,
             onStatusChanged: (index) {
               setState(() {
@@ -122,7 +123,7 @@ class _TeacherClassesTabState extends ConsumerState<TeacherClassesTab> {
                     'Đã xảy ra lỗi không xác định';
                 return EmptyStateWidgets.error(
                   message: errorMessage,
-                  onRetry: () => ref.refresh(teacherClassroomsProvider),
+                  onRetry: null, // Không hiển thị nút "Thử lại"
                 );
               },
             ),
@@ -149,7 +150,7 @@ class _TeacherClassesTabState extends ConsumerState<TeacherClassesTab> {
 
     if (selectedClassrooms.isEmpty) {
       return EmptyStateWidgets.noClassrooms(
-        onRefresh: () => ref.refresh(teacherClassroomsProvider),
+        onRefresh: null, // Không hiển thị nút "Làm mới"
       );
     }
 
@@ -211,11 +212,12 @@ class _TeacherClassesTabState extends ConsumerState<TeacherClassesTab> {
   );
 
   void _handleClassroomAction(ClassroomTeacherResponseDto classroom) {
-    // TODO: Implement classroom actions for teacher
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('Chức năng quản lý lớp học đang được phát triển'),
-        backgroundColor: AppColors.primary,
+    // Navigate to classroom details screen
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder:
+            (context) =>
+                TeacherClassroomDetailsScreen(classroomId: classroom.id),
       ),
     );
   }

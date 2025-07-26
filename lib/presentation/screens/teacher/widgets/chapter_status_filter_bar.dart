@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../../../core/constants/chapter_constants.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_text_styles.dart';
 
@@ -16,9 +17,9 @@ class ChapterStatusFilterBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final statusOptions = [
-      {'label': 'Đã lên lịch', 'count': 0},
-      {'label': 'Đang mở', 'count': 0},
-      {'label': 'Đã đóng', 'count': 0},
+      {'label': 'Đã lên lịch', 'status': EChapterStatus.SCHEDULED},
+      {'label': 'Đang mở', 'status': EChapterStatus.OPEN},
+      {'label': 'Đã đóng', 'status': EChapterStatus.CLOSED},
     ];
 
     return Container(
@@ -29,6 +30,10 @@ class ChapterStatusFilterBar extends StatelessWidget {
               final index = entry.key;
               final status = entry.value;
               final isSelected = index == selectedIndex;
+              final statusEnum = status['status'] as EChapterStatus;
+
+              // Get the darker color for this status
+              final statusColor = _getStatusColor(statusEnum);
 
               return Expanded(
                 child: Padding(
@@ -43,13 +48,11 @@ class ChapterStatusFilterBar extends StatelessWidget {
                         horizontal: 16,
                       ),
                       decoration: BoxDecoration(
-                        color: isSelected ? AppColors.primary : Colors.white,
+                        color: isSelected ? statusColor : Colors.white,
                         borderRadius: BorderRadius.circular(24),
                         border: Border.all(
                           color:
-                              isSelected
-                                  ? AppColors.primary
-                                  : AppColors.grey300,
+                              isSelected ? statusColor : Colors.grey.shade300,
                           width: 1,
                         ),
                       ),
@@ -57,8 +60,7 @@ class ChapterStatusFilterBar extends StatelessWidget {
                         status['label'] as String,
                         textAlign: TextAlign.center,
                         style: AppTextStyles.bodyMedium.copyWith(
-                          color:
-                              isSelected ? Colors.white : AppColors.textPrimary,
+                          color: isSelected ? Colors.white : Colors.black87,
                           fontWeight:
                               isSelected ? FontWeight.w600 : FontWeight.normal,
                         ),
@@ -70,5 +72,18 @@ class ChapterStatusFilterBar extends StatelessWidget {
             }).toList(),
       ),
     );
+  }
+
+  Color _getStatusColor(EChapterStatus status) {
+    switch (status) {
+      case EChapterStatus.SCHEDULED:
+        return const Color(0xFF2196F3); // Blue - darker version of #ECF4FE
+      case EChapterStatus.OPEN:
+        return const Color(0xFF4CAF50); // Green - darker version of #E2F7F0
+      case EChapterStatus.CLOSED:
+        return const Color(0xFFF44336); // Red - darker version of #FDE9E9
+      case EChapterStatus.CANCELED:
+        return const Color(0xFFF44336); // Red - darker version of #FDE9E9
+    }
   }
 }

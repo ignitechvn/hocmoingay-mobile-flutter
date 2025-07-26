@@ -10,11 +10,17 @@ import '../../../../core/widgets/app_button.dart';
 import '../../../../core/widgets/app_text_field.dart';
 import '../../../../data/dto/chapter_dto.dart';
 import '../../../../providers/teacher_chapters/teacher_chapters_providers.dart';
+import '../../../../domain/usecases/teacher_chapters/update_chapter_usecase.dart';
 
 class CreateChapterScreen extends ConsumerStatefulWidget {
   final String classroomId;
+  final ChapterTeacherResponseDto? chapterToEdit; // For editing mode
 
-  const CreateChapterScreen({super.key, required this.classroomId});
+  const CreateChapterScreen({
+    super.key,
+    required this.classroomId,
+    this.chapterToEdit,
+  });
 
   @override
   ConsumerState<CreateChapterScreen> createState() =>
@@ -37,12 +43,30 @@ class _CreateChapterScreenState extends ConsumerState<CreateChapterScreen> {
   }
 
   @override
+  void initState() {
+    super.initState();
+    // If editing, populate fields with existing data
+    if (widget.chapterToEdit != null) {
+      _titleController.text = widget.chapterToEdit!.title;
+      _descriptionController.text = widget.chapterToEdit!.description ?? '';
+      if (widget.chapterToEdit!.startDate != null) {
+        _startDate = DateTime.parse(widget.chapterToEdit!.startDate!);
+      }
+      if (widget.chapterToEdit!.deadline != null) {
+        _deadline = DateTime.parse(widget.chapterToEdit!.deadline!);
+      }
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
+    final isEditing = widget.chapterToEdit != null;
+
     return Scaffold(
       backgroundColor: AppColors.background,
       appBar: AppBar(
-        title: const Text(
-          'Tạo chủ đề mới',
+        title: Text(
+          isEditing ? 'Chỉnh sửa chủ đề' : 'Tạo chủ đề mới',
           style: AppTextStyles.headlineMedium,
         ),
         backgroundColor: AppColors.background,
@@ -60,10 +84,55 @@ class _CreateChapterScreenState extends ConsumerState<CreateChapterScreen> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               // Title Field
-              AppTextField(
+              Text(
+                'Tên chủ đề *',
+                style: AppTextStyles.bodyMedium.copyWith(
+                  color: AppColors.textPrimary,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+              const SizedBox(height: 8),
+              TextFormField(
                 controller: _titleController,
-                label: 'Tên chủ đề *',
-                hint: 'Nhập tên chủ đề',
+                decoration: InputDecoration(
+                  hintText: 'Nhập tên chủ đề',
+                  hintStyle: AppTextStyles.bodyMedium.copyWith(
+                    color: AppColors.textSecondary,
+                  ),
+                  filled: true,
+                  fillColor: Colors.white,
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(8),
+                    borderSide: const BorderSide(color: AppColors.grey300),
+                  ),
+                  enabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(8),
+                    borderSide: const BorderSide(color: AppColors.grey300),
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(8),
+                    borderSide: const BorderSide(
+                      color: AppColors.primary,
+                      width: 2,
+                    ),
+                  ),
+                  errorBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(8),
+                    borderSide: const BorderSide(color: AppColors.error),
+                  ),
+                  focusedErrorBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(8),
+                    borderSide: const BorderSide(
+                      color: AppColors.error,
+                      width: 2,
+                    ),
+                  ),
+                  contentPadding: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 12,
+                  ),
+                ),
+                style: AppTextStyles.bodyMedium,
                 validator: (value) {
                   if (value == null || value.trim().isEmpty) {
                     return 'Vui lòng nhập tên chủ đề';
@@ -74,11 +143,45 @@ class _CreateChapterScreenState extends ConsumerState<CreateChapterScreen> {
               const SizedBox(height: 16),
 
               // Description Field
-              AppTextField(
+              Text(
+                'Mô tả',
+                style: AppTextStyles.bodyMedium.copyWith(
+                  color: AppColors.textPrimary,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+              const SizedBox(height: 8),
+              TextFormField(
                 controller: _descriptionController,
-                label: 'Mô tả',
-                hint: 'Nhập mô tả (không bắt buộc)',
                 maxLines: 3,
+                decoration: InputDecoration(
+                  hintText: 'Nhập mô tả (không bắt buộc)',
+                  hintStyle: AppTextStyles.bodyMedium.copyWith(
+                    color: AppColors.textSecondary,
+                  ),
+                  filled: true,
+                  fillColor: Colors.white,
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(8),
+                    borderSide: const BorderSide(color: AppColors.grey300),
+                  ),
+                  enabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(8),
+                    borderSide: const BorderSide(color: AppColors.grey300),
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(8),
+                    borderSide: const BorderSide(
+                      color: AppColors.primary,
+                      width: 2,
+                    ),
+                  ),
+                  contentPadding: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 12,
+                  ),
+                ),
+                style: AppTextStyles.bodyMedium,
               ),
               const SizedBox(height: 16),
 
@@ -176,12 +279,18 @@ class _CreateChapterScreenState extends ConsumerState<CreateChapterScreen> {
               ),
               const SizedBox(height: 32),
 
-              // Create Button
+              // Create/Update Button
               SizedBox(
                 width: double.infinity,
                 child: AppButton(
-                  onPressed: _isLoading ? null : _createChapter,
-                  text: _isLoading ? 'Đang tạo...' : 'Tạo chủ đề',
+                  onPressed:
+                      _isLoading
+                          ? null
+                          : (isEditing ? _updateChapter : _createChapter),
+                  text:
+                      _isLoading
+                          ? (isEditing ? 'Đang cập nhật...' : 'Đang tạo...')
+                          : (isEditing ? 'Cập nhật chủ đề' : 'Tạo chủ đề'),
                 ),
               ),
             ],
@@ -253,6 +362,49 @@ class _CreateChapterScreenState extends ConsumerState<CreateChapterScreen> {
       ToastUtils.showFail(
         context: context,
         message: 'Tạo chủ đề thất bại: ${e.toString()}',
+      );
+    } finally {
+      setState(() {
+        _isLoading = false;
+      });
+    }
+  }
+
+  Future<void> _updateChapter() async {
+    if (!_formKey.currentState!.validate()) {
+      return;
+    }
+
+    setState(() {
+      _isLoading = true;
+    });
+
+    try {
+      final dto = UpdateChapterDto(
+        title: _titleController.text.trim(),
+        description:
+            _descriptionController.text.trim().isEmpty
+                ? null
+                : _descriptionController.text.trim(),
+        startDate: _startDate?.toIso8601String(),
+        deadline: _deadline?.toIso8601String(),
+      );
+
+      final useCase = ref.read(updateChapterUseCaseProvider);
+      await useCase(
+        UpdateChapterParams(chapterId: widget.chapterToEdit!.id, dto: dto),
+      );
+
+      ToastUtils.showSuccess(
+        context: context,
+        message: 'Cập nhật chủ đề thành công',
+      );
+
+      Navigator.of(context).pop(true); // Return true to indicate success
+    } catch (e) {
+      ToastUtils.showFail(
+        context: context,
+        message: 'Cập nhật chủ đề thất bại: ${e.toString()}',
       );
     } finally {
       setState(() {

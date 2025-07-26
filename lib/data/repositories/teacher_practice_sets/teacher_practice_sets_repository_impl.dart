@@ -36,4 +36,19 @@ class TeacherPracticeSetsRepositoryImpl
   ) async {
     return await _api.updatePracticeSet(practiceSetId, dto);
   }
+
+  @override
+  Future<PracticeSetTeacherResponseDto> updatePracticeSetStatus(
+    String practiceSetId,
+    UpdatePracticeSetStatusDto dto,
+  ) async {
+    return await _api.updatePracticeSetStatus(practiceSetId, dto);
+  }
+
+  @override
+  Future<PracticeSetDetailsTeacherResponseDto> getPracticeSetDetails(
+    String practiceSetId,
+  ) async {
+    return await _api.getPracticeSetDetails(practiceSetId);
+  }
 }

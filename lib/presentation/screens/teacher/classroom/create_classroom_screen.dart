@@ -158,365 +158,433 @@ class _CreateClassroomScreenState extends ConsumerState<CreateClassroomScreen> {
   }
 
   @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: AppColors.background,
-      appBar: AppBar(
-        title: Text(
-          isEditMode ? 'Chỉnh sửa lớp học' : 'Thêm lớp học',
-          style: AppTextStyles.headlineSmall.copyWith(
-            color: AppColors.textPrimary,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: AppColors.textPrimary),
-          onPressed: () => Navigator.of(context).pop(),
+  Widget build(BuildContext context) => Scaffold(
+    backgroundColor: AppColors.background,
+    appBar: AppBar(
+      title: Text(
+        isEditMode ? 'Chỉnh sửa lớp học' : 'Thêm lớp học',
+        style: AppTextStyles.headlineSmall.copyWith(
+          color: AppColors.textPrimary,
+          fontWeight: FontWeight.bold,
         ),
       ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16),
-        child: Form(
-          key: _formKey,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // Tên lớp học
+      backgroundColor: Colors.transparent,
+      elevation: 0,
+      leading: IconButton(
+        icon: const Icon(Icons.arrow_back, color: AppColors.textPrimary),
+        onPressed: () => Navigator.of(context).pop(),
+      ),
+    ),
+    body: SingleChildScrollView(
+      padding: const EdgeInsets.all(16),
+      child: Form(
+        key: _formKey,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Tên lớp học
+            Text(
+              'Tên lớp học',
+              style: AppTextStyles.titleMedium.copyWith(
+                color: AppColors.textPrimary,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+            const SizedBox(height: 8),
+            TextFormField(
+              controller: _nameController,
+              validator: (String? value) {
+                if (value == null || value.trim().isEmpty) {
+                  return 'Vui lòng nhập tên lớp học';
+                }
+                return null;
+              },
+              decoration: InputDecoration(
+                hintText: 'Nhập tên lớp học',
+                hintStyle: AppTextStyles.bodyMedium.copyWith(
+                  color: AppColors.grey500,
+                ),
+                filled: true,
+                fillColor: Colors.white,
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(8),
+                  borderSide: const BorderSide(color: AppColors.grey300),
+                ),
+                enabledBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(8),
+                  borderSide: const BorderSide(color: AppColors.grey300),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(8),
+                  borderSide: const BorderSide(
+                    color: AppColors.primary,
+                    width: 2,
+                  ),
+                ),
+                errorBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(8),
+                  borderSide: const BorderSide(color: AppColors.error),
+                ),
+                focusedErrorBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(8),
+                  borderSide: const BorderSide(
+                    color: AppColors.error,
+                    width: 2,
+                  ),
+                ),
+                contentPadding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 16,
+                ),
+              ),
+              style: AppTextStyles.bodyMedium,
+            ),
+            const SizedBox(height: 24),
+
+            // Khối lớp
+            Text(
+              'Khối lớp',
+              style: AppTextStyles.titleMedium.copyWith(
+                color: AppColors.textPrimary,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+            const SizedBox(height: 8),
+            Container(
+              width: double.infinity,
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(8),
+                border: Border.all(color: AppColors.grey300),
+              ),
+              child: DropdownButtonFormField<EGradeLevel>(
+                value: _selectedGrade,
+                decoration: const InputDecoration(
+                  border: InputBorder.none,
+                  contentPadding: EdgeInsets.zero,
+                ),
+                items:
+                    EGradeLevel.values
+                        .map(
+                          (EGradeLevel grade) => DropdownMenuItem(
+                            value: grade,
+                            child: Text(
+                              grade.label,
+                              style: AppTextStyles.bodyMedium.copyWith(
+                                color: AppColors.textPrimary,
+                              ),
+                            ),
+                          ),
+                        )
+                        .toList(),
+                onChanged: (value) {
+                  if (value != null) {
+                    setState(() {
+                      _selectedGrade = value;
+                    });
+                  }
+                },
+              ),
+            ),
+            const SizedBox(height: 24),
+
+            // Môn học
+            Text(
+              'Môn học',
+              style: AppTextStyles.titleMedium.copyWith(
+                color: AppColors.textPrimary,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+            const SizedBox(height: 8),
+            Container(
+              width: double.infinity,
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(8),
+                border: Border.all(color: AppColors.grey300),
+              ),
+              child: DropdownButtonFormField<ESubjectCode>(
+                value: _selectedSubject,
+                decoration: const InputDecoration(
+                  border: InputBorder.none,
+                  contentPadding: EdgeInsets.zero,
+                ),
+                items:
+                    ESubjectCode.values
+                        .map(
+                          (ESubjectCode subject) => DropdownMenuItem(
+                            value: subject,
+                            child: Text(
+                              SubjectLabels.getLabel(subject),
+                              style: AppTextStyles.bodyMedium.copyWith(
+                                color: AppColors.textPrimary,
+                              ),
+                            ),
+                          ),
+                        )
+                        .toList(),
+                onChanged: (ESubjectCode? value) {
+                  if (value != null) {
+                    setState(() {
+                      _selectedSubject = value;
+                    });
+                  }
+                },
+              ),
+            ),
+            const SizedBox(height: 24),
+
+            // Số buổi học dự kiến (chỉ hiển thị khi tạo mới)
+            if (!isEditMode) ...[
               Text(
-                'Tên lớp học',
+                'Số buổi học dự kiến',
                 style: AppTextStyles.titleMedium.copyWith(
                   color: AppColors.textPrimary,
                   fontWeight: FontWeight.w600,
                 ),
               ),
               const SizedBox(height: 8),
-              AppTextField(
-                controller: _nameController,
-                label: '',
-                hint: 'Nhập tên lớp học',
-                validator: (value) {
+              TextFormField(
+                controller: _expectedSessionsController,
+                keyboardType: TextInputType.number,
+                validator: (String? value) {
                   if (value == null || value.trim().isEmpty) {
-                    return 'Vui lòng nhập tên lớp học';
+                    return 'Vui lòng nhập số buổi học';
+                  }
+                  final number = int.tryParse(value);
+                  if (number == null || number <= 0) {
+                    return 'Số buổi học phải là số nguyên dương';
                   }
                   return null;
                 },
-              ),
-              const SizedBox(height: 24),
-
-              // Khối lớp
-              Text(
-                'Khối lớp',
-                style: AppTextStyles.titleMedium.copyWith(
-                  color: AppColors.textPrimary,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-              const SizedBox(height: 8),
-              Container(
-                width: double.infinity,
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 16,
-                  vertical: 4,
-                ),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(8),
-                  border: Border.all(color: AppColors.grey300),
-                ),
-                child: DropdownButtonFormField<EGradeLevel>(
-                  value: _selectedGrade,
-                  decoration: const InputDecoration(
-                    border: InputBorder.none,
-                    contentPadding: EdgeInsets.zero,
+                decoration: InputDecoration(
+                  hintText: 'Nhập số buổi học',
+                  hintStyle: AppTextStyles.bodyMedium.copyWith(
+                    color: AppColors.grey500,
                   ),
-                  items:
-                      EGradeLevel.values.map((grade) {
-                        return DropdownMenuItem(
-                          value: grade,
-                          child: Text(
-                            grade.label,
-                            style: AppTextStyles.bodyMedium.copyWith(
-                              color: AppColors.textPrimary,
-                            ),
-                          ),
-                        );
-                      }).toList(),
-                  onChanged: (value) {
-                    if (value != null) {
-                      setState(() {
-                        _selectedGrade = value;
-                      });
-                    }
-                  },
-                ),
-              ),
-              const SizedBox(height: 24),
-
-              // Môn học
-              Text(
-                'Môn học',
-                style: AppTextStyles.titleMedium.copyWith(
-                  color: AppColors.textPrimary,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-              const SizedBox(height: 8),
-              Container(
-                width: double.infinity,
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 16,
-                  vertical: 4,
-                ),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(8),
-                  border: Border.all(color: AppColors.grey300),
-                ),
-                child: DropdownButtonFormField<ESubjectCode>(
-                  value: _selectedSubject,
-                  decoration: const InputDecoration(
-                    border: InputBorder.none,
-                    contentPadding: EdgeInsets.zero,
-                  ),
-                  items:
-                      ESubjectCode.values.map((subject) {
-                        return DropdownMenuItem(
-                          value: subject,
-                          child: Text(
-                            SubjectLabels.getLabel(subject),
-                            style: AppTextStyles.bodyMedium.copyWith(
-                              color: AppColors.textPrimary,
-                            ),
-                          ),
-                        );
-                      }).toList(),
-                  onChanged: (value) {
-                    if (value != null) {
-                      setState(() {
-                        _selectedSubject = value;
-                      });
-                    }
-                  },
-                ),
-              ),
-              const SizedBox(height: 24),
-
-              // Số buổi học dự kiến (chỉ hiển thị khi tạo mới)
-              if (!isEditMode) ...[
-                Text(
-                  'Số buổi học dự kiến',
-                  style: AppTextStyles.titleMedium.copyWith(
-                    color: AppColors.textPrimary,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-                const SizedBox(height: 8),
-                AppTextField(
-                  controller: _expectedSessionsController,
-                  label: '',
-                  hint: 'Nhập số buổi học',
-                  keyboardType: TextInputType.number,
-                  validator: (value) {
-                    if (value == null || value.trim().isEmpty) {
-                      return 'Vui lòng nhập số buổi học';
-                    }
-                    final number = int.tryParse(value);
-                    if (number == null || number <= 0) {
-                      return 'Số buổi học phải là số nguyên dương';
-                    }
-                    return null;
-                  },
-                ),
-                const SizedBox(height: 24),
-              ],
-
-              // Ngày bắt đầu
-              Text(
-                'Ngày bắt đầu',
-                style: AppTextStyles.titleMedium.copyWith(
-                  color: AppColors.textPrimary,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-              const SizedBox(height: 8),
-              InkWell(
-                onTap: () => _selectDate(context, true),
-                child: Container(
-                  width: double.infinity,
-                  padding: const EdgeInsets.all(16),
-                  decoration: BoxDecoration(
-                    color: Colors.white,
+                  filled: true,
+                  fillColor: Colors.white,
+                  border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(8),
-                    border: Border.all(color: AppColors.grey300),
+                    borderSide: const BorderSide(color: AppColors.grey300),
                   ),
-                  child: Row(
-                    children: [
-                      Icon(
-                        Icons.calendar_today,
-                        color: AppColors.textSecondary,
-                        size: 20,
-                      ),
-                      const SizedBox(width: 12),
-                      Text(
-                        DateFormat('dd/MM/yyyy').format(_startDate),
-                        style: AppTextStyles.bodyMedium.copyWith(
-                          color: AppColors.textPrimary,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-              const SizedBox(height: 24),
-
-              // Ngày kết thúc
-              Text(
-                'Ngày kết thúc',
-                style: AppTextStyles.titleMedium.copyWith(
-                  color: AppColors.textPrimary,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-              const SizedBox(height: 8),
-              InkWell(
-                onTap: () => _selectDate(context, false),
-                child: Container(
-                  width: double.infinity,
-                  padding: const EdgeInsets.all(16),
-                  decoration: BoxDecoration(
-                    color: Colors.white,
+                  enabledBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(8),
-                    border: Border.all(color: AppColors.grey300),
+                    borderSide: const BorderSide(color: AppColors.grey300),
                   ),
-                  child: Row(
-                    children: [
-                      Icon(
-                        Icons.calendar_today,
-                        color: AppColors.textSecondary,
-                        size: 20,
-                      ),
-                      const SizedBox(width: 12),
-                      Text(
-                        DateFormat('dd/MM/yyyy').format(_endDate),
-                        style: AppTextStyles.bodyMedium.copyWith(
-                          color: AppColors.textPrimary,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-              const SizedBox(height: 24),
-
-              // Thiết lập lịch học
-              Text(
-                'Lịch học',
-                style: AppTextStyles.titleMedium.copyWith(
-                  color: AppColors.textPrimary,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-              const SizedBox(height: 8),
-
-              // Nút thiết lập lịch học
-              InkWell(
-                onTap: _setupSchedule,
-                child: Container(
-                  width: double.infinity,
-                  padding: const EdgeInsets.all(16),
-                  decoration: BoxDecoration(
-                    color: Colors.white,
+                  focusedBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(8),
-                    border: Border.all(color: AppColors.grey300),
-                  ),
-                  child: Row(
-                    children: [
-                      Icon(
-                        Icons.schedule,
-                        color: AppColors.textSecondary,
-                        size: 20,
-                      ),
-                      const SizedBox(width: 12),
-                      Expanded(
-                        child: Text(
-                          _schedule.isEmpty
-                              ? 'Thiết lập lịch học'
-                              : '${_schedule.length} ngày đã thiết lập',
-                          style: AppTextStyles.bodyMedium.copyWith(
-                            color: AppColors.textPrimary,
-                          ),
-                        ),
-                      ),
-                      Icon(
-                        Icons.arrow_forward_ios,
-                        color: AppColors.textSecondary,
-                        size: 16,
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-
-              // Hiển thị thông tin lịch học đã thiết lập
-              if (_schedule.isNotEmpty) ...[
-                const SizedBox(height: 12),
-                Container(
-                  width: double.infinity,
-                  padding: const EdgeInsets.all(12),
-                  decoration: BoxDecoration(
-                    color: AppColors.primary.withOpacity(0.1),
-                    borderRadius: BorderRadius.circular(8),
-                    border: Border.all(
-                      color: AppColors.primary.withOpacity(0.3),
+                    borderSide: const BorderSide(
+                      color: AppColors.primary,
+                      width: 2,
                     ),
                   ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'Lịch học đã thiết lập:',
-                        style: AppTextStyles.bodyMedium.copyWith(
-                          color: AppColors.primary,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                      const SizedBox(height: 8),
-                      ..._schedule
-                          .map(
-                            (schedule) => Padding(
-                              padding: const EdgeInsets.only(bottom: 4),
-                              child: Text(
-                                '${schedule.dayOfWeekText}: ${schedule.startTime} - ${schedule.endTime}',
-                                style: AppTextStyles.bodyMedium.copyWith(
-                                  color: AppColors.textPrimary,
-                                ),
-                              ),
-                            ),
-                          )
-                          .toList(),
-                    ],
+                  errorBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(8),
+                    borderSide: const BorderSide(color: AppColors.error),
+                  ),
+                  focusedErrorBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(8),
+                    borderSide: const BorderSide(
+                      color: AppColors.error,
+                      width: 2,
+                    ),
+                  ),
+                  contentPadding: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 16,
                   ),
                 ),
-              ],
+                style: AppTextStyles.bodyMedium,
+              ),
+              const SizedBox(height: 24),
+            ],
 
-              const SizedBox(height: 32),
-
-              // Nút tạo/cập nhật lớp học
-              SizedBox(
+            // Ngày bắt đầu
+            Text(
+              'Ngày bắt đầu',
+              style: AppTextStyles.titleMedium.copyWith(
+                color: AppColors.textPrimary,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+            const SizedBox(height: 8),
+            InkWell(
+              onTap: () => _selectDate(context, true),
+              child: Container(
                 width: double.infinity,
-                child: AppButton(
-                  text: isEditMode ? 'Cập nhật lớp học' : 'Tạo lớp học',
-                  onPressed: isEditMode ? _updateClassroom : _createClassroom,
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(8),
+                  border: Border.all(color: AppColors.grey300),
+                ),
+                child: Row(
+                  children: <Widget>[
+                    const Icon(
+                      Icons.calendar_today,
+                      color: AppColors.textSecondary,
+                      size: 20,
+                    ),
+                    const SizedBox(width: 12),
+                    Text(
+                      DateFormat('dd/MM/yyyy').format(_startDate),
+                      style: AppTextStyles.bodyMedium.copyWith(
+                        color: AppColors.textPrimary,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            const SizedBox(height: 24),
+
+            // Ngày kết thúc
+            Text(
+              'Ngày kết thúc',
+              style: AppTextStyles.titleMedium.copyWith(
+                color: AppColors.textPrimary,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+            const SizedBox(height: 8),
+            InkWell(
+              onTap: () => _selectDate(context, false),
+              child: Container(
+                width: double.infinity,
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(8),
+                  border: Border.all(color: AppColors.grey300),
+                ),
+                child: Row(
+                  children: <Widget>[
+                    const Icon(
+                      Icons.calendar_today,
+                      color: AppColors.textSecondary,
+                      size: 20,
+                    ),
+                    const SizedBox(width: 12),
+                    Text(
+                      DateFormat('dd/MM/yyyy').format(_endDate),
+                      style: AppTextStyles.bodyMedium.copyWith(
+                        color: AppColors.textPrimary,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            const SizedBox(height: 24),
+
+            // Thiết lập lịch học
+            Text(
+              'Lịch học',
+              style: AppTextStyles.titleMedium.copyWith(
+                color: AppColors.textPrimary,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+            const SizedBox(height: 8),
+
+            // Nút thiết lập lịch học
+            InkWell(
+              onTap: _setupSchedule,
+              child: Container(
+                width: double.infinity,
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(8),
+                  border: Border.all(color: AppColors.grey300),
+                ),
+                child: Row(
+                  children: <Widget>[
+                    const Icon(
+                      Icons.schedule,
+                      color: AppColors.textSecondary,
+                      size: 20,
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: Text(
+                        _schedule.isEmpty
+                            ? 'Thiết lập lịch học'
+                            : '${_schedule.length} ngày đã thiết lập',
+                        style: AppTextStyles.bodyMedium.copyWith(
+                          color: AppColors.textPrimary,
+                        ),
+                      ),
+                    ),
+                    const Icon(
+                      Icons.arrow_forward_ios,
+                      color: AppColors.textSecondary,
+                      size: 16,
+                    ),
+                  ],
+                ),
+              ),
+            ),
+
+            // Hiển thị thông tin lịch học đã thiết lập
+            if (_schedule.isNotEmpty) ...[
+              const SizedBox(height: 12),
+              Container(
+                width: double.infinity,
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: AppColors.primary.withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(8),
+                  border: Border.all(color: AppColors.primary.withOpacity(0.3)),
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Lịch học đã thiết lập:',
+                      style: AppTextStyles.bodyMedium.copyWith(
+                        color: AppColors.primary,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    ..._schedule
+                        .map(
+                          (schedule) => Padding(
+                            padding: const EdgeInsets.only(bottom: 4),
+                            child: Text(
+                              '${schedule.dayOfWeekText}: ${schedule.startTime} - ${schedule.endTime}',
+                              style: AppTextStyles.bodyMedium.copyWith(
+                                color: AppColors.textPrimary,
+                              ),
+                            ),
+                          ),
+                        )
+                        .toList(),
+                  ],
                 ),
               ),
             ],
-          ),
+
+            const SizedBox(height: 32),
+
+            // Nút tạo/cập nhật lớp học
+            SizedBox(
+              width: double.infinity,
+              child: AppButton(
+                text: isEditMode ? 'Cập nhật lớp học' : 'Tạo lớp học',
+                onPressed: isEditMode ? _updateClassroom : _createClassroom,
+              ),
+            ),
+          ],
         ),
       ),
-    );
-  }
+    ),
+  );
 
   Future<void> _selectDate(BuildContext context, bool isStartDate) async {
     final DateTime? picked = await showDatePicker(
