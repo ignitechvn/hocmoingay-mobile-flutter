@@ -19,7 +19,28 @@ class MathRenderer extends StatelessWidget {
   Widget build(BuildContext context) {
     try {
       // Loại bỏ khoảng trắng thừa ở đầu, cuối và giữa các từ
-      final cleanLatex = latex.trim().replaceAll(RegExp(r'\s+'), ' ');
+      String cleanLatex = latex.trim().replaceAll(RegExp(r'\s+'), ' ');
+
+      // Xử lý cú pháp tập hợp với backslash
+      if (cleanLatex.contains('\\\\')) {
+        developer.log(
+          'Set notation detected: $cleanLatex',
+          name: 'MathRenderer',
+        );
+
+        // Thử các cách khác nhau để xử lý set notation
+        final originalLatex = cleanLatex;
+
+        // Cách 1: Thay thế \\ bằng \setminus
+        cleanLatex = cleanLatex.replaceAll('\\\\', '\\setminus');
+
+        // Cách 2: Nếu vẫn lỗi, thử với \backslash
+        if (cleanLatex == originalLatex) {
+          cleanLatex = cleanLatex.replaceAll('\\\\', '\\backslash');
+        }
+
+        developer.log('Converted to: $cleanLatex', name: 'MathRenderer');
+      }
 
       developer.log(
         'Rendering LaTeX: $latex -> $cleanLatex',
@@ -69,6 +90,7 @@ class RichMathContent extends StatelessWidget {
   final List<Map<String, dynamic>>? equations;
   final double? fontSize;
   final Color? color;
+  final FontWeight? fontWeight;
 
   const RichMathContent({
     super.key,
@@ -76,6 +98,7 @@ class RichMathContent extends StatelessWidget {
     this.equations,
     this.fontSize,
     this.color,
+    this.fontWeight,
   });
 
   @override
@@ -96,6 +119,7 @@ class RichMathContent extends StatelessWidget {
           style: TextStyle(
             fontSize: fontSize ?? 16,
             color: color ?? Colors.black,
+            fontWeight: fontWeight,
           ),
         );
       }
@@ -140,6 +164,7 @@ class RichMathContent extends StatelessWidget {
                 style: TextStyle(
                   fontSize: fontSize ?? 16,
                   color: color ?? Colors.black,
+                  fontWeight: fontWeight,
                 ),
               ),
             );
@@ -163,6 +188,7 @@ class RichMathContent extends StatelessWidget {
             style: TextStyle(
               fontSize: fontSize ?? 16,
               color: color ?? Colors.black,
+              fontWeight: fontWeight,
             ),
           ),
         );
@@ -187,6 +213,7 @@ class RichMathContent extends StatelessWidget {
         style: TextStyle(
           fontSize: fontSize ?? 16,
           color: color ?? Colors.black,
+          fontWeight: fontWeight,
         ),
       );
     }

@@ -69,16 +69,14 @@ class MultipleChoiceQuestionWidget extends StatelessWidget {
             margin: const EdgeInsets.only(bottom: AppDimensions.paddingS),
             padding: const EdgeInsets.all(AppDimensions.paddingM),
             decoration: BoxDecoration(
-              color:
-                  isCorrect
-                      ? AppColors.success.withOpacity(0.1)
-                      : Colors.grey.withOpacity(0.1),
+              color: isCorrect
+                  ? AppColors.success.withOpacity(0.1)
+                  : Colors.grey.withOpacity(0.1),
               borderRadius: BorderRadius.circular(8),
               border: Border.all(
-                color:
-                    isCorrect
-                        ? AppColors.success
-                        : Colors.grey.withOpacity(0.3),
+                color: isCorrect
+                    ? AppColors.success
+                    : Colors.grey.withOpacity(0.3),
                 width: 1,
               ),
             ),
@@ -91,39 +89,33 @@ class MultipleChoiceQuestionWidget extends StatelessWidget {
                     shape: BoxShape.circle,
                     color: isCorrect ? AppColors.success : Colors.transparent,
                     border: Border.all(
-                      color:
-                          isCorrect
-                              ? AppColors.success
-                              : Colors.grey.withOpacity(0.5),
+                      color: isCorrect
+                          ? AppColors.success
+                          : Colors.grey.withOpacity(0.5),
                       width: 2,
                     ),
                   ),
-                  child:
-                      isCorrect
-                          ? const Icon(
-                            Icons.check,
-                            color: Colors.white,
-                            size: 16,
-                          )
-                          : Center(
-                            child: Text(
-                              String.fromCharCode(65 + index), // A, B, C, D...
-                              style: AppTextStyles.bodySmall.copyWith(
-                                color: Colors.grey,
-                                fontWeight: FontWeight.w600,
-                              ),
+                  child: isCorrect
+                      ? const Icon(Icons.check, color: Colors.white, size: 16)
+                      : Center(
+                          child: Text(
+                            String.fromCharCode(65 + index), // A, B, C, D...
+                            style: AppTextStyles.bodySmall.copyWith(
+                              color: Colors.grey,
+                              fontWeight: FontWeight.w600,
                             ),
                           ),
+                        ),
                 ),
                 const SizedBox(width: AppDimensions.paddingM),
                 Expanded(
                   child: RichMathContent(
                     content: content,
-                    equations:
-                        (answer['equations'] as List<dynamic>?)
-                            ?.cast<Map<String, dynamic>>(),
+                    equations: (answer['equations'] as List<dynamic>?)
+                        ?.cast<Map<String, dynamic>>(),
                     fontSize: AppTextStyles.bodyMedium.fontSize,
                     color: AppColors.textPrimary,
+                    fontWeight: FontWeight.w500, // Thêm bold để đồng nhất
                   ),
                 ),
               ],
@@ -143,23 +135,23 @@ class MultipleChoiceQuestionWidget extends StatelessWidget {
   Widget _buildQuestionContent() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
-      children:
-          question.contentBlocks.map((block) {
-            if (block is Map<String, dynamic> && block['type'] == 'text') {
-              String content = block['content'] as String? ?? '';
-              final equations = block['equations'] as List<dynamic>?;
+      children: question.contentBlocks.map((block) {
+        if (block is Map<String, dynamic> && block['type'] == 'text') {
+          String content = block['content'] as String? ?? '';
+          final equations = block['equations'] as List<dynamic>?;
 
-              content = _processQuestionContent(content, equations);
+          content = _processQuestionContent(content, equations);
 
-              return RichMathContent(
-                content: content,
-                equations: equations?.cast<Map<String, dynamic>>(),
-                fontSize: AppTextStyles.bodyLarge.fontSize,
-                color: AppColors.textPrimary,
-              );
-            }
-            return const SizedBox.shrink();
-          }).toList(),
+          return RichMathContent(
+            content: content,
+            equations: equations?.cast<Map<String, dynamic>>(),
+            fontSize: AppTextStyles.bodyLarge.fontSize,
+            color: AppColors.textPrimary,
+            fontWeight: FontWeight.w500, // Thêm bold để đồng nhất
+          );
+        }
+        return const SizedBox.shrink();
+      }).toList(),
     );
   }
 }
@@ -181,10 +173,9 @@ class FillInBlankQuestionWidget extends StatelessWidget {
         // Correct answers - chỉ hiển thị khi có đáp án đúng
         Builder(
           builder: (context) {
-            final correctAnswers =
-                question.answers
-                    .where((answer) => (answer['isCorrect'] as bool? ?? false))
-                    .toList();
+            final correctAnswers = question.answers
+                .where((answer) => (answer['isCorrect'] as bool? ?? false))
+                .toList();
 
             if (correctAnswers.isEmpty) {
               return const SizedBox.shrink();
@@ -210,27 +201,26 @@ class FillInBlankQuestionWidget extends StatelessWidget {
                   const SizedBox(height: AppDimensions.paddingS),
                   Wrap(
                     spacing: AppDimensions.paddingS,
-                    children:
-                        correctAnswers.map((answer) {
-                          final content = answer['content'] as String? ?? '';
-                          return Container(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: AppDimensions.paddingM,
-                              vertical: AppDimensions.paddingS,
-                            ),
-                            decoration: BoxDecoration(
-                              color: AppColors.success,
-                              borderRadius: BorderRadius.circular(16),
-                            ),
-                            child: Text(
-                              content,
-                              style: AppTextStyles.bodySmall.copyWith(
-                                color: Colors.white,
-                                fontWeight: FontWeight.w600,
-                              ),
-                            ),
-                          );
-                        }).toList(),
+                    children: correctAnswers.map((answer) {
+                      final content = answer['content'] as String? ?? '';
+                      return Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: AppDimensions.paddingM,
+                          vertical: AppDimensions.paddingS,
+                        ),
+                        decoration: BoxDecoration(
+                          color: AppColors.success,
+                          borderRadius: BorderRadius.circular(16),
+                        ),
+                        child: Text(
+                          content,
+                          style: AppTextStyles.bodySmall.copyWith(
+                            color: Colors.white,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      );
+                    }).toList(),
                   ),
                 ],
               ),
@@ -250,24 +240,23 @@ class FillInBlankQuestionWidget extends StatelessWidget {
   Widget _buildQuestionContent() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
-      children:
-          question.contentBlocks.map((block) {
-            if (block is Map<String, dynamic> && block['type'] == 'text') {
-              String content = block['content'] as String? ?? '';
-              final equations = block['equations'] as List<dynamic>?;
+      children: question.contentBlocks.map((block) {
+        if (block is Map<String, dynamic> && block['type'] == 'text') {
+          String content = block['content'] as String? ?? '';
+          final equations = block['equations'] as List<dynamic>?;
 
-              content = _processQuestionContent(content, equations);
+          content = _processQuestionContent(content, equations);
 
-              return Text(
-                content,
-                style: AppTextStyles.bodyLarge.copyWith(
-                  color: AppColors.textPrimary,
-                  fontWeight: FontWeight.w500,
-                ),
-              );
-            }
-            return const SizedBox.shrink();
-          }).toList(),
+          return Text(
+            content,
+            style: AppTextStyles.bodyLarge.copyWith(
+              color: AppColors.textPrimary,
+              fontWeight: FontWeight.w500,
+            ),
+          );
+        }
+        return const SizedBox.shrink();
+      }).toList(),
     );
   }
 }
@@ -309,115 +298,108 @@ class ClozeTestQuestionWidget extends StatelessWidget {
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
-      children:
-          answersByPosition.entries.map((entry) {
-            final position = entry.key;
-            final answers = entry.value;
+      children: answersByPosition.entries.map((entry) {
+        final position = entry.key;
+        final answers = entry.value;
 
-            return Padding(
-              padding: const EdgeInsets.only(bottom: AppDimensions.paddingM),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'Chỗ trống ${position + 1}:',
-                    style: AppTextStyles.titleMedium.copyWith(
-                      color: AppColors.textPrimary,
-                      fontWeight: FontWeight.w600,
+        return Padding(
+          padding: const EdgeInsets.only(bottom: AppDimensions.paddingM),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'Chỗ trống ${position + 1}:',
+                style: AppTextStyles.titleMedium.copyWith(
+                  color: AppColors.textPrimary,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+              const SizedBox(height: AppDimensions.paddingS),
+              ...answers.expand((answer) {
+                final options = _getAnswerOptions(answer);
+                return options.asMap().entries.map((entry) {
+                  final optionIndex = entry.key;
+                  final option = entry.value;
+                  final isCorrect = _isCorrectAnswer(answer, optionIndex);
+
+                  return Padding(
+                    padding: const EdgeInsets.only(
+                      bottom: AppDimensions.paddingS,
                     ),
-                  ),
-                  const SizedBox(height: AppDimensions.paddingS),
-                  ...answers.expand((answer) {
-                    final options = _getAnswerOptions(answer);
-                    return options.asMap().entries.map((entry) {
-                      final optionIndex = entry.key;
-                      final option = entry.value;
-                      final isCorrect = _isCorrectAnswer(answer, optionIndex);
-
-                      return Padding(
-                        padding: const EdgeInsets.only(
-                          bottom: AppDimensions.paddingS,
+                    child: Container(
+                      padding: const EdgeInsets.all(AppDimensions.paddingM),
+                      decoration: BoxDecoration(
+                        color: isCorrect
+                            ? AppColors.success.withOpacity(0.1)
+                            : Colors.grey.withOpacity(0.1),
+                        borderRadius: BorderRadius.circular(8),
+                        border: Border.all(
+                          color: isCorrect
+                              ? AppColors.success
+                              : Colors.grey.withOpacity(0.3),
+                          width: 1,
                         ),
-                        child: Container(
-                          padding: const EdgeInsets.all(AppDimensions.paddingM),
-                          decoration: BoxDecoration(
-                            color:
-                                isCorrect
-                                    ? AppColors.success.withOpacity(0.1)
-                                    : Colors.grey.withOpacity(0.1),
-                            borderRadius: BorderRadius.circular(8),
-                            border: Border.all(
-                              color:
-                                  isCorrect
-                                      ? AppColors.success
-                                      : Colors.grey.withOpacity(0.3),
-                              width: 1,
+                      ),
+                      child: Row(
+                        children: [
+                          Container(
+                            width: 24,
+                            height: 24,
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              color: isCorrect
+                                  ? AppColors.success
+                                  : Colors.transparent,
+                              border: Border.all(
+                                color: isCorrect
+                                    ? AppColors.success
+                                    : Colors.grey.withOpacity(0.5),
+                                width: 2,
+                              ),
+                            ),
+                            child: isCorrect
+                                ? const Icon(
+                                    Icons.check,
+                                    color: Colors.white,
+                                    size: 16,
+                                  )
+                                : Center(
+                                    child: Text(
+                                      String.fromCharCode(
+                                        65 + optionIndex,
+                                      ), // A, B, C, D...
+                                      style: AppTextStyles.bodySmall.copyWith(
+                                        color: Colors.grey,
+                                        fontWeight: FontWeight.w600,
+                                      ),
+                                    ),
+                                  ),
+                          ),
+                          const SizedBox(width: AppDimensions.paddingM),
+                          Expanded(
+                            child: Text(
+                              option,
+                              style: AppTextStyles.bodyMedium.copyWith(
+                                color: AppColors.textPrimary,
+                              ),
                             ),
                           ),
-                          child: Row(
-                            children: [
-                              Container(
-                                width: 24,
-                                height: 24,
-                                decoration: BoxDecoration(
-                                  shape: BoxShape.circle,
-                                  color:
-                                      isCorrect
-                                          ? AppColors.success
-                                          : Colors.transparent,
-                                  border: Border.all(
-                                    color:
-                                        isCorrect
-                                            ? AppColors.success
-                                            : Colors.grey.withOpacity(0.5),
-                                    width: 2,
-                                  ),
-                                ),
-                                child:
-                                    isCorrect
-                                        ? const Icon(
-                                          Icons.check,
-                                          color: Colors.white,
-                                          size: 16,
-                                        )
-                                        : Center(
-                                          child: Text(
-                                            String.fromCharCode(
-                                              65 + optionIndex,
-                                            ), // A, B, C, D...
-                                            style: AppTextStyles.bodySmall
-                                                .copyWith(
-                                                  color: Colors.grey,
-                                                  fontWeight: FontWeight.w600,
-                                                ),
-                                          ),
-                                        ),
-                              ),
-                              const SizedBox(width: AppDimensions.paddingM),
-                              Expanded(
-                                child: Text(
-                                  option,
-                                  style: AppTextStyles.bodyMedium.copyWith(
-                                    color: AppColors.textPrimary,
-                                  ),
-                                ),
-                              ),
-                              if (isCorrect)
-                                Icon(
-                                  Icons.check_circle,
-                                  color: AppColors.success,
-                                  size: 16,
-                                ),
-                            ],
-                          ),
-                        ),
-                      );
-                    });
-                  }).toList(),
-                ],
-              ),
-            );
-          }).toList(),
+                          if (isCorrect)
+                            Icon(
+                              Icons.check_circle,
+                              color: AppColors.success,
+                              size: 16,
+                            ),
+                        ],
+                      ),
+                    ),
+                  );
+                });
+              }).toList(),
+            ],
+          ),
+        );
+      }).toList(),
     );
   }
 
@@ -441,24 +423,23 @@ class ClozeTestQuestionWidget extends StatelessWidget {
   Widget _buildQuestionContent() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
-      children:
-          question.contentBlocks.map((block) {
-            if (block is Map<String, dynamic> && block['type'] == 'text') {
-              String content = block['content'] as String? ?? '';
-              final equations = block['equations'] as List<dynamic>?;
+      children: question.contentBlocks.map((block) {
+        if (block is Map<String, dynamic> && block['type'] == 'text') {
+          String content = block['content'] as String? ?? '';
+          final equations = block['equations'] as List<dynamic>?;
 
-              content = _processQuestionContent(content, equations);
+          content = _processQuestionContent(content, equations);
 
-              return Text(
-                content,
-                style: AppTextStyles.bodyLarge.copyWith(
-                  color: AppColors.textPrimary,
-                  fontWeight: FontWeight.w500,
-                ),
-              );
-            }
-            return const SizedBox.shrink();
-          }).toList(),
+          return Text(
+            content,
+            style: AppTextStyles.bodyLarge.copyWith(
+              color: AppColors.textPrimary,
+              fontWeight: FontWeight.w500,
+            ),
+          );
+        }
+        return const SizedBox.shrink();
+      }).toList(),
     );
   }
 }
@@ -480,10 +461,9 @@ class SentenceRewritingQuestionWidget extends StatelessWidget {
         // Correct answers - chỉ hiển thị khi có đáp án đúng
         Builder(
           builder: (context) {
-            final correctAnswers =
-                question.answers
-                    .where((answer) => (answer['isCorrect'] as bool? ?? false))
-                    .toList();
+            final correctAnswers = question.answers
+                .where((answer) => (answer['isCorrect'] as bool? ?? false))
+                .toList();
 
             if (correctAnswers.isEmpty) {
               return const SizedBox.shrink();
@@ -545,24 +525,23 @@ class SentenceRewritingQuestionWidget extends StatelessWidget {
   Widget _buildQuestionContent() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
-      children:
-          question.contentBlocks.map((block) {
-            if (block is Map<String, dynamic> && block['type'] == 'text') {
-              String content = block['content'] as String? ?? '';
-              final equations = block['equations'] as List<dynamic>?;
+      children: question.contentBlocks.map((block) {
+        if (block is Map<String, dynamic> && block['type'] == 'text') {
+          String content = block['content'] as String? ?? '';
+          final equations = block['equations'] as List<dynamic>?;
 
-              content = _processQuestionContent(content, equations);
+          content = _processQuestionContent(content, equations);
 
-              return Text(
-                content,
-                style: AppTextStyles.bodyLarge.copyWith(
-                  color: AppColors.textPrimary,
-                  fontWeight: FontWeight.w500,
-                ),
-              );
-            }
-            return const SizedBox.shrink();
-          }).toList(),
+          return Text(
+            content,
+            style: AppTextStyles.bodyLarge.copyWith(
+              color: AppColors.textPrimary,
+              fontWeight: FontWeight.w500,
+            ),
+          );
+        }
+        return const SizedBox.shrink();
+      }).toList(),
     );
   }
 }
