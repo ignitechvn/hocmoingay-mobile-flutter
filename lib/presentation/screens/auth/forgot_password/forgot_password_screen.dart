@@ -79,10 +79,9 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen>
 
       if (mounted) {
         // Navigate to OTP verification screen with phone
-        Navigator.pushNamed(
-          context,
-          '/verify-otp',
-          arguments: {'phone': _phoneController.text.trim()},
+        context.push(
+          AppRoutes.verifyOtp,
+          extra: {'phone': _phoneController.text.trim()},
         );
       }
     } catch (e) {

@@ -126,7 +126,7 @@ class _OnboardingScreenState extends State<OnboardingScreen>
                       PrimaryButton(
                         text: 'Bắt đầu',
                         size: AppButtonSize.large,
-                        onPressed: () => Navigator.pushNamed(context, '/role-selection'),
+                        onPressed: () => context.push(AppRoutes.roleSelection),
                       ),
                     ],
                   ),

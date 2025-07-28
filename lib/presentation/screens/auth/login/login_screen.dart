@@ -102,11 +102,11 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
   }
 
   void _handleForgotPassword() {
-    Navigator.pushNamed(context, '/forgot-password');
+    context.push(AppRoutes.forgotPassword);
   }
 
   void _handleRegister() {
-    Navigator.pushNamed(context, '/register');
+    context.push(AppRoutes.register);
   }
 
   @override
@@ -121,7 +121,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
         );
 
         // Navigate to home and clear all previous routes
-        Navigator.pushNamedAndRemoveUntil(context, '/', (route) => false);
+        context.go(AppRoutes.root);
       } else if (next.hasError && mounted) {
         // Show error message using enhanced error handler
         ApiErrorHandler.handleError(context, next.error);

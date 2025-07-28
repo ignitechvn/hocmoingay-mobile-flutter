@@ -81,10 +81,12 @@ class _VerifyOtpScreenState extends ConsumerState<VerifyOtpScreen>
 
       if (mounted) {
         // Navigate to reset password screen
-        await Navigator.pushNamed(
-          context,
-          '/reset-password',
-          arguments: <String, String>{'phone': widget.phone, 'otp': _otpController.text.trim()},
+        await context.push(
+          AppRoutes.resetPassword,
+          extra: <String, String>{
+            'phone': widget.phone,
+            'otp': _otpController.text.trim(),
+          },
         );
       }
     } catch (e) {

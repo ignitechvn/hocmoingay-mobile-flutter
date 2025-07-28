@@ -247,16 +247,71 @@ class QuestionResponseDto extends BaseQuestionResponseDto {
   });
 
   factory QuestionResponseDto.fromJson(Map<String, dynamic> json) {
-    final base = BaseQuestionResponseDto.fromJson(json);
+    // Parse contentBlocks with error handling
+    List<ContentBlockResponseDto> contentBlocksList;
+    try {
+      contentBlocksList =
+          (json['contentBlocks'] as List)
+              .map(
+                (block) => TextContentBlockResponseDto.fromJson(
+                  block as Map<String, dynamic>,
+                ),
+              )
+              .toList();
+    } catch (e) {
+      print('Error parsing contentBlocks: $e');
+      contentBlocksList = [];
+    }
+
+    // Parse answers with error handling
+    List<AnswerResponseDto> answersList;
+    try {
+      answersList =
+          (json['answers'] as List)
+              .map(
+                (answer) =>
+                    AnswerResponseDto.fromJson(answer as Map<String, dynamic>),
+              )
+              .toList();
+    } catch (e) {
+      print('Error parsing answers: $e');
+      answersList = [];
+    }
+
+    // Parse explanation with error handling
+    List<ContentBlockResponseDto>? explanationBlocks;
+    if (json['explanation'] != null) {
+      try {
+        if (json['explanation'] is List) {
+          explanationBlocks =
+              (json['explanation'] as List)
+                  .map(
+                    (block) => TextContentBlockResponseDto.fromJson(
+                      block as Map<String, dynamic>,
+                    ),
+                  )
+                  .toList();
+        } else {
+          print('Explanation is not a list, skipping');
+          explanationBlocks = null;
+        }
+      } catch (e) {
+        print('Error parsing explanation: $e');
+        explanationBlocks = null;
+      }
+    }
+
     return QuestionResponseDto(
-      id: base.id,
-      questionNumber: base.questionNumber,
-      questionType: base.questionType,
-      difficulty: base.difficulty,
-      contentBlocks: base.contentBlocks,
-      answers: base.answers,
-      point: base.point,
-      explanation: base.explanation,
+      id: json['id']?.toString() ?? '',
+      questionNumber: json['questionNumber'] as int? ?? 0,
+      questionType: EQuestionType.fromString(
+        json['questionType']?.toString() ?? '',
+      ),
+      difficulty: EDifficulty.fromString(json['difficulty']?.toString() ?? ''),
+      contentBlocks: contentBlocksList,
+      answers: answersList,
+      explanation: explanationBlocks ?? [],
+      point: json['point'] as int? ?? 0,
       bankQuestionId: json['bankQuestionId'] as String?,
       chapterId: json['chapterId'] as String?,
       practiceSetId: json['practiceSetId'] as String?,

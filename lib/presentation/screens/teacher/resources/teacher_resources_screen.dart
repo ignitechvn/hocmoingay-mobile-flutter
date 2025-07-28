@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_dimensions.dart';
 import '../../../../core/theme/app_text_styles.dart';
 import '../../../../core/widgets/empty_state_widget.dart';
+import '../../../../core/routers/app_router.dart';
 import '../../../../data/dto/subject_dto.dart';
 import '../../../../providers/subjects/subjects_providers.dart';
 import 'create_subject_screen.dart';
@@ -108,15 +110,7 @@ class _TeacherResourcesScreenState
       color: Colors.white,
       child: InkWell(
         onTap: () {
-          // TODO: Navigate to subject details or resources
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(
-                'Chức năng xem tài liệu cho ${subject.name} sẽ sớm có mặt!',
-              ),
-              backgroundColor: AppColors.primary,
-            ),
-          );
+          context.push(AppRoutes.subjectDetails, extra: {'subject': subject});
         },
         borderRadius: BorderRadius.circular(12),
         child: Padding(
@@ -124,84 +118,13 @@ class _TeacherResourcesScreenState
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Title and Status
-              Row(
-                children: [
-                  Expanded(
-                    child: Text(
-                      subject.name,
-                      style: AppTextStyles.titleMedium.copyWith(
-                        color: AppColors.textPrimary,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ),
-                  Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 8,
-                      vertical: 4,
-                    ),
-                    decoration: BoxDecoration(
-                      color:
-                          subject.isActive
-                              ? AppColors.success.withOpacity(0.1)
-                              : AppColors.error.withOpacity(0.1),
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: Text(
-                      subject.isActive ? 'Hoạt động' : 'Không hoạt động',
-                      style: AppTextStyles.bodySmall.copyWith(
-                        color:
-                            subject.isActive
-                                ? AppColors.success
-                                : AppColors.error,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 8),
-
-              // Subject Code and Grade
-              Row(
-                children: [
-                  Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 8,
-                      vertical: 4,
-                    ),
-                    decoration: BoxDecoration(
-                      color: AppColors.primary.withOpacity(0.1),
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    child: Text(
-                      subject.code,
-                      style: AppTextStyles.bodySmall.copyWith(
-                        color: AppColors.primary,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                  ),
-                  const SizedBox(width: 8),
-                  Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 8,
-                      vertical: 4,
-                    ),
-                    decoration: BoxDecoration(
-                      color: AppColors.info.withOpacity(0.1),
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    child: Text(
-                      _getGradeLabel(subject.grade),
-                      style: AppTextStyles.bodySmall.copyWith(
-                        color: AppColors.info,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                  ),
-                ],
+              // Title
+              Text(
+                subject.name,
+                style: AppTextStyles.titleMedium.copyWith(
+                  color: AppColors.textPrimary,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
 
               // Description
@@ -217,73 +140,10 @@ class _TeacherResourcesScreenState
                   overflow: TextOverflow.ellipsis,
                 ),
               ],
-
-              // Created Date
-              const SizedBox(height: 8),
-              Row(
-                children: [
-                  const Icon(
-                    Icons.calendar_today,
-                    size: 16,
-                    color: AppColors.textSecondary,
-                  ),
-                  const SizedBox(width: 8),
-                  Text(
-                    'Tạo ngày: ${_formatDate(subject.createdDate)}',
-                    style: AppTextStyles.bodySmall.copyWith(
-                      color: AppColors.textSecondary,
-                    ),
-                  ),
-                ],
-              ),
-
-              // Arrow
-              const SizedBox(height: 8),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: [
-                  Text(
-                    'Xem tài liệu',
-                    style: AppTextStyles.bodySmall.copyWith(
-                      color: AppColors.primary,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                  const SizedBox(width: 4),
-                  const Icon(
-                    Icons.arrow_forward_ios,
-                    color: AppColors.primary,
-                    size: 12,
-                  ),
-                ],
-              ),
             ],
           ),
         ),
       ),
     );
-  }
-
-  String _getGradeLabel(String grade) {
-    switch (grade.toUpperCase()) {
-      case 'GRADE_10':
-        return 'Lớp 10';
-      case 'GRADE_11':
-        return 'Lớp 11';
-      case 'GRADE_12':
-        return 'Lớp 12';
-      default:
-        return grade;
-    }
-  }
-
-  String _formatDate(String dateString) {
-    if (dateString.isEmpty) return 'Chưa có';
-    try {
-      final date = DateTime.parse(dateString);
-      return '${date.day.toString().padLeft(2, '0')}/${date.month.toString().padLeft(2, '0')}/${date.year}';
-    } catch (e) {
-      return dateString;
-    }
   }
 }

@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../../../core/constants/app_constants.dart';
 import '../../../../core/constants/grade_constants.dart';
+import '../../../../core/routers/app_router.dart';
 import '../../../../core/error/api_error_handler.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_dimensions.dart';
@@ -121,7 +122,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen>
           );
           // Save user data if needed
           // await secureStorage.write(key: AppConstants.userKey, value: response.user.toJson());
-          await Navigator.pushNamed(context, '/congratulations');
+          await context.push(AppRoutes.congratulations);
         }
       } else if (_selectedRole == Role.teacher) {
         // Register Teacher
@@ -142,7 +143,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen>
           );
           // Save user data if needed
           // await secureStorage.write(key: AppConstants.userKey, value: response.user.toJson());
-          await Navigator.pushNamed(context, '/congratulations');
+          await context.push(AppRoutes.congratulations);
         }
       }
     } catch (e) {
@@ -291,13 +292,18 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen>
                                 contentPadding: EdgeInsets.zero,
                               ),
                               items:
-                                  Gender.values.map((Gender gender) => DropdownMenuItem<Gender>(
+                                  Gender.values
+                                      .map(
+                                        (Gender gender) =>
+                                            DropdownMenuItem<Gender>(
                                       value: gender,
                                       child: Text(
                                         gender.label,
                                         style: AppTextStyles.bodyMedium,
                                       ),
-                                    )).toList(),
+                                            ),
+                                      )
+                                      .toList(),
                               onChanged: (Gender? value) {
                                 if (value != null) {
                                   setState(() {
@@ -344,13 +350,17 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen>
                                 contentPadding: EdgeInsets.zero,
                               ),
                               items:
-                                  <Role>[Role.student, Role.teacher].map((Role role) => DropdownMenuItem<Role>(
+                                  <Role>[Role.student, Role.teacher]
+                                      .map(
+                                        (Role role) => DropdownMenuItem<Role>(
                                       value: role,
                                       child: Text(
                                         role.displayName,
                                         style: AppTextStyles.bodyMedium,
                                       ),
-                                    )).toList(),
+                                        ),
+                                      )
+                                      .toList(),
                               onChanged: (Role? value) {
                                 if (value != null) {
                                   setState(() {
@@ -403,13 +413,19 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen>
                                   color: AppColors.textSecondary,
                                 ),
                                 items:
-                                    EGradeLevel.values.map((EGradeLevel grade) => DropdownMenuItem<EGradeLevel>(
+                                    EGradeLevel.values
+                                        .map(
+                                          (EGradeLevel grade) =>
+                                              DropdownMenuItem<EGradeLevel>(
                                         value: grade,
                                         child: Text(
                                           grade.label,
-                                          style: AppTextStyles.bodyMedium,
+                                                  style:
+                                                      AppTextStyles.bodyMedium,
+                                                ),
                                         ),
-                                      )).toList(),
+                                        )
+                                        .toList(),
                                 onChanged: (EGradeLevel? value) {
                                   setState(() {
                                     _selectedGrade = value;

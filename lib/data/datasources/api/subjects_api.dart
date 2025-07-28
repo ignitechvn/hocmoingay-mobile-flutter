@@ -3,6 +3,10 @@ import 'package:dio/dio.dart';
 import '../../../core/error/api_error_handler.dart';
 import '../../../core/error/api_exception.dart';
 import '../../dto/subject_dto.dart';
+import '../../dto/bank_topic_dto.dart';
+import '../../dto/topic_template_dto.dart';
+import '../../dto/create_bank_topics_from_templates_dto.dart';
+import '../../dto/bank_question_dto.dart';
 import 'base_api_service.dart';
 
 class SubjectsApi {
@@ -47,6 +51,117 @@ class SubjectsApi {
     } catch (e) {
       print('❌ SubjectsApi: General exception: $e');
       throw Exception('Failed to create subject: $e');
+    }
+  }
+
+  /// Get topics by subject code and grade
+  Future<List<BankTopicWithCountDto>> getTopicsBySubjectCodeAndGrade(
+    String subjectCode,
+    String grade,
+  ) async {
+    try {
+      print(
+        '🔍 SubjectsApi: Calling GET /subjects/get-topics-by-code-and-grade with subjectCode: $subjectCode, grade: $grade',
+      );
+      final response = await _apiService.get(
+        '/subjects/get-topics-by-code-and-grade',
+        queryParams: {'subjectCode': subjectCode, 'grade': grade},
+      );
+      print('✅ SubjectsApi: Get topics success response: ${response.data}');
+
+      final List<dynamic> data = response.data as List<dynamic>;
+      return data.map((json) => BankTopicWithCountDto.fromJson(json)).toList();
+    } on DioException catch (e) {
+      print('❌ SubjectsApi: DioException: ${e.message}');
+      print('❌ SubjectsApi: Status code: ${e.response?.statusCode}');
+      print('❌ SubjectsApi: Response data: ${e.response?.data}');
+      throw _handleDioError(e);
+    } catch (e) {
+      print('❌ SubjectsApi: General exception: $e');
+      throw Exception('Failed to get topics: $e');
+    }
+  }
+
+  /// Get available topic templates for a subject
+  Future<List<TopicTemplateResponseDto>> getAvailableTopicTemplates(
+    String subjectId,
+  ) async {
+    try {
+      print(
+        '🔍 SubjectsApi: Calling GET /subjects/$subjectId/available-topic-templates',
+      );
+      final response = await _apiService.get(
+        '/subjects/$subjectId/available-topic-templates',
+      );
+      print(
+        '✅ SubjectsApi: Get available topic templates success response: ${response.data}',
+      );
+
+      final List<dynamic> data = response.data as List<dynamic>;
+      return data
+          .map((json) => TopicTemplateResponseDto.fromJson(json))
+          .toList();
+    } on DioException catch (e) {
+      print('❌ SubjectsApi: DioException: ${e.message}');
+      print('❌ SubjectsApi: Status code: ${e.response?.statusCode}');
+      print('❌ SubjectsApi: Response data: ${e.response?.data}');
+      throw _handleDioError(e);
+    } catch (e) {
+      print('❌ SubjectsApi: General exception: $e');
+      throw Exception('Failed to get available topic templates: $e');
+    }
+  }
+
+  /// Create bank topics from templates
+  Future<List<BankTopicResponseDto>> createBankTopicsFromTemplates(
+    CreateBankTopicsFromTemplatesDto dto,
+  ) async {
+    try {
+      print(
+        '🔍 SubjectsApi: Calling POST /bank-topics/create-from-templates with data: ${dto.toJson()}',
+      );
+      final response = await _apiService.post(
+        '/bank-topics/create-from-templates',
+        data: dto.toJson(),
+      );
+      print(
+        '✅ SubjectsApi: Create bank topics from templates success response: ${response.data}',
+      );
+
+      final List<dynamic> data = response.data as List<dynamic>;
+      return data.map((json) => BankTopicResponseDto.fromJson(json)).toList();
+    } on DioException catch (e) {
+      print('❌ SubjectsApi: DioException: ${e.message}');
+      print('❌ SubjectsApi: Status code: ${e.response?.statusCode}');
+      print('❌ SubjectsApi: Response data: ${e.response?.data}');
+      throw _handleDioError(e);
+    } catch (e) {
+      print('❌ SubjectsApi: General exception: $e');
+      throw Exception('Failed to create bank topics from templates: $e');
+    }
+  }
+
+  /// Get questions by bank topic ID
+  Future<List<BankQuestionResponseDto>> getQuestionsByBankTopicId(
+    String bankTopicId,
+  ) async {
+    try {
+      print(
+        '🔍 SubjectsApi: Calling GET /bank-topics/$bankTopicId/questions',
+      );
+      final response = await _apiService.get('/bank-topics/$bankTopicId/questions');
+      print('✅ SubjectsApi: Get questions by bank topic ID success response: ${response.data}');
+
+      final List<dynamic> data = response.data as List<dynamic>;
+      return data.map((json) => BankQuestionResponseDto.fromJson(json)).toList();
+    } on DioException catch (e) {
+      print('❌ SubjectsApi: DioException: ${e.message}');
+      print('❌ SubjectsApi: Status code: ${e.response?.statusCode}');
+      print('❌ SubjectsApi: Response data: ${e.response?.data}');
+      throw _handleDioError(e);
+    } catch (e) {
+      print('❌ SubjectsApi: General exception: $e');
+      throw Exception('Failed to get questions by bank topic ID: $e');
     }
   }
 

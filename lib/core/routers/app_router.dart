@@ -14,6 +14,12 @@ import '../../../presentation/screens/student/classroom/classroom_details_screen
 import '../../presentation/screens/student/chapter/student_chapters_screen.dart';
 import '../../presentation/screens/student/chapter/student_chapter_details_screen.dart';
 import '../../../presentation/screens/teacher/teacher_dashboard_screen.dart';
+import '../../../presentation/screens/teacher/resources/subject_details_screen.dart';
+import '../../../presentation/screens/teacher/resources/topic_templates_screen.dart';
+import '../../../presentation/screens/teacher/resources/topic_details_screen.dart';
+import '../../../presentation/widgets/auth_wrapper.dart';
+import '../../../data/dto/subject_dto.dart';
+import '../../../data/dto/bank_topic_dto.dart';
 import '../../../core/constants/app_constants.dart';
 
 class AppRoutes {
@@ -31,9 +37,17 @@ class AppRoutes {
   static const chapters = '/chapters';
   static const chapterDetails = '/chapter-details';
   static const teacherDashboard = '/teacher-dashboard';
+  static const subjectDetails = '/subject-details';
+  static const topicTemplates = '/topic-templates';
+  static const topicDetails = '/topic-details';
+  static const root = '/';
 
   static final routerConfig = GoRouter(
     routes: [
+      GoRoute(
+        path: AppRoutes.root,
+        builder: (context, state) => const AuthWrapper(),
+      ),
       GoRoute(
         path: AppRoutes.onboarding,
         builder: (context, state) => const OnboardingScreen(),
@@ -133,7 +147,44 @@ class AppRoutes {
         path: AppRoutes.teacherDashboard,
         builder: (context, state) => const TeacherDashboardScreen(),
       ),
+      GoRoute(
+        path: AppRoutes.subjectDetails,
+        builder: (context, state) {
+          final extra = state.extra as Map<String, dynamic>?;
+          final subject = extra?['subject'] as SubjectResponseDto?;
+          if (subject != null) {
+            return SubjectDetailsScreen(subject: subject);
+          }
+          return const TeacherDashboardScreen();
+        },
+      ),
+      GoRoute(
+        path: AppRoutes.topicTemplates,
+        builder: (context, state) {
+          final extra = state.extra as Map<String, dynamic>?;
+          final subject = extra?['subject'] as SubjectResponseDto?;
+          if (subject != null) {
+            return TopicTemplatesScreen(subject: subject);
+          }
+          return const TeacherDashboardScreen();
+        },
+      ),
+      GoRoute(
+        path: AppRoutes.topicDetails,
+        builder: (context, state) {
+          final extra = state.extra as Map<String, dynamic>?;
+          final topic = extra?['topic'] as BankTopicWithCountDto?;
+          if (topic != null) {
+            return TopicDetailsScreen(topic: topic);
+          }
+          return const TeacherDashboardScreen();
+        },
+      ),
     ],
-    initialLocation: AppRoutes.onboarding,
+    initialLocation: AppRoutes.root,
+    redirect: (context, state) {
+      // Redirect to onboarding if not authenticated
+      return null;
+    },
   );
 }
