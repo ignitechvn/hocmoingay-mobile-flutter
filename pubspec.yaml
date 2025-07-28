@@ -94,6 +94,9 @@ dependencies:
   # QR Code
   qr_flutter: ^4.1.0
   mobile_scanner: ^3.5.6
+  
+  # Math Rendering
+  flutter_math_fork: ^0.7.1
 
 dev_dependencies:
   flutter_test:

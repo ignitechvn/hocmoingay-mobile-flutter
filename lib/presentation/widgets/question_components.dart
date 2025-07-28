@@ -4,71 +4,42 @@ import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_dimensions.dart';
 import '../../core/theme/app_text_styles.dart';
 import 'question_display_data.dart';
+import 'math_renderer.dart';
 
 /// Helper function để xử lý nội dung câu hỏi
 String _processQuestionContent(String content, List<dynamic>? equations) {
   // Replace [BLANK] with "......"
   content = content.replaceAll('[BLANK]', '......');
 
-  // Replace placeholders with equations if available
-  if (equations != null) {
-    for (final equation in equations) {
-      if (equation is Map<String, dynamic>) {
-        final placeholder = equation['placeholder'] as String? ?? '';
-        final latex = equation['latex'] as String? ?? '';
-        content = content.replaceAll('{{$placeholder}}', latex);
-      }
-    }
-  }
-
   return content;
 }
 
 Widget _buildExplanationWidget(List<dynamic> explanation) {
-  return Container(
-    padding: const EdgeInsets.all(AppDimensions.paddingM),
-    decoration: BoxDecoration(
-      color: AppColors.primary.withOpacity(0.1),
-      borderRadius: BorderRadius.circular(8),
-    ),
-    child: Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          'Giải thích:',
-          style: AppTextStyles.bodyMedium.copyWith(
-            color: AppColors.primary,
-            fontWeight: FontWeight.w600,
-          ),
+  return Column(
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: [
+      Text(
+        'Giải thích:',
+        style: AppTextStyles.bodyMedium.copyWith(
+          color: AppColors.primary,
+          fontWeight: FontWeight.w600,
         ),
-        const SizedBox(height: AppDimensions.paddingS),
-        ...explanation.map((block) {
-          if (block is Map<String, dynamic> && block['type'] == 'text') {
-            String content = block['content'] as String? ?? '';
-
-            // Replace placeholders with equations if available
-            final equations = block['equations'] as List<dynamic>?;
-            if (equations != null) {
-              for (final equation in equations) {
-                if (equation is Map<String, dynamic>) {
-                  final placeholder = equation['placeholder'] as String? ?? '';
-                  final latex = equation['latex'] as String? ?? '';
-                  content = content.replaceAll('{{$placeholder}}', latex);
-                }
-              }
-            }
-
-            return Text(
-              content,
-              style: AppTextStyles.bodyMedium.copyWith(
-                color: AppColors.textPrimary,
-              ),
-            );
-          }
-          return const SizedBox.shrink();
-        }).toList(),
-      ],
-    ),
+      ),
+      const SizedBox(height: AppDimensions.paddingS),
+      ...explanation.map((block) {
+        if (block is Map<String, dynamic> && block['type'] == 'text') {
+          String content = block['content'] as String? ?? '';
+          final equations = block['equations'] as List<dynamic>?;
+          return RichMathContent(
+            content: content,
+            equations: equations?.cast<Map<String, dynamic>>(),
+            fontSize: AppTextStyles.bodyMedium.fontSize,
+            color: AppColors.textPrimary,
+          );
+        }
+        return const SizedBox.shrink();
+      }).toList(),
+    ],
   );
 }
 
@@ -146,11 +117,13 @@ class MultipleChoiceQuestionWidget extends StatelessWidget {
                 ),
                 const SizedBox(width: AppDimensions.paddingM),
                 Expanded(
-                  child: Text(
-                    content,
-                    style: AppTextStyles.bodyMedium.copyWith(
-                      color: AppColors.textPrimary,
-                    ),
+                  child: RichMathContent(
+                    content: content,
+                    equations:
+                        (answer['equations'] as List<dynamic>?)
+                            ?.cast<Map<String, dynamic>>(),
+                    fontSize: AppTextStyles.bodyMedium.fontSize,
+                    color: AppColors.textPrimary,
                   ),
                 ),
               ],
@@ -178,12 +151,11 @@ class MultipleChoiceQuestionWidget extends StatelessWidget {
 
               content = _processQuestionContent(content, equations);
 
-              return Text(
-                content,
-                style: AppTextStyles.bodyLarge.copyWith(
-                  color: AppColors.textPrimary,
-                  fontWeight: FontWeight.w500,
-                ),
+              return RichMathContent(
+                content: content,
+                equations: equations?.cast<Map<String, dynamic>>(),
+                fontSize: AppTextStyles.bodyLarge.fontSize,
+                color: AppColors.textPrimary,
               );
             }
             return const SizedBox.shrink();
