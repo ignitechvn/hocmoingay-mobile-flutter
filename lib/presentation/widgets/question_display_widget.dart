@@ -71,49 +71,29 @@ class QuestionDisplayWidget extends StatelessWidget {
                       size: 20,
                     ),
                     onSelected: (value) => _handleAction(value),
-                    itemBuilder:
-                        (context) => [
-                          if (onEdit != null)
-                            PopupMenuItem<String>(
-                              value: 'edit',
-                              child: Row(
-                                children: [
-                                  Icon(
-                                    Icons.edit,
-                                    color: AppColors.primary,
-                                    size: 18,
-                                  ),
-                                  const SizedBox(width: 8),
-                                  Text(
-                                    'Chỉnh sửa',
-                                    style: AppTextStyles.bodyMedium.copyWith(
-                                      color: AppColors.textPrimary,
-                                    ),
-                                  ),
-                                ],
-                              ),
+                    itemBuilder: (context) => [
+                      if (onEdit != null)
+                        PopupMenuItem<String>(
+                          value: 'edit',
+                          child: Text(
+                            'Chỉnh sửa',
+                            style: AppTextStyles.bodyMedium.copyWith(
+                              color: AppColors.textPrimary,
                             ),
-                          if (onDelete != null)
-                            PopupMenuItem<String>(
-                              value: 'delete',
-                              child: Row(
-                                children: [
-                                  Icon(
-                                    Icons.delete,
-                                    color: AppColors.error,
-                                    size: 18,
-                                  ),
-                                  const SizedBox(width: 8),
-                                  Text(
-                                    'Xóa',
-                                    style: AppTextStyles.bodyMedium.copyWith(
-                                      color: AppColors.textPrimary,
-                                    ),
-                                  ),
-                                ],
-                              ),
+                          ),
+                        ),
+                      if (onDelete != null)
+                        PopupMenuItem<String>(
+                          value: 'delete',
+                          child: Text(
+                            'Xóa',
+                            style: AppTextStyles.bodyMedium.copyWith(
+                              color: AppColors.error,
+                              fontWeight: FontWeight.w600,
                             ),
-                        ],
+                          ),
+                        ),
+                    ],
                   ),
               ],
             ),

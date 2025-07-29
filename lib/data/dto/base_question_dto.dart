@@ -45,17 +45,22 @@ class ContentBlock {
   final String type;
   final String content;
   final List<Equation>? equations;
+  final String? url; // Thêm trường url cho image
 
-  ContentBlock({required this.type, required this.content, this.equations});
+  ContentBlock({
+    required this.type,
+    required this.content,
+    this.equations,
+    this.url,
+  });
 
   factory ContentBlock.fromJson(Map<String, dynamic> json) {
     List<Equation>? equationsList;
     if (json['equations'] != null) {
       try {
-        equationsList =
-            (json['equations'] as List)
-                .map((eq) => Equation.fromJson(eq as Map<String, dynamic>))
-                .toList();
+        equationsList = (json['equations'] as List)
+            .map((eq) => Equation.fromJson(eq as Map<String, dynamic>))
+            .toList();
       } catch (e) {
         print('Error parsing equations: $e');
         equationsList = null;
@@ -66,6 +71,7 @@ class ContentBlock {
       type: json['type']?.toString() ?? '',
       content: json['content']?.toString() ?? '',
       equations: equationsList,
+      url: json['url']?.toString(), // Parse url field
     );
   }
 
@@ -74,6 +80,7 @@ class ContentBlock {
       'type': type,
       'content': content,
       'equations': equations?.map((eq) => eq.toJson()).toList(),
+      'url': url, // Include url in JSON
     };
   }
 }
@@ -117,10 +124,9 @@ class Answer {
     List<Equation>? equationsList;
     if (json['equations'] != null) {
       try {
-        equationsList =
-            (json['equations'] as List)
-                .map((eq) => Equation.fromJson(eq as Map<String, dynamic>))
-                .toList();
+        equationsList = (json['equations'] as List)
+            .map((eq) => Equation.fromJson(eq as Map<String, dynamic>))
+            .toList();
       } catch (e) {
         print('Error parsing answer equations: $e');
         equationsList = null;

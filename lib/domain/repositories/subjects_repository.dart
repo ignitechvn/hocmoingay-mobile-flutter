@@ -23,4 +23,6 @@ abstract class SubjectsRepository {
   Future<List<BankQuestionResponseDto>> getQuestionsByBankTopicId(
     String bankTopicId,
   );
+
+  Future<void> deleteBankQuestion(String questionId);
 }

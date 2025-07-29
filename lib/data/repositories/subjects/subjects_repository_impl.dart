@@ -52,4 +52,9 @@ class SubjectsRepositoryImpl implements SubjectsRepository {
   ) async {
     return await _subjectsApi.getQuestionsByBankTopicId(bankTopicId);
   }
+
+  @override
+  Future<void> deleteBankQuestion(String questionId) async {
+    return await _subjectsApi.deleteBankQuestion(questionId);
+  }
 }

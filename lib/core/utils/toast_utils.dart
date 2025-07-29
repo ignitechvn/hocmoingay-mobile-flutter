@@ -3,7 +3,7 @@ import '../theme/app_colors.dart';
 import '../theme/app_dimensions.dart';
 import '../theme/app_text_styles.dart';
 
-enum ToastType { success, fail, warning }
+enum ToastType { success, fail, warning, info }
 
 class ToastUtils {
   static OverlayEntry? _overlayEntry;
@@ -21,9 +21,8 @@ class ToastUtils {
 
     // Tạo OverlayEntry mới
     _overlayEntry = OverlayEntry(
-      builder:
-          (context) =>
-              _ToastWidget(message: message, type: type, onDismiss: _hideToast),
+      builder: (context) =>
+          _ToastWidget(message: message, type: type, onDismiss: _hideToast),
     );
 
     // Hiển thị Toast
@@ -74,6 +73,20 @@ class ToastUtils {
       context: context,
       message: message,
       type: ToastType.warning,
+      duration: duration,
+    );
+  }
+
+  /// Hiển thị Toast thông tin
+  static void showInfo({
+    required BuildContext context,
+    required String message,
+    Duration duration = const Duration(seconds: 3),
+  }) {
+    showToast(
+      context: context,
+      message: message,
+      type: ToastType.info,
       duration: duration,
     );
   }
@@ -147,6 +160,8 @@ class _ToastWidgetState extends State<_ToastWidget>
         return AppColors.error;
       case ToastType.warning:
         return AppColors.warning;
+      case ToastType.info:
+        return AppColors.info;
     }
   }
 
@@ -157,6 +172,8 @@ class _ToastWidgetState extends State<_ToastWidget>
       case ToastType.fail:
         return Colors.white;
       case ToastType.warning:
+        return Colors.white;
+      case ToastType.info:
         return Colors.white;
     }
   }
@@ -169,6 +186,8 @@ class _ToastWidgetState extends State<_ToastWidget>
         return Icons.error_outline;
       case ToastType.warning:
         return Icons.warning_amber_outlined;
+      case ToastType.info:
+        return Icons.info_outline;
     }
   }
 
@@ -180,6 +199,8 @@ class _ToastWidgetState extends State<_ToastWidget>
         return 'Thất bại';
       case ToastType.warning:
         return 'Cảnh báo';
+      case ToastType.info:
+        return 'Thông tin';
     }
   }
 

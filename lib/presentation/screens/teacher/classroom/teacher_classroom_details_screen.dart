@@ -399,6 +399,7 @@ class _TeacherClassroomDetailsScreenState
                   backgroundColor: color.withOpacity(0.1),
                   foregroundColor: color,
                   elevation: 0,
+                  shadowColor: Colors.transparent,
                   padding: const EdgeInsets.symmetric(vertical: 8),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(8),

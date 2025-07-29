@@ -146,14 +146,18 @@ class SubjectsApi {
     String bankTopicId,
   ) async {
     try {
-      print(
-        '🔍 SubjectsApi: Calling GET /bank-topics/$bankTopicId/questions',
+      print('🔍 SubjectsApi: Calling GET /bank-topics/$bankTopicId/questions');
+      final response = await _apiService.get(
+        '/bank-topics/$bankTopicId/questions',
       );
-      final response = await _apiService.get('/bank-topics/$bankTopicId/questions');
-      print('✅ SubjectsApi: Get questions by bank topic ID success response: ${response.data}');
+      print(
+        '✅ SubjectsApi: Get questions by bank topic ID success response: ${response.data}',
+      );
 
       final List<dynamic> data = response.data as List<dynamic>;
-      return data.map((json) => BankQuestionResponseDto.fromJson(json)).toList();
+      return data
+          .map((json) => BankQuestionResponseDto.fromJson(json))
+          .toList();
     } on DioException catch (e) {
       print('❌ SubjectsApi: DioException: ${e.message}');
       print('❌ SubjectsApi: Status code: ${e.response?.statusCode}');
@@ -162,6 +166,23 @@ class SubjectsApi {
     } catch (e) {
       print('❌ SubjectsApi: General exception: $e');
       throw Exception('Failed to get questions by bank topic ID: $e');
+    }
+  }
+
+  /// Delete bank question by ID
+  Future<void> deleteBankQuestion(String questionId) async {
+    try {
+      print('🔍 SubjectsApi: Calling DELETE /bank-questions/$questionId');
+      await _apiService.delete('/bank-questions/$questionId');
+      print('✅ SubjectsApi: Delete bank question success');
+    } on DioException catch (e) {
+      print('❌ SubjectsApi: DioException: ${e.message}');
+      print('❌ SubjectsApi: Status code: ${e.response?.statusCode}');
+      print('❌ SubjectsApi: Response data: ${e.response?.data}');
+      throw _handleDioError(e);
+    } catch (e) {
+      print('❌ SubjectsApi: General exception: $e');
+      throw Exception('Failed to delete bank question: $e');
     }
   }
 

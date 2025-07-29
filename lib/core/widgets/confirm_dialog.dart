@@ -92,6 +92,37 @@ class ConfirmDialog extends StatelessWidget {
 }
 
 // Rich content widgets for specific confirmations
+class DeleteQuestionContent extends StatelessWidget {
+  const DeleteQuestionContent({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        // Main question
+        Text(
+          'Bạn có chắc chắn muốn xóa câu hỏi này không?',
+          style: AppTextStyles.bodyMedium.copyWith(
+            color: AppColors.textPrimary,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        const SizedBox(height: 8),
+        
+        // Warning message
+        Text(
+          'Hành động này sẽ xóa vĩnh viễn câu hỏi khỏi ngân hàng câu hỏi. Thao tác không thể hoàn tác.',
+          style: AppTextStyles.bodyMedium.copyWith(
+            color: AppColors.textSecondary,
+          ),
+        ),
+      ],
+    );
+  }
+}
+
 class DeleteClassroomContent extends StatelessWidget {
   final String className;
 

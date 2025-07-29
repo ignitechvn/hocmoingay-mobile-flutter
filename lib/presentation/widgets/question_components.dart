@@ -14,6 +14,61 @@ String _processQuestionContent(String content, List<dynamic>? equations) {
   return content;
 }
 
+/// Helper function để xử lý hiển thị image
+Widget _buildImageWidget(Map<String, dynamic> block) {
+  // Sử dụng content field cho URL nếu không có url field
+  final imageUrl = block['url'] as String? ?? block['content'] as String? ?? '';
+  if (imageUrl.isNotEmpty) {
+    return Container(
+      margin: const EdgeInsets.symmetric(vertical: AppDimensions.paddingM),
+      child: Center(
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(8),
+          child: Image.network(
+            imageUrl,
+            fit: BoxFit.contain,
+            loadingBuilder: (context, child, loadingProgress) {
+              if (loadingProgress == null) return child;
+              return Container(
+                height: 200,
+                decoration: BoxDecoration(
+                  color: Colors.grey.withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Center(
+                  child: CircularProgressIndicator(
+                    value: loadingProgress.expectedTotalBytes != null
+                        ? loadingProgress.cumulativeBytesLoaded /
+                              loadingProgress.expectedTotalBytes!
+                        : null,
+                  ),
+                ),
+              );
+            },
+            errorBuilder: (context, error, stackTrace) {
+              return Container(
+                height: 200,
+                decoration: BoxDecoration(
+                  color: Colors.grey.withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: const Center(
+                  child: Icon(
+                    Icons.error_outline,
+                    color: Colors.grey,
+                    size: 48,
+                  ),
+                ),
+              );
+            },
+          ),
+        ),
+      ),
+    );
+  }
+  return const SizedBox.shrink();
+}
+
 Widget _buildExplanationWidget(List<dynamic> explanation) {
   return Column(
     crossAxisAlignment: CrossAxisAlignment.start,
@@ -153,55 +208,7 @@ class MultipleChoiceQuestionWidget extends StatelessWidget {
               fontWeight: FontWeight.w500, // Thêm bold để đồng nhất
             );
           } else if (type == 'image') {
-            final imageUrl = block['url'] as String? ?? '';
-            if (imageUrl.isNotEmpty) {
-              return Container(
-                margin: const EdgeInsets.symmetric(
-                  vertical: AppDimensions.paddingM,
-                ),
-                child: ClipRRect(
-                  borderRadius: BorderRadius.circular(8),
-                  child: Image.network(
-                    imageUrl,
-                    fit: BoxFit.contain,
-                    loadingBuilder: (context, child, loadingProgress) {
-                      if (loadingProgress == null) return child;
-                      return Container(
-                        height: 200,
-                        decoration: BoxDecoration(
-                          color: Colors.grey.withOpacity(0.1),
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                        child: Center(
-                          child: CircularProgressIndicator(
-                            value: loadingProgress.expectedTotalBytes != null
-                                ? loadingProgress.cumulativeBytesLoaded /
-                                      loadingProgress.expectedTotalBytes!
-                                : null,
-                          ),
-                        ),
-                      );
-                    },
-                    errorBuilder: (context, error, stackTrace) {
-                      return Container(
-                        height: 200,
-                        decoration: BoxDecoration(
-                          color: Colors.grey.withOpacity(0.1),
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                        child: const Center(
-                          child: Icon(
-                            Icons.error_outline,
-                            color: Colors.grey,
-                            size: 48,
-                          ),
-                        ),
-                      );
-                    },
-                  ),
-                ),
-              );
-            }
+            return _buildImageWidget(block);
           }
         }
         return const SizedBox.shrink();
@@ -312,55 +319,7 @@ class FillInBlankQuestionWidget extends StatelessWidget {
               ),
             );
           } else if (type == 'image') {
-            final imageUrl = block['url'] as String? ?? '';
-            if (imageUrl.isNotEmpty) {
-              return Container(
-                margin: const EdgeInsets.symmetric(
-                  vertical: AppDimensions.paddingM,
-                ),
-                child: ClipRRect(
-                  borderRadius: BorderRadius.circular(8),
-                  child: Image.network(
-                    imageUrl,
-                    fit: BoxFit.contain,
-                    loadingBuilder: (context, child, loadingProgress) {
-                      if (loadingProgress == null) return child;
-                      return Container(
-                        height: 200,
-                        decoration: BoxDecoration(
-                          color: Colors.grey.withOpacity(0.1),
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                        child: Center(
-                          child: CircularProgressIndicator(
-                            value: loadingProgress.expectedTotalBytes != null
-                                ? loadingProgress.cumulativeBytesLoaded /
-                                      loadingProgress.expectedTotalBytes!
-                                : null,
-                          ),
-                        ),
-                      );
-                    },
-                    errorBuilder: (context, error, stackTrace) {
-                      return Container(
-                        height: 200,
-                        decoration: BoxDecoration(
-                          color: Colors.grey.withOpacity(0.1),
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                        child: const Center(
-                          child: Icon(
-                            Icons.error_outline,
-                            color: Colors.grey,
-                            size: 48,
-                          ),
-                        ),
-                      );
-                    },
-                  ),
-                ),
-              );
-            }
+            return _buildImageWidget(block);
           }
         }
         return const SizedBox.shrink();
@@ -549,55 +508,7 @@ class ClozeTestQuestionWidget extends StatelessWidget {
               ),
             );
           } else if (type == 'image') {
-            final imageUrl = block['url'] as String? ?? '';
-            if (imageUrl.isNotEmpty) {
-              return Container(
-                margin: const EdgeInsets.symmetric(
-                  vertical: AppDimensions.paddingM,
-                ),
-                child: ClipRRect(
-                  borderRadius: BorderRadius.circular(8),
-                  child: Image.network(
-                    imageUrl,
-                    fit: BoxFit.contain,
-                    loadingBuilder: (context, child, loadingProgress) {
-                      if (loadingProgress == null) return child;
-                      return Container(
-                        height: 200,
-                        decoration: BoxDecoration(
-                          color: Colors.grey.withOpacity(0.1),
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                        child: Center(
-                          child: CircularProgressIndicator(
-                            value: loadingProgress.expectedTotalBytes != null
-                                ? loadingProgress.cumulativeBytesLoaded /
-                                      loadingProgress.expectedTotalBytes!
-                                : null,
-                          ),
-                        ),
-                      );
-                    },
-                    errorBuilder: (context, error, stackTrace) {
-                      return Container(
-                        height: 200,
-                        decoration: BoxDecoration(
-                          color: Colors.grey.withOpacity(0.1),
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                        child: const Center(
-                          child: Icon(
-                            Icons.error_outline,
-                            color: Colors.grey,
-                            size: 48,
-                          ),
-                        ),
-                      );
-                    },
-                  ),
-                ),
-              );
-            }
+            return _buildImageWidget(block);
           }
         }
         return const SizedBox.shrink();
@@ -705,55 +616,7 @@ class SentenceRewritingQuestionWidget extends StatelessWidget {
               ),
             );
           } else if (type == 'image') {
-            final imageUrl = block['url'] as String? ?? '';
-            if (imageUrl.isNotEmpty) {
-              return Container(
-                margin: const EdgeInsets.symmetric(
-                  vertical: AppDimensions.paddingM,
-                ),
-                child: ClipRRect(
-                  borderRadius: BorderRadius.circular(8),
-                  child: Image.network(
-                    imageUrl,
-                    fit: BoxFit.contain,
-                    loadingBuilder: (context, child, loadingProgress) {
-                      if (loadingProgress == null) return child;
-                      return Container(
-                        height: 200,
-                        decoration: BoxDecoration(
-                          color: Colors.grey.withOpacity(0.1),
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                        child: Center(
-                          child: CircularProgressIndicator(
-                            value: loadingProgress.expectedTotalBytes != null
-                                ? loadingProgress.cumulativeBytesLoaded /
-                                      loadingProgress.expectedTotalBytes!
-                                : null,
-                          ),
-                        ),
-                      );
-                    },
-                    errorBuilder: (context, error, stackTrace) {
-                      return Container(
-                        height: 200,
-                        decoration: BoxDecoration(
-                          color: Colors.grey.withOpacity(0.1),
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                        child: const Center(
-                          child: Icon(
-                            Icons.error_outline,
-                            color: Colors.grey,
-                            size: 48,
-                          ),
-                        ),
-                      );
-                    },
-                  ),
-                ),
-              );
-            }
+            return _buildImageWidget(block);
           }
         }
         return const SizedBox.shrink();

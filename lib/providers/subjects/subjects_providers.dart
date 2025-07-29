@@ -11,6 +11,7 @@ import '../../domain/usecases/subjects/get_topics_by_subject_code_and_grade_usec
 import '../../domain/usecases/subjects/get_available_topic_templates_usecase.dart';
 import '../../domain/usecases/subjects/create_bank_topics_from_templates_usecase.dart';
 import '../../domain/usecases/subjects/get_questions_by_bank_topic_id_usecase.dart';
+import '../../domain/usecases/subjects/delete_bank_question_usecase.dart';
 import '../../data/dto/topic_template_dto.dart';
 import '../../data/dto/create_bank_topics_from_templates_dto.dart';
 import '../../data/dto/bank_question_dto.dart';
@@ -43,25 +44,31 @@ final getTopicsBySubjectCodeAndGradeUseCaseProvider =
     Provider<GetTopicsBySubjectCodeAndGradeUseCase>((ref) {
       final repository = ref.watch(subjectsRepositoryProvider);
       return GetTopicsBySubjectCodeAndGradeUseCase(repository);
-});
+    });
 
 final getAvailableTopicTemplatesUseCaseProvider =
     Provider<GetAvailableTopicTemplatesUseCase>((ref) {
       final repository = ref.watch(subjectsRepositoryProvider);
       return GetAvailableTopicTemplatesUseCase(repository);
-});
+    });
 
 final createBankTopicsFromTemplatesUseCaseProvider =
     Provider<CreateBankTopicsFromTemplatesUseCase>((ref) {
       final repository = ref.watch(subjectsRepositoryProvider);
       return CreateBankTopicsFromTemplatesUseCase(repository);
-});
+    });
 
 final getQuestionsByBankTopicIdUseCaseProvider =
     Provider<GetQuestionsByBankTopicIdUseCase>((ref) {
       final repository = ref.watch(subjectsRepositoryProvider);
       return GetQuestionsByBankTopicIdUseCase(repository);
-});
+    });
+
+final deleteBankQuestionUseCaseProvider =
+    Provider<DeleteBankQuestionUseCase>((ref) {
+      final repository = ref.watch(subjectsRepositoryProvider);
+      return DeleteBankQuestionUseCase(repository);
+    });
 
 // Data Provider
 final subjectsProvider = FutureProvider<List<SubjectResponseDto>>((ref) async {
@@ -79,20 +86,30 @@ final topicsBySubjectProvider =
     });
 
 // Provider ổn định hơn để tránh rebuild liên tục
-final stableTopicsBySubjectProvider = Provider.family<AsyncValue<List<BankTopicWithCountDto>>, Map<String, String>>((ref, params) {
-  return ref.watch(topicsBySubjectProvider(params));
-});
+final stableTopicsBySubjectProvider =
+    Provider.family<
+      AsyncValue<List<BankTopicWithCountDto>>,
+      Map<String, String>
+    >((ref, params) {
+      return ref.watch(topicsBySubjectProvider(params));
+    });
 
 // Topic Templates Provider
 final topicTemplatesProvider =
-    FutureProvider.family<List<TopicTemplateResponseDto>, String>((ref, subjectId) async {
+    FutureProvider.family<List<TopicTemplateResponseDto>, String>((
+      ref,
+      subjectId,
+    ) async {
       final useCase = ref.read(getAvailableTopicTemplatesUseCaseProvider);
       return await useCase(subjectId);
     });
 
 // Bank Topic Questions Provider
 final bankTopicQuestionsProvider =
-    FutureProvider.family<List<BankQuestionResponseDto>, String>((ref, bankTopicId) async {
+    FutureProvider.family<List<BankQuestionResponseDto>, String>((
+      ref,
+      bankTopicId,
+    ) async {
       final useCase = ref.read(getQuestionsByBankTopicIdUseCaseProvider);
       return await useCase(bankTopicId);
     });
