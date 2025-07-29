@@ -12,9 +12,11 @@ import '../../domain/usecases/subjects/get_available_topic_templates_usecase.dar
 import '../../domain/usecases/subjects/create_bank_topics_from_templates_usecase.dart';
 import '../../domain/usecases/subjects/get_questions_by_bank_topic_id_usecase.dart';
 import '../../domain/usecases/subjects/delete_bank_question_usecase.dart';
+import '../../domain/usecases/subjects/get_theory_page_sidebar_items_usecase.dart';
 import '../../data/dto/topic_template_dto.dart';
 import '../../data/dto/create_bank_topics_from_templates_dto.dart';
 import '../../data/dto/bank_question_dto.dart';
+import '../../data/dto/bank_theory_page_dto.dart';
 import '../api/api_providers.dart';
 
 // API Provider
@@ -64,10 +66,17 @@ final getQuestionsByBankTopicIdUseCaseProvider =
       return GetQuestionsByBankTopicIdUseCase(repository);
     });
 
-final deleteBankQuestionUseCaseProvider =
-    Provider<DeleteBankQuestionUseCase>((ref) {
+final deleteBankQuestionUseCaseProvider = Provider<DeleteBankQuestionUseCase>((
+  ref,
+) {
+  final repository = ref.watch(subjectsRepositoryProvider);
+  return DeleteBankQuestionUseCase(repository);
+});
+
+final getTheoryPageSidebarItemsUseCaseProvider =
+    Provider<GetTheoryPageSidebarItemsUseCase>((ref) {
       final repository = ref.watch(subjectsRepositoryProvider);
-      return DeleteBankQuestionUseCase(repository);
+      return GetTheoryPageSidebarItemsUseCase(repository);
     });
 
 // Data Provider
@@ -111,5 +120,15 @@ final bankTopicQuestionsProvider =
       bankTopicId,
     ) async {
       final useCase = ref.read(getQuestionsByBankTopicIdUseCaseProvider);
+      return await useCase(bankTopicId);
+    });
+
+// Bank Topic Theory Pages Provider
+final bankTopicTheoryPagesProvider =
+    FutureProvider.family<BankTheoryPageSidebarResponseDto, String>((
+      ref,
+      bankTopicId,
+    ) async {
+      final useCase = ref.read(getTheoryPageSidebarItemsUseCaseProvider);
       return await useCase(bankTopicId);
     });

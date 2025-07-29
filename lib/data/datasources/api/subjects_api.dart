@@ -7,6 +7,7 @@ import '../../dto/bank_topic_dto.dart';
 import '../../dto/topic_template_dto.dart';
 import '../../dto/create_bank_topics_from_templates_dto.dart';
 import '../../dto/bank_question_dto.dart';
+import '../../dto/bank_theory_page_dto.dart';
 import 'base_api_service.dart';
 
 class SubjectsApi {
@@ -183,6 +184,33 @@ class SubjectsApi {
     } catch (e) {
       print('❌ SubjectsApi: General exception: $e');
       throw Exception('Failed to delete bank question: $e');
+    }
+  }
+
+  /// Get theory page sidebar items for bank topic
+  Future<BankTheoryPageSidebarResponseDto> getTheoryPageSidebarItems(
+    String bankTopicId,
+  ) async {
+    try {
+      print(
+        '🔍 SubjectsApi: Calling GET /bank-topics/$bankTopicId/theory-pages/sidebar',
+      );
+      final response = await _apiService.get(
+        '/bank-topics/$bankTopicId/theory-pages/sidebar',
+      );
+      print(
+        '✅ SubjectsApi: Get theory page sidebar items success response: ${response.data}',
+      );
+
+      return BankTheoryPageSidebarResponseDto.fromJson(response.data);
+    } on DioException catch (e) {
+      print('❌ SubjectsApi: DioException: ${e.message}');
+      print('❌ SubjectsApi: Status code: ${e.response?.statusCode}');
+      print('❌ SubjectsApi: Response data: ${e.response?.data}');
+      throw _handleDioError(e);
+    } catch (e) {
+      print('❌ SubjectsApi: General exception: $e');
+      throw Exception('Failed to get theory page sidebar items: $e');
     }
   }
 

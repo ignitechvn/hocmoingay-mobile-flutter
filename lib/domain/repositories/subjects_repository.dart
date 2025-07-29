@@ -3,6 +3,7 @@ import '../../data/dto/bank_topic_dto.dart';
 import '../../data/dto/topic_template_dto.dart';
 import '../../data/dto/create_bank_topics_from_templates_dto.dart';
 import '../../data/dto/bank_question_dto.dart';
+import '../../data/dto/bank_theory_page_dto.dart';
 
 abstract class SubjectsRepository {
   Future<List<SubjectResponseDto>> getAllSubjects();
@@ -25,4 +26,8 @@ abstract class SubjectsRepository {
   );
 
   Future<void> deleteBankQuestion(String questionId);
+
+  Future<BankTheoryPageSidebarResponseDto> getTheoryPageSidebarItems(
+    String bankTopicId,
+  );
 }

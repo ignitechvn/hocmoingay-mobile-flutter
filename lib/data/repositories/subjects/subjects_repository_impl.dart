@@ -4,6 +4,7 @@ import '../../dto/bank_topic_dto.dart';
 import '../../dto/topic_template_dto.dart';
 import '../../dto/create_bank_topics_from_templates_dto.dart';
 import '../../dto/bank_question_dto.dart';
+import '../../dto/bank_theory_page_dto.dart';
 import '../../../domain/repositories/subjects_repository.dart';
 
 class SubjectsRepositoryImpl implements SubjectsRepository {
@@ -56,5 +57,12 @@ class SubjectsRepositoryImpl implements SubjectsRepository {
   @override
   Future<void> deleteBankQuestion(String questionId) async {
     return await _subjectsApi.deleteBankQuestion(questionId);
+  }
+
+  @override
+  Future<BankTheoryPageSidebarResponseDto> getTheoryPageSidebarItems(
+    String bankTopicId,
+  ) async {
+    return await _subjectsApi.getTheoryPageSidebarItems(bankTopicId);
   }
 }
