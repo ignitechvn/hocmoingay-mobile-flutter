@@ -12,6 +12,7 @@ import '../../../../core/utils/toast_utils.dart';
 import '../../../../core/error/api_error_handler.dart';
 import '../../../../core/widgets/app_button.dart';
 import '../../../../core/widgets/app_text_field.dart';
+import '../../../../core/services/login_memory_service.dart';
 import '../../../../providers/auth/auth_state_provider.dart';
 
 class LoginScreen extends ConsumerStatefulWidget {
@@ -49,18 +50,41 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
       CurvedAnimation(parent: _animationController, curve: Curves.easeInOut),
     );
 
-    _slideAnimation = Tween<Offset>(
-      begin: const Offset(0, 0.3),
-      end: Offset.zero,
-    ).animate(
-      CurvedAnimation(parent: _animationController, curve: Curves.easeOutCubic),
-    );
+    _slideAnimation =
+        Tween<Offset>(begin: const Offset(0, 0.3), end: Offset.zero).animate(
+          CurvedAnimation(
+            parent: _animationController,
+            curve: Curves.easeOutCubic,
+          ),
+        );
 
     _animationController.forward();
 
     // Set selected role from constructor if provided
     if (widget.selectedRole != null) {
       _selectedRole = widget.selectedRole!;
+    }
+
+    // Load saved login information
+    _loadSavedLoginInfo();
+  }
+
+  Future<void> _loadSavedLoginInfo() async {
+    try {
+      final savedLogin = await LoginMemoryService.getLastLogin();
+      if (savedLogin != null) {
+        setState(() {
+          _phoneController.text = savedLogin['phone'] ?? '';
+          _passwordController.text = savedLogin['password'] ?? '';
+          _selectedRole = Role.values.firstWhere(
+            (role) => role.value == savedLogin['role'],
+            orElse: () => Role.student,
+          );
+          _rememberMe = true;
+        });
+      }
+    } catch (e) {
+      print('Error loading saved login info: $e');
     }
   }
 
@@ -87,6 +111,19 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
             _passwordController.text,
             _selectedRole,
           );
+
+      // Save login information if remember me is enabled
+      if (_rememberMe) {
+        await LoginMemoryService.saveLastLogin(
+          phone: _phoneController.text.trim(),
+          password: _passwordController.text,
+          role: _selectedRole.value,
+          rememberMe: true,
+        );
+      } else {
+        // Clear saved login info if remember me is disabled
+        await LoginMemoryService.clearLastLogin();
+      }
     } catch (e) {
       if (mounted) {
         // Use enhanced error handler
@@ -218,25 +255,20 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
                                     border: InputBorder.none,
                                     contentPadding: EdgeInsets.zero,
                                   ),
-                                  items:
-                                      Role.values
-                                          .map(
-                                            (role) => DropdownMenuItem<Role>(
-                                              value: role,
-                                              child: Text(
-                                                role.displayName,
-                                                style: AppTextStyles.bodyMedium,
-                                              ),
-                                            ),
-                                          )
-                                          .toList(),
-                                  onChanged:
-                                      (Role? value) =>
-                                          value != null
-                                              ? setState(
-                                                () => _selectedRole = value,
-                                              )
-                                              : null,
+                                  items: Role.values
+                                      .map(
+                                        (role) => DropdownMenuItem<Role>(
+                                          value: role,
+                                          child: Text(
+                                            role.displayName,
+                                            style: AppTextStyles.bodyMedium,
+                                          ),
+                                        ),
+                                      )
+                                      .toList(),
+                                  onChanged: (Role? value) => value != null
+                                      ? setState(() => _selectedRole = value)
+                                      : null,
                                 ),
                               ),
                             ],
@@ -257,6 +289,10 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
                                         setState(() {
                                           _rememberMe = value ?? false;
                                         });
+                                        // Save remember me preference
+                                        LoginMemoryService.setRememberMe(
+                                          _rememberMe,
+                                        );
                                       },
                                       activeColor: AppColors.primary,
                                     ),
@@ -299,7 +335,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
                               Text(
-                                'Chưa có tài khoản? ',
+                                'Chưa có tài khoản?',
                                 style: AppTextStyles.bodyMedium.copyWith(
                                   color: AppColors.textSecondary,
                                 ),
@@ -313,6 +349,47 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
                                     fontWeight: FontWeight.w600,
                                   ),
                                 ),
+                              ),
+                            ],
+                          ),
+
+                          const SizedBox(
+                            height: AppDimensions.largePadding * 2,
+                          ),
+
+                          // Copyright Footer
+                          Column(
+                            children: [
+                              Text(
+                                'Phiên bản 1.0.0',
+                                style: AppTextStyles.bodySmall.copyWith(
+                                  color: AppColors.textSecondary,
+                                ),
+                              ),
+                              const SizedBox(height: 4),
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Text(
+                                    '© 2024 ',
+                                    style: AppTextStyles.bodySmall.copyWith(
+                                      color: AppColors.textSecondary,
+                                    ),
+                                  ),
+                                  Text(
+                                    'Ignitech',
+                                    style: AppTextStyles.bodySmall.copyWith(
+                                      color: AppColors.primary,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                  Text(
+                                    '. Phát triển bởi Ignitech.',
+                                    style: AppTextStyles.bodySmall.copyWith(
+                                      color: AppColors.textSecondary,
+                                    ),
+                                  ),
+                                ],
                               ),
                             ],
                           ),

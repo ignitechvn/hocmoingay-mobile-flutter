@@ -315,3 +315,99 @@ class ErrorResponseDto {
     if (statusCode != null) 'statusCode': statusCode,
   };
 }
+
+// Update Teacher User DTO
+class UpdateTeacherUserDto {
+  final String? fullName;
+  final String? avatar;
+  final String? address;
+  final String? gender;
+  final String? email;
+
+  const UpdateTeacherUserDto({
+    this.fullName,
+    this.avatar,
+    this.address,
+    this.gender,
+    this.email,
+  });
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = {};
+    if (fullName != null) data['fullName'] = fullName;
+    if (avatar != null) data['avatar'] = avatar;
+    if (address != null) data['address'] = address;
+    if (gender != null) data['gender'] = gender;
+    if (email != null) data['email'] = email;
+    return data;
+  }
+}
+
+// Update Student User DTO
+class UpdateStudentUserDto {
+  final String? fullName;
+  final String? avatar;
+  final String? grade;
+  final String? address;
+  final String? gender;
+  final String? email;
+
+  const UpdateStudentUserDto({
+    this.fullName,
+    this.avatar,
+    this.grade,
+    this.address,
+    this.gender,
+    this.email,
+  });
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = {};
+    if (fullName != null) data['fullName'] = fullName;
+    if (avatar != null) data['avatar'] = avatar;
+    if (grade != null) data['grade'] = grade;
+    if (address != null) data['address'] = address;
+    if (gender != null) data['gender'] = gender;
+    if (email != null) data['email'] = email;
+    return data;
+  }
+}
+
+// Student User Info Response DTO
+class StudentUserInfoResponseDto {
+  final String id;
+  final String fullName;
+  final String? avatar;
+  final String phone;
+  final String address;
+  final String grade;
+  final String? gender;
+  final String? email;
+  final String role;
+
+  const StudentUserInfoResponseDto({
+    required this.id,
+    required this.fullName,
+    this.avatar,
+    required this.phone,
+    required this.address,
+    required this.grade,
+    this.gender,
+    this.email,
+    required this.role,
+  });
+
+  factory StudentUserInfoResponseDto.fromJson(Map<String, dynamic> json) {
+    return StudentUserInfoResponseDto(
+      id: json['id'] ?? '',
+      fullName: json['fullName'] ?? '',
+      avatar: json['avatar'],
+      phone: json['phone'] ?? '',
+      address: json['address'] ?? '',
+      grade: json['grade'] ?? '',
+      gender: json['gender'],
+      email: json['email'],
+      role: json['role'] ?? '',
+    );
+  }
+}

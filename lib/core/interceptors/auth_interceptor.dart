@@ -30,6 +30,9 @@ class AuthInterceptor extends Interceptor {
     );
     if (accessToken != null) {
       options.headers['Authorization'] = 'Bearer $accessToken';
+      print('🔍 AuthInterceptor: Added Authorization header for ${options.path}');
+    } else {
+      print('⚠️ AuthInterceptor: No access token found for ${options.path}');
     }
 
     return handler.next(options);
@@ -169,6 +172,7 @@ class AuthInterceptor extends Interceptor {
       '/auth/verify-otp',
       '/auth/reset-password',
       '/auth/refresh',
+      // Note: /auth/logout is NOT in skip list, so it will send token
     ];
 
     return skipPaths.any((skipPath) => path.contains(skipPath));

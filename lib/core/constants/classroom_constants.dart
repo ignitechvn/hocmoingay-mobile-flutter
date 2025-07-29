@@ -28,9 +28,9 @@ class ClassroomStatusBackgroundColor {
 class ClassroomStatusFilterBarColor {
   static const Map<ClassroomStatus, String> colors = {
     ClassroomStatus.enrolling: "#2196F3", // Blue - darker version of #ECF4FE
-    ClassroomStatus.ongoing: "#4CAF50",   // Green - darker version of #E2F7F0
-    ClassroomStatus.finished: "#F44336",  // Red - darker version of #FDE9E9
-    ClassroomStatus.canceled: "#F44336",  // Red - darker version of #FDE9E9
+    ClassroomStatus.ongoing: "#4CAF50", // Green - darker version of #E2F7F0
+    ClassroomStatus.finished: "#F44336", // Red - darker version of #FDE9E9
+    ClassroomStatus.canceled: "#F44336", // Red - darker version of #FDE9E9
   };
 }
 

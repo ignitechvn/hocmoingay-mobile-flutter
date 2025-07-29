@@ -70,9 +70,8 @@ class _TeacherClassroomDetailsScreenState
                 classroomDetailsAsync.whenData((classroom) {
                   Navigator.of(context).push(
                     MaterialPageRoute(
-                      builder:
-                          (context) =>
-                              CreateClassroomScreen(classroom: classroom),
+                      builder: (context) =>
+                          CreateClassroomScreen(classroom: classroom),
                     ),
                   );
                 });
@@ -124,15 +123,12 @@ class _TeacherClassroomDetailsScreenState
       body: classroomDetailsAsync.when(
         data: (classroomDetails) => _buildContent(context, classroomDetails),
         loading: () => const Center(child: CircularProgressIndicator()),
-        error:
-            (error, stack) => EmptyStateWidgets.error(
-              message: 'Có lỗi xảy ra\n${error.toString()}',
-              onRetry:
-                  () => ref.refresh(
-                    teacherClassroomDetailsProvider(widget.classroomId),
-                  ),
-              icon: Icons.error_outline,
-            ),
+        error: (error, stack) => EmptyStateWidgets.error(
+          message: 'Có lỗi xảy ra\n${error.toString()}',
+          onRetry: () =>
+              ref.refresh(teacherClassroomDetailsProvider(widget.classroomId)),
+          icon: Icons.error_outline,
+        ),
       ),
     );
   }
@@ -510,11 +506,10 @@ class _TeacherClassroomDetailsScreenState
                 onPressed: () {
                   Navigator.of(context).push(
                     MaterialPageRoute(
-                      builder:
-                          (context) => ReportsScreen(
-                            classroomId: classroom.id,
-                            classroomName: classroom.name,
-                          ),
+                      builder: (context) => ReportsScreen(
+                        classroomId: classroom.id,
+                        classroomName: classroom.name,
+                      ),
                     ),
                   );
                 },
@@ -548,25 +543,24 @@ class _TeacherClassroomDetailsScreenState
         case 'Chủ đề':
           Navigator.of(context).push(
             MaterialPageRoute(
-              builder:
-                  (context) => TeacherChaptersScreen(classroomId: classroom.id),
+              builder: (context) =>
+                  TeacherChaptersScreen(classroomId: classroom.id),
             ),
           );
           break;
         case 'Bài tập':
           Navigator.of(context).push(
             MaterialPageRoute(
-              builder:
-                  (context) =>
-                      TeacherPracticeSetsScreen(classroomId: classroom.id),
+              builder: (context) =>
+                  TeacherPracticeSetsScreen(classroomId: classroom.id),
             ),
           );
           break;
         case 'Bài kiểm tra':
           Navigator.of(context).push(
             MaterialPageRoute(
-              builder:
-                  (context) => TeacherExamsScreen(classroomId: classroom.id),
+              builder: (context) =>
+                  TeacherExamsScreen(classroomId: classroom.id),
             ),
           );
           break;
@@ -586,18 +580,29 @@ class _TeacherClassroomDetailsScreenState
   }
 
   Color _getStatusColor(String status) {
+    // Convert string status to ClassroomStatus enum
+    ClassroomStatus statusEnum;
     switch (status) {
       case 'ENROLLING':
-        return AppColors.warning;
+        statusEnum = ClassroomStatus.enrolling;
+        break;
       case 'ONGOING':
-        return AppColors.success;
+        statusEnum = ClassroomStatus.ongoing;
+        break;
       case 'FINISHED':
-        return AppColors.info;
+        statusEnum = ClassroomStatus.finished;
+        break;
       case 'CANCELED':
-        return AppColors.error;
+        statusEnum = ClassroomStatus.canceled;
+        break;
       default:
-        return AppColors.grey300;
+        statusEnum = ClassroomStatus.enrolling;
     }
+
+    // Get the darker color for this status (same as TeacherStatusFilterBar)
+    final statusColor =
+        ClassroomStatusFilterBarColor.colors[statusEnum] ?? "#2196F3";
+    return Color(int.parse(statusColor.replaceAll('#', '0xFF')));
   }
 
   String _formatDate(String dateString) {

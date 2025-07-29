@@ -42,8 +42,10 @@ class AuthState {
 
 // Auth State Notifier
 class AuthStateNotifier extends StateNotifier<AuthState> {
-  AuthStateNotifier(this._authApi) : super(const AuthState());
+  AuthStateNotifier(this._authApi, this._authenticatedAuthApi)
+    : super(const AuthState());
   final AuthApi _authApi;
+  final AuthApi _authenticatedAuthApi;
 
   // Check if user is already logged in (from local storage)
   Future<void> checkAuthStatus() async {
@@ -65,13 +67,12 @@ class AuthStateNotifier extends StateNotifier<AuthState> {
               (Role r) => r.value == userData['role'],
               orElse: () => Role.student,
             ),
-            grade:
-                userData['grade'] != null
-                    ? EGradeLevel.values.firstWhere(
-                      (g) => g.value == userData['grade'],
-                      orElse: () => EGradeLevel.GRADE_9,
-                    )
-                    : null,
+            grade: userData['grade'] != null
+                ? EGradeLevel.values.firstWhere(
+                    (g) => g.value == userData['grade'],
+                    orElse: () => EGradeLevel.GRADE_9,
+                  )
+                : null,
             gender: Gender.values.firstWhere(
               (g) => g.value == userData['gender'],
               orElse: () => Gender.male,
@@ -164,18 +165,32 @@ class AuthStateNotifier extends StateNotifier<AuthState> {
     state = state.copyWith(status: AuthStatus.loading);
 
     try {
-      // Call logout API
-      await _authApi.logout();
+      // Call logout API with authenticated client
+      await _authenticatedAuthApi.logout();
 
       // Clear all tokens and user data
       await TokenManager.clearTokens();
 
       state = const AuthState(status: AuthStatus.unauthenticated);
     } catch (e) {
-      state = state.copyWith(
-        status: AuthStatus.error,
-        error: 'Logout failed: ${e.toString()}',
-      );
+      // Handle 401 error - this is expected when token is expired/invalid
+      if (e.toString().contains('401') ||
+          e.toString().contains('unauthorized')) {
+        print(
+          'ℹ️ Logout: Token expired/invalid (401) - proceeding with local cleanup',
+        );
+
+        // Still clear local data even if API call fails
+        await TokenManager.clearTokens();
+        state = const AuthState(status: AuthStatus.unauthenticated);
+      } else {
+        // Handle other errors
+        print('❌ Logout failed: $e');
+        state = state.copyWith(
+          status: AuthStatus.error,
+          error: 'Logout failed: ${e.toString()}',
+        );
+      }
     }
   }
 
@@ -212,5 +227,6 @@ final authStateProvider = StateNotifierProvider<AuthStateNotifier, AuthState>((
   ref,
 ) {
   final authApi = ref.watch(authApiProvider);
-  return AuthStateNotifier(authApi);
+  final authenticatedAuthApi = ref.watch(authenticatedAuthApiProvider);
+  return AuthStateNotifier(authApi, authenticatedAuthApi);
 });

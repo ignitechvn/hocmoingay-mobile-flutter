@@ -4,12 +4,12 @@ import 'package:intl/intl.dart';
 
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_text_styles.dart';
+import '../../../core/widgets/empty_state_widget.dart';
 import '../../../domain/entities/classroom.dart';
 import '../student/schedule/widgets/week_selector.dart';
 import 'widgets/common_schedule_event_card.dart';
 
 class CommonScheduleScreen extends ConsumerStatefulWidget {
-
   const CommonScheduleScreen({
     super.key,
     required this.classrooms,
@@ -44,79 +44,83 @@ class _CommonScheduleScreenState extends ConsumerState<CommonScheduleScreen> {
 
   @override
   Widget build(BuildContext context) => Scaffold(
-      backgroundColor: AppColors.grey50,
-      appBar: AppBar(
-        title: Text(
-          widget.title,
-          style: AppTextStyles.headlineSmall.copyWith(
-            color: AppColors.textPrimary,
-            fontWeight: FontWeight.bold,
+    backgroundColor: AppColors.grey50,
+    appBar: AppBar(
+      title: Text(
+        widget.title,
+        style: AppTextStyles.headlineSmall.copyWith(
+          color: AppColors.textPrimary,
+          fontWeight: FontWeight.bold,
+        ),
+      ),
+      backgroundColor: Colors.transparent,
+      elevation: 0,
+    ),
+    body: Column(
+      children: [
+        // Date Header
+        Container(
+          padding: const EdgeInsets.all(16),
+          child: Row(
+            children: [
+              Text(
+                _getFormattedDate(),
+                style: AppTextStyles.headlineSmall.copyWith(
+                  color: AppColors.textPrimary,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ],
           ),
         ),
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-      ),
-      body: Column(
-        children: [
-          // Date Header
-          Container(
-            padding: const EdgeInsets.all(16),
-            child: Row(
-              children: [
-                Text(
-                  _getFormattedDate(),
-                  style: AppTextStyles.headlineSmall.copyWith(
-                    color: AppColors.textPrimary,
-                    fontWeight: FontWeight.bold,
-                  ),
+
+        // Week Selector
+        WeekSelector(
+          weekStart: _weekStart,
+          selectedDate: _selectedDate,
+          onDateSelected: (date) {
+            setState(() {
+              _selectedDate = date;
+              _calculateWeekRange();
+            });
+          },
+        ),
+
+        // Schedule Timeline
+        Expanded(
+          child: Container(
+            margin: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(16),
+              boxShadow: const [
+                BoxShadow(
+                  color: AppColors.shadowLight,
+                  blurRadius: 8,
+                  offset: Offset(0, 2),
                 ),
               ],
             ),
+            child: _buildScheduleTimeline(),
           ),
-
-          // Week Selector
-          WeekSelector(
-            weekStart: _weekStart,
-            selectedDate: _selectedDate,
-            onDateSelected: (date) {
-              setState(() {
-                _selectedDate = date;
-                _calculateWeekRange();
-              });
-            },
-          ),
-
-          // Schedule Timeline
-          Expanded(
-            child: Container(
-              margin: const EdgeInsets.all(16),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(16),
-                boxShadow: const [
-                  BoxShadow(
-                    color: AppColors.shadowLight,
-                    blurRadius: 8,
-                    offset: Offset(0, 2),
-                  ),
-                ],
-              ),
-              child: _buildScheduleTimeline(),
-            ),
-          ),
-        ],
-      ),
-    );
+        ),
+      ],
+    ),
+  );
 
   Widget _buildScheduleTimeline() {
     // Filter classrooms that are active in current week
-    final weekClassrooms =
-        widget.classrooms.where((Classroom classroom) => classroom.startDate.isBefore(
+    final weekClassrooms = widget.classrooms
+        .where(
+          (Classroom classroom) =>
+              classroom.startDate.isBefore(
                 _weekEnd.add(const Duration(days: 1)),
               ) &&
               classroom.endDate.isAfter(
                 _weekStart.subtract(const Duration(days: 1)),
-              )).toList();
+              ),
+        )
+        .toList();
 
     // Group classrooms by day and time
     final scheduleMap = <int, List<Classroom>>{};
@@ -149,87 +153,143 @@ class _CommonScheduleScreenState extends ConsumerState<CommonScheduleScreen> {
   }
 
   List<Widget> _buildTimelineRows(Map<int, List<Classroom>> scheduleMap) {
-    // Define time slots based on actual API data
-    final timeSlots = [
-      {'start': '12:00', 'end': '15:00'}, // Thứ 3: Lớp toán 12 ca tối
-      {'start': '15:00', 'end': '17:00'}, // Thứ 4: Lớp toán 12 ca chiều
-      {'start': '17:00', 'end': '22:00'}, // Thứ 5: Lớp học tiếng Anh lớp 8
-    ];
+    // Get the selected day of week (1 = Monday, 7 = Sunday)
+    final selectedDayOfWeek = _selectedDate.weekday;
+
+    // Extract unique time slots only for the selected day
+    final Set<String> uniqueTimeSlots = {};
+
+    // Only get classrooms for the selected day
+    final classroomsForDay = scheduleMap[selectedDayOfWeek] ?? [];
+
+    for (final classroom in classroomsForDay) {
+      for (final schedule in classroom.schedule) {
+        // Only include schedules for the selected day
+        if (schedule.dayOfWeek == selectedDayOfWeek) {
+          // Convert API time format (HH:mm:ss) to slot format (HH:mm)
+          final startTime = schedule.startTime.substring(0, 5);
+          final endTime = schedule.endTime.substring(0, 5);
+          uniqueTimeSlots.add('$startTime-$endTime');
+        }
+      }
+    }
+
+    // Convert to list and sort by start time
+    final timeSlots = uniqueTimeSlots.map((timeSlot) {
+      final parts = timeSlot.split('-');
+      return {'start': parts[0], 'end': parts[1]};
+    }).toList();
+
+    // Sort time slots by start time
+    timeSlots.sort((a, b) => a['start']!.compareTo(b['start']!));
 
     // Debug: Print time slots
     print(
-      '⏰ Time slots: ${timeSlots.map((slot) => '${slot['start']}-${slot['end']}').join(', ')}',
+      '⏰ Time slots for ${_selectedDate.weekday == 1
+          ? 'Monday'
+          : _selectedDate.weekday == 2
+          ? 'Tuesday'
+          : _selectedDate.weekday == 3
+          ? 'Wednesday'
+          : _selectedDate.weekday == 4
+          ? 'Thursday'
+          : _selectedDate.weekday == 5
+          ? 'Friday'
+          : _selectedDate.weekday == 6
+          ? 'Saturday'
+          : 'Sunday'}: ${timeSlots.map((slot) => '${slot['start']}-${slot['end']}').join(', ')}',
     );
 
-    return timeSlots.map((slot) => Container(
-        margin: const EdgeInsets.only(top: 24),
-        child: Row(
-          children: [
-            // Time column
-            SizedBox(
-              width: 60,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    slot['start']!,
-                    style: AppTextStyles.bodyMedium.copyWith(
-                      color: AppColors.textSecondary,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                  Text(
-                    slot['end']!,
-                    style: AppTextStyles.bodySmall.copyWith(
-                      color: AppColors.textSecondary,
-                    ),
-                  ),
-                ],
-              ),
-            ),
+    if (timeSlots.isEmpty) {
+      return [
+        Container(
+          padding: const EdgeInsets.all(32),
+          child: EmptyStateWidget(
+            message: 'Không có lịch học nào trong ngày này',
+          ),
+        ),
+      ];
+    }
 
-            // Timeline marker
-            Container(
-              width: 20,
-              child: Stack(
-                children: [
-                  Container(width: 2, height: 100, color: AppColors.grey300),
-                  Positioned(
-                    top: 0,
-                    left: 6,
-                    child: Container(
-                      width: 8,
-                      height: 8,
-                      decoration: BoxDecoration(
-                        color:
-                            _hasClassInTimeSlot(scheduleMap, slot)
+    return timeSlots
+        .map(
+          (slot) => Container(
+            margin: const EdgeInsets.only(top: 24),
+            child: Row(
+              children: [
+                // Time column
+                SizedBox(
+                  width: 60,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        slot['start']!,
+                        style: AppTextStyles.bodyMedium.copyWith(
+                          color: AppColors.textSecondary,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                      Text(
+                        slot['end']!,
+                        style: AppTextStyles.bodySmall.copyWith(
+                          color: AppColors.textSecondary,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+
+                // Timeline marker
+                Container(
+                  width: 20,
+                  child: Stack(
+                    children: [
+                      Container(
+                        width: 2,
+                        height: 100,
+                        color: AppColors.grey300,
+                      ),
+                      Positioned(
+                        top: 0,
+                        left: 6,
+                        child: Container(
+                          width: 8,
+                          height: 8,
+                          decoration: BoxDecoration(
+                            color: _hasClassInTimeSlot(scheduleMap, slot)
                                 ? AppColors.primary
                                 : AppColors.grey300,
-                        shape: BoxShape.circle,
+                            shape: BoxShape.circle,
+                          ),
+                        ),
                       ),
-                    ),
+                    ],
                   ),
-                ],
-              ),
-            ),
+                ),
 
-            // Schedule content (full width)
-            Expanded(child: _buildScheduleContent(scheduleMap, slot)),
-          ],
-        ),
-      )).toList();
+                // Schedule content (full width)
+                Expanded(child: _buildScheduleContent(scheduleMap, slot)),
+              ],
+            ),
+          ),
+        )
+        .toList();
   }
 
   bool _hasClassInTimeSlot(
     Map<int, List<Classroom>> scheduleMap,
     Map<String, String> slot,
   ) {
-    for (final day in scheduleMap.keys) {
-      final classrooms = scheduleMap[day]!;
-      for (final classroom in classrooms) {
-        if (_isClassInTimeSlot(classroom, slot)) {
-          return true;
-        }
+    // Get the selected day of week (1 = Monday, 7 = Sunday)
+    final selectedDayOfWeek = _selectedDate.weekday;
+
+    // Only check classrooms for the selected day
+    final classroomsForDay = scheduleMap[selectedDayOfWeek] ?? [];
+
+    for (final classroom in classroomsForDay) {
+      if (_isClassInTimeSlot(classroom, slot)) {
+        return true;
       }
     }
     return false;

@@ -7,6 +7,7 @@ class User {
   final String phone;
   final String address;
   final String? email;
+  final String? avatar;
   final Role role;
   final EGradeLevel? grade;
   final Gender gender;
@@ -17,6 +18,7 @@ class User {
     required this.phone,
     required this.address,
     this.email,
+    this.avatar,
     required this.role,
     this.grade,
     required this.gender,

@@ -9,9 +9,15 @@ final baseApiServiceProvider = Provider<BaseApiService>((ref) {
   return BaseApiService();
 });
 
-// Auth API Provider
+// Auth API Provider (without auth for login/register)
 final authApiProvider = Provider<AuthApi>((ref) {
   final baseApiService = ref.watch(baseApiServiceProvider);
+  return AuthApi(baseApiService);
+});
+
+// Auth API Provider (with auth for logout)
+final authenticatedAuthApiProvider = Provider<AuthApi>((ref) {
+  final baseApiService = ref.watch(authenticatedBaseApiServiceProvider);
   return AuthApi(baseApiService);
 });
 

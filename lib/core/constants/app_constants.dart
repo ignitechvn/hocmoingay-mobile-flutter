@@ -117,10 +117,11 @@ enum Role {
   final String displayName;
 
   static Role fromString(String value) => Role.values.firstWhere(
-      (Role role) => role.value == value,
-      orElse: () => Role.student,
-    );
+    (Role role) => role.value == value,
+    orElse: () => Role.student,
+  );
 }
+
 // Gender Enum
 enum Gender {
   male('male', 'Nam'),
@@ -132,9 +133,9 @@ enum Gender {
   final String label;
 
   static Gender fromString(String value) => Gender.values.firstWhere(
-      (Gender gender) => gender.value == value,
-      orElse: () => Gender.male,
-    );
+    (Gender gender) => gender.value == value,
+    orElse: () => Gender.male,
+  );
 }
 
 // Classroom Status Enum
@@ -148,10 +149,11 @@ enum ClassroomStatus {
   final String value;
   final String label;
 
-  static ClassroomStatus fromString(String value) => ClassroomStatus.values.firstWhere(
-      (ClassroomStatus status) => status.value == value,
-      orElse: () => ClassroomStatus.enrolling,
-    );
+  static ClassroomStatus fromString(String value) =>
+      ClassroomStatus.values.firstWhere(
+        (ClassroomStatus status) => status.value == value,
+        orElse: () => ClassroomStatus.enrolling,
+      );
 }
 
 // Classroom Student Status Enum
@@ -166,8 +168,38 @@ enum ClassroomStudentStatus {
   final String value;
   final String label;
 
-  static ClassroomStudentStatus fromString(String value) => ClassroomStudentStatus.values.firstWhere(
-      (ClassroomStudentStatus status) => status.value == value,
-      orElse: () => ClassroomStudentStatus.waitingTeacherConfirm,
-    );
+  static ClassroomStudentStatus fromString(String value) =>
+      ClassroomStudentStatus.values.firstWhere(
+        (ClassroomStudentStatus status) => status.value == value,
+        orElse: () => ClassroomStudentStatus.waitingTeacherConfirm,
+      );
+}
+
+// Degree enum
+enum Degree { bachelor, master, phd }
+
+// Degree labels
+const Map<Degree, String> degreeLabels = {
+  Degree.bachelor: 'Cử nhân',
+  Degree.master: 'Thạc sĩ',
+  Degree.phd: 'Tiến sĩ',
+};
+
+// Helper function to get degree label
+String getDegreeLabel(String? degreeValue) {
+  if (degreeValue == null) return '';
+
+  switch (degreeValue.toLowerCase()) {
+    case 'bachelor':
+    case 'cử nhân':
+      return degreeLabels[Degree.bachelor]!;
+    case 'master':
+    case 'thạc sĩ':
+      return degreeLabels[Degree.master]!;
+    case 'phd':
+    case 'tiến sĩ':
+      return degreeLabels[Degree.phd]!;
+    default:
+      return degreeValue; // Return original value if not found
+  }
 }

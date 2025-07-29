@@ -136,19 +136,73 @@ class MultipleChoiceQuestionWidget extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: question.contentBlocks.map((block) {
-        if (block is Map<String, dynamic> && block['type'] == 'text') {
-          String content = block['content'] as String? ?? '';
-          final equations = block['equations'] as List<dynamic>?;
+        if (block is Map<String, dynamic>) {
+          final type = block['type'] as String? ?? '';
 
-          content = _processQuestionContent(content, equations);
+          if (type == 'text') {
+            String content = block['content'] as String? ?? '';
+            final equations = block['equations'] as List<dynamic>?;
 
-          return RichMathContent(
-            content: content,
-            equations: equations?.cast<Map<String, dynamic>>(),
-            fontSize: AppTextStyles.bodyLarge.fontSize,
-            color: AppColors.textPrimary,
-            fontWeight: FontWeight.w500, // Thêm bold để đồng nhất
-          );
+            content = _processQuestionContent(content, equations);
+
+            return RichMathContent(
+              content: content,
+              equations: equations?.cast<Map<String, dynamic>>(),
+              fontSize: AppTextStyles.bodyLarge.fontSize,
+              color: AppColors.textPrimary,
+              fontWeight: FontWeight.w500, // Thêm bold để đồng nhất
+            );
+          } else if (type == 'image') {
+            final imageUrl = block['url'] as String? ?? '';
+            if (imageUrl.isNotEmpty) {
+              return Container(
+                margin: const EdgeInsets.symmetric(
+                  vertical: AppDimensions.paddingM,
+                ),
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(8),
+                  child: Image.network(
+                    imageUrl,
+                    fit: BoxFit.contain,
+                    loadingBuilder: (context, child, loadingProgress) {
+                      if (loadingProgress == null) return child;
+                      return Container(
+                        height: 200,
+                        decoration: BoxDecoration(
+                          color: Colors.grey.withOpacity(0.1),
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        child: Center(
+                          child: CircularProgressIndicator(
+                            value: loadingProgress.expectedTotalBytes != null
+                                ? loadingProgress.cumulativeBytesLoaded /
+                                      loadingProgress.expectedTotalBytes!
+                                : null,
+                          ),
+                        ),
+                      );
+                    },
+                    errorBuilder: (context, error, stackTrace) {
+                      return Container(
+                        height: 200,
+                        decoration: BoxDecoration(
+                          color: Colors.grey.withOpacity(0.1),
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        child: const Center(
+                          child: Icon(
+                            Icons.error_outline,
+                            color: Colors.grey,
+                            size: 48,
+                          ),
+                        ),
+                      );
+                    },
+                  ),
+                ),
+              );
+            }
+          }
         }
         return const SizedBox.shrink();
       }).toList(),
@@ -241,19 +295,73 @@ class FillInBlankQuestionWidget extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: question.contentBlocks.map((block) {
-        if (block is Map<String, dynamic> && block['type'] == 'text') {
-          String content = block['content'] as String? ?? '';
-          final equations = block['equations'] as List<dynamic>?;
+        if (block is Map<String, dynamic>) {
+          final type = block['type'] as String? ?? '';
 
-          content = _processQuestionContent(content, equations);
+          if (type == 'text') {
+            String content = block['content'] as String? ?? '';
+            final equations = block['equations'] as List<dynamic>?;
 
-          return Text(
-            content,
-            style: AppTextStyles.bodyLarge.copyWith(
-              color: AppColors.textPrimary,
-              fontWeight: FontWeight.w500,
-            ),
-          );
+            content = _processQuestionContent(content, equations);
+
+            return Text(
+              content,
+              style: AppTextStyles.bodyLarge.copyWith(
+                color: AppColors.textPrimary,
+                fontWeight: FontWeight.w500,
+              ),
+            );
+          } else if (type == 'image') {
+            final imageUrl = block['url'] as String? ?? '';
+            if (imageUrl.isNotEmpty) {
+              return Container(
+                margin: const EdgeInsets.symmetric(
+                  vertical: AppDimensions.paddingM,
+                ),
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(8),
+                  child: Image.network(
+                    imageUrl,
+                    fit: BoxFit.contain,
+                    loadingBuilder: (context, child, loadingProgress) {
+                      if (loadingProgress == null) return child;
+                      return Container(
+                        height: 200,
+                        decoration: BoxDecoration(
+                          color: Colors.grey.withOpacity(0.1),
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        child: Center(
+                          child: CircularProgressIndicator(
+                            value: loadingProgress.expectedTotalBytes != null
+                                ? loadingProgress.cumulativeBytesLoaded /
+                                      loadingProgress.expectedTotalBytes!
+                                : null,
+                          ),
+                        ),
+                      );
+                    },
+                    errorBuilder: (context, error, stackTrace) {
+                      return Container(
+                        height: 200,
+                        decoration: BoxDecoration(
+                          color: Colors.grey.withOpacity(0.1),
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        child: const Center(
+                          child: Icon(
+                            Icons.error_outline,
+                            color: Colors.grey,
+                            size: 48,
+                          ),
+                        ),
+                      );
+                    },
+                  ),
+                ),
+              );
+            }
+          }
         }
         return const SizedBox.shrink();
       }).toList(),
@@ -424,19 +532,73 @@ class ClozeTestQuestionWidget extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: question.contentBlocks.map((block) {
-        if (block is Map<String, dynamic> && block['type'] == 'text') {
-          String content = block['content'] as String? ?? '';
-          final equations = block['equations'] as List<dynamic>?;
+        if (block is Map<String, dynamic>) {
+          final type = block['type'] as String? ?? '';
 
-          content = _processQuestionContent(content, equations);
+          if (type == 'text') {
+            String content = block['content'] as String? ?? '';
+            final equations = block['equations'] as List<dynamic>?;
 
-          return Text(
-            content,
-            style: AppTextStyles.bodyLarge.copyWith(
-              color: AppColors.textPrimary,
-              fontWeight: FontWeight.w500,
-            ),
-          );
+            content = _processQuestionContent(content, equations);
+
+            return Text(
+              content,
+              style: AppTextStyles.bodyLarge.copyWith(
+                color: AppColors.textPrimary,
+                fontWeight: FontWeight.w500,
+              ),
+            );
+          } else if (type == 'image') {
+            final imageUrl = block['url'] as String? ?? '';
+            if (imageUrl.isNotEmpty) {
+              return Container(
+                margin: const EdgeInsets.symmetric(
+                  vertical: AppDimensions.paddingM,
+                ),
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(8),
+                  child: Image.network(
+                    imageUrl,
+                    fit: BoxFit.contain,
+                    loadingBuilder: (context, child, loadingProgress) {
+                      if (loadingProgress == null) return child;
+                      return Container(
+                        height: 200,
+                        decoration: BoxDecoration(
+                          color: Colors.grey.withOpacity(0.1),
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        child: Center(
+                          child: CircularProgressIndicator(
+                            value: loadingProgress.expectedTotalBytes != null
+                                ? loadingProgress.cumulativeBytesLoaded /
+                                      loadingProgress.expectedTotalBytes!
+                                : null,
+                          ),
+                        ),
+                      );
+                    },
+                    errorBuilder: (context, error, stackTrace) {
+                      return Container(
+                        height: 200,
+                        decoration: BoxDecoration(
+                          color: Colors.grey.withOpacity(0.1),
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        child: const Center(
+                          child: Icon(
+                            Icons.error_outline,
+                            color: Colors.grey,
+                            size: 48,
+                          ),
+                        ),
+                      );
+                    },
+                  ),
+                ),
+              );
+            }
+          }
         }
         return const SizedBox.shrink();
       }).toList(),
@@ -526,19 +688,73 @@ class SentenceRewritingQuestionWidget extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: question.contentBlocks.map((block) {
-        if (block is Map<String, dynamic> && block['type'] == 'text') {
-          String content = block['content'] as String? ?? '';
-          final equations = block['equations'] as List<dynamic>?;
+        if (block is Map<String, dynamic>) {
+          final type = block['type'] as String? ?? '';
 
-          content = _processQuestionContent(content, equations);
+          if (type == 'text') {
+            String content = block['content'] as String? ?? '';
+            final equations = block['equations'] as List<dynamic>?;
 
-          return Text(
-            content,
-            style: AppTextStyles.bodyLarge.copyWith(
-              color: AppColors.textPrimary,
-              fontWeight: FontWeight.w500,
-            ),
-          );
+            content = _processQuestionContent(content, equations);
+
+            return Text(
+              content,
+              style: AppTextStyles.bodyLarge.copyWith(
+                color: AppColors.textPrimary,
+                fontWeight: FontWeight.w500,
+              ),
+            );
+          } else if (type == 'image') {
+            final imageUrl = block['url'] as String? ?? '';
+            if (imageUrl.isNotEmpty) {
+              return Container(
+                margin: const EdgeInsets.symmetric(
+                  vertical: AppDimensions.paddingM,
+                ),
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(8),
+                  child: Image.network(
+                    imageUrl,
+                    fit: BoxFit.contain,
+                    loadingBuilder: (context, child, loadingProgress) {
+                      if (loadingProgress == null) return child;
+                      return Container(
+                        height: 200,
+                        decoration: BoxDecoration(
+                          color: Colors.grey.withOpacity(0.1),
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        child: Center(
+                          child: CircularProgressIndicator(
+                            value: loadingProgress.expectedTotalBytes != null
+                                ? loadingProgress.cumulativeBytesLoaded /
+                                      loadingProgress.expectedTotalBytes!
+                                : null,
+                          ),
+                        ),
+                      );
+                    },
+                    errorBuilder: (context, error, stackTrace) {
+                      return Container(
+                        height: 200,
+                        decoration: BoxDecoration(
+                          color: Colors.grey.withOpacity(0.1),
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        child: const Center(
+                          child: Icon(
+                            Icons.error_outline,
+                            color: Colors.grey,
+                            size: 48,
+                          ),
+                        ),
+                      );
+                    },
+                  ),
+                ),
+              );
+            }
+          }
         }
         return const SizedBox.shrink();
       }).toList(),
